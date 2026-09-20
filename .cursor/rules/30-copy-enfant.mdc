@@ -1,6 +1,6 @@
 ---
 description: Règles de rédaction des textes destinés à l'enfant et des prompts IA
-globs: ["content/**", "src/components/gwenn/**", "src/lib/ai/prompts/**"]
+globs: ["content/**", "src/app/enfant/**", "src/components/enfant/**", "src/components/pilou/**", "src/lib/ai/prompts/**"]
 ---
 
 # Rédaction pour un CE1

@@ -173,7 +173,10 @@ BEGIN
   END IF;
 END $$;
 
--- Barème de 3.7 : +1 par étape, +1 bonus. Aucun crédit ne dépasse 1.
+-- Barème : +1 par étape terminée, +1 quand toutes les étapes programmées du
+-- soir le sont (ARB-08, qui remplace le « 2 étapes » en dur de la section 3.7
+-- parce qu'une étape vide n'est plus jamais programmée). Dans les deux cas le
+-- crédit unitaire vaut 1 : aucun crédit ne dépasse 1.
 DO $$
 BEGIN
   IF NOT EXISTS (

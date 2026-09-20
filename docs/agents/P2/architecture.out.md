@@ -70,6 +70,20 @@ ARB-11**, que ce document cite désormais par leur numéro.
 | **Glob `30-copy-enfant.mdc`** (sans numéro à ce jour) | Glob complet proposé en 18, `gwenn` supprimé. Je ne modifie pas le fichier de règles : ce n'est pas un de mes quatre livrables |
 | **ARB-10 — `ui-enfant.json` / `ui-parent.json`** | Affectés à **`contenu-enfant`, contrôlés par `controle-produit`, avant G3**, et non à `dev-feature`. Écrit en 14 |
 
+## 0.4 Reprise après ARB-12
+
+ARB-12 tranche les deux points que j'avais laissés ouverts à la fin du tour 2.
+
+| Point | Décision de l'Orchestrateur | Ce que j'ai fait |
+| --- | --- | --- |
+| **ARB-12.1 — les six clés `lecture.vide.*` / `maths.vide.*`** | Retirées, **à condition** qu'aucun des cinq états limites n'y perde sa couverture. « Je préfère une clé en trop à un état limite sans écran » | **Vérification menée état par état, section 10.3.** Les cinq états gardent chacun une couverture propre : aucune des six clés n'est porteuse. **Les six partent.** J'y ajoute deux points d'exécution que la vérification a fait apparaître : le retrait touche aussi `content/encouragements.json` (deux entrées de `cles_fixes_non_variees`), et une **condition** du résumé parent doit être élargie — sans ajouter le moindre texte |
+| **ARB-12.2 — le barème** | La ligne de `TRACEABILITY.md` doit citer ARB-08 et expliquer l'écart en une phrase. Idem partout où le livrable touche au barème | **Formulation canonique unique, écrite en 9.5**, reprise dans les **quatre** endroits qui énoncent le barème : section 9.5, commentaire de `RaisonGem` dans `prisma/schema.prisma`, commentaire du `CHECK gem_ledger_delta_max_un` dans `supabase/policies.sql`, et **trois lignes de traçabilité prêtes à coller en 16.2** (ETH-04, TEC-11, SEC-06) |
+
+Rien d'autre n'a bougé : aucun chiffre, aucune route, aucune table, aucune
+variable. Les mesures du tour 2 restent valides telles quelles, et
+`prisma validate` est rejoué en 17.1 parce que le commentaire de `RaisonGem` a
+changé.
+
 ---
 
 ## Sommaire
@@ -984,13 +998,27 @@ programmées » est une notion qui ne dépend plus de la qualité du découpage 
 l'IA. Un enfant n'est jamais privé d'une pierre parce que le pipeline a mal
 fonctionné.
 
-**Ce que cela change et que je signale** : une soirée à une seule étape — Soir
-léger, ou une seule matière ce soir-là — rapporte désormais 2 pierres, comme une
-soirée à deux étapes. La section 3.7 du prompt maître écrit « +1 bonus si les 2
-étapes du soir sont terminées ». C'est donc un écart assumé à la lettre de 3.7,
-décidé par l'Orchestrateur, et cohérent avec PED-05, ETH-01 et la règle du
-marketing selon laquelle un Soir léger doit rester indétectable par l'enfant
-(ARB-06). À inscrire comme arbitrage dans `GATES.md` — voir section 18, point 2.
+**L'écart à la section 3.7, écrit ici dans sa forme canonique.** Tout endroit du
+projet qui énonce le barème reprend cette phrase, mot pour mot :
+
+> **+1 par étape terminée, +1 lorsque *toutes les étapes programmées* du soir
+> sont terminées (ARB-08).** La section 3.7 du prompt maître écrit « +1 bonus si
+> les 2 étapes du soir sont terminées » ; ARB-08 remplace ce « 2 » en dur par
+> « toutes les étapes programmées » parce qu'une étape vide n'est plus jamais
+> programmée, de sorte qu'un découpage incomplet de l'IA ne coûte aucune pierre
+> à un enfant qui n'en est pas responsable.
+
+Conséquence concrète, à ne jamais laisser implicite : **une soirée à une seule
+étape rapporte 2 pierres, comme une soirée à deux étapes.** C'est cohérent avec
+PED-05, ETH-01 et ARB-06, qui veut qu'un Soir léger reste indétectable par
+l'enfant — y compris dans son coffre.
+
+Les quatre endroits qui énoncent le barème citent désormais ARB-08 : cette
+section, le commentaire de l'énumération `RaisonGem` dans `prisma/schema.prisma`,
+le commentaire du `CHECK gem_ledger_delta_max_un` dans `supabase/policies.sql`,
+et les lignes de `TRACEABILITY.md` rédigées en 16.2. `src/config/pierres.config.ts`,
+écrit en V1, portera la même phrase en commentaire d'en-tête : c'est la seule
+table de barème du code.
 
 Jamais de pierre par bonne réponse (PED-05). Jamais de delta négatif (ETH-04,
 garanti par `CHECK`).
@@ -1074,6 +1102,58 @@ indisponibles (`maths.sans_indice`), transition non délivrée
 
 **Aucun état de cette section n'est une impasse** : chacun a au moins un bouton,
 et la seule impasse du tour 1 — la session de la veille — est fermée par T12.
+
+## 10.3 Les six clés rendues inatteignables par ARB-08 (ARB-12, point 1)
+
+ARB-08 supprime la transition `ETAPE_VIDE` : une étape sans exercice n'est plus
+jamais programmée, donc les six clés qui l'accompagnaient n'ont plus de
+déclencheur. Avant de conclure à leur retrait, l'Orchestrateur demande de
+vérifier qu'aucune d'elles ne servait de filet à un état limite sans que ce soit
+écrit. **J'ai mené la vérification état par état. Voici son résultat.**
+
+| État limite | Ce qui le couvre réellement | Une des six clés est-elle porteuse ? |
+| --- | --- | --- |
+| **Aucun devoir chargé ce soir** | Parent : `parent.scan.sans_devoir.bouton/.confirmation/.valider`, et `parent.apercu.vide.*` si l'analyse ne reconnaît rien. Enfant : `enfant.accueil.vide.titre/.corps/.bouton`, alimentées par les 20 variantes de la banque `pas_de_devoirs` | **Non.** C'est un état de **session** — zéro étape programmée, transition T3 — et non une étape vide. Les deux cas étaient déjà distincts avant ARB-08 : les clés ne se recouvrent en rien |
+| **OCR illisible** | Parent : `parent.scan.illisible.*` (4 clés) + saisie manuelle toujours ouverte. Enfant, s'il est déjà devant l'écran : `enfant.accueil.souci.*` + les 20 variantes de `photo_illisible` | **Non.** Une photo illisible n'a jamais produit d'étape : elle bloque en amont de la validation parent (TEC-06) |
+| **Blocage total sur un exercice** | `maths.blocage.corps/.corps_2` + boutons, `lecture.blocage.corps/.corps_2` + boutons, et les banques `blocage_maths` et `blocage_lecture` (20 variantes chacune). Repli maths : `maths.sans_indice.*` | **Non.** Le blocage suppose un exercice présent : c'est l'inverse d'une étape vide |
+| **Session interrompue et reprise le soir même** | `enfant.accueil.reprise.*` + banque `reprise_session`, puis `lecture.reprise.corps/.corps_2` et `maths.reprise.corps/.corps_2` | **Non.** Aucun rapport : la reprise rejoue une étape qui a du contenu |
+| **Session orpheline close automatiquement (T12)** | Enfant : accueil ordinaire, sans aucune mention de la veille (ETH-02). Parent : résumé, avec l'observation « La séance a été arrêtée avant la fin. Les pierres acquises sont conservées. » et `parent.resume.etape_passee` pour les étapes non faites | **Non** — mais avec une réserve, ci-dessous |
+
+**Conclusion : les six clés peuvent être retirées.** Ce sont
+`lecture.vide.corps`, `lecture.vide.corps_2.suite`, `lecture.vide.corps_2.fin`,
+`maths.vide.corps`, `maths.vide.corps_2.suite`, `maths.vide.corps_2.fin`.
+Aucune ne porte seule un état limite ; chacun des cinq états garde une couverture
+complète et propre.
+
+**Deux points d'exécution pour `contenu-enfant`, sous contrôle de
+`controle-produit` (ARB-10). Je ne modifie pas `content/` moi-même.**
+
+1. **Le retrait touche deux fichiers, pas un.** Les six clés n'existent pas
+   encore dans `content/ui-enfant.json`, qui reste à écrire : il suffit de ne pas
+   les y créer. Mais `lecture.vide.corps` et `maths.vide.corps` sont **déjà
+   déclarées** dans `content/encouragements.json`, dans le cinquième groupe de
+   `cles_fixes_non_variees` (« États techniques à message unique »). Ces deux
+   entrées-là doivent en être retirées, sinon le fichier déclarera comme « clé
+   fixe volontairement non variée » une clé qui n'existe plus nulle part — et le
+   contrôle qui vérifie que les clés déclarées existent côté marketing échouera.
+   Les six autres clés du même groupe restent : elles ont toutes un déclencheur
+   (`lecture.pas_entendu.*`, `lecture.micro_absent.corps`,
+   `lecture.sans_voix.corps`, `maths.sans_indice.corps`,
+   `enfant.programme.souci.corps`).
+
+2. **Une condition à élargir, et non une clé à ajouter.** Le livrable marketing
+   (7.12) range l'observation « La séance a été arrêtée avant la fin. Les pierres
+   acquises sont conservées. » sous la condition « Session arrêtée par le
+   parent ». **Le texte est exact pour T12 aussi** — la séance a bien été
+   interrompue, les pierres sont bien conservées (9.4, point 3) — mais la
+   condition est trop étroite d'un cas. Elle doit devenir « Séance non terminée :
+   arrêt par le parent (T10) ou clôture automatique le lendemain (T12) ». Aucun
+   texte nouveau n'est nécessaire, et c'est tant mieux : une phrase de plus,
+   c'est une phrase de plus à faire viser par `gardien-charte`.
+
+Si `controle-produit` juge qu'une de ces six clés doit malgré tout survivre, je
+préfère qu'elle survive : une clé en trop est un fichier un peu gros, un état
+limite sans écran est un enfant devant une impasse.
 
 ---
 
@@ -1425,6 +1505,49 @@ puis `qa-e2e`. Tant que la condition n'est pas évaluée, l'exigence est réput�
 couverte par l'interface + Web Speech (arbitrage Orchestrateur, G2 tour 1). |
 ```
 
+Une correction de ma part sur cette ligne : elle dit « arbitrage Orchestrateur,
+G2 tour 1 », et cet arbitrage porte désormais un numéro. Lire **ARB-11**.
+
+## 16.2 Lignes à inscrire dans `TRACEABILITY.md` pour le barème (ARB-12, point 2)
+
+Le risque est nommé : `recette-finale` ne lit pas `GATES.md` exigence par
+exigence, elle lit la section 2 du prompt maître et vérifie le code contre elle.
+Elle trouvera « +1 bonus si les 2 étapes du soir sont terminées » en 3.7, verra
+`bonus_soiree_complete`, et conclura à un écart — avec raison, si rien ne le lui
+explique là où elle regarde. **Un écart assumé et tracé n'est pas un écart ; un
+écart silencieux est un piège pour le dernier agent de la chaîne.**
+
+Trois lignes portent le barème. Chacune doit citer ARB-08 :
+
+```
+| ETH-04 | Les pierres ne se perdent jamais et n'expirent jamais |
+prisma/schema.prisma (CHECK gem_ledger.delta > 0 et delta <= 1, via
+supabase/policies.sql partie B), src/lib/pierres/service.ts,
+src/config/pierres.config.ts | tests V6 | COUVERTE. BARÈME MODIFIÉ PAR ARB-08 :
++1 par étape terminée, +1 quand TOUTES les étapes programmées du soir sont
+terminées. La section 3.7 écrit « les 2 étapes » ; ARB-08 remplace ce « 2 » en
+dur parce qu'une étape vide n'est plus jamais programmée, afin qu'un découpage
+incomplet de l'IA ne coûte aucune pierre à l'enfant. Conséquence assumée : une
+soirée à une seule étape rapporte 2 pierres. |
+
+| TEC-11 | Service pierres côté serveur | src/lib/pierres/service.ts,
+src/lib/session/service.ts, src/lib/session/cloture-automatique.ts,
+POST /api/session/:id/transition | tests V6 | COUVERTE. Barème appliqué :
+voir ETH-04 et ARB-08 — le bonus porte sur toutes les étapes programmées, pas
+sur un « 2 » en dur. |
+
+| SEC-06 | Le solde n'est jamais modifiable depuis le client | recalcul
+SUM(gem_ledger.delta) dans src/lib/pierres/service.ts, unique
+(session_id, raison) sur colonne obligatoire, aucune route n'accepte de montant
+| tests V6 | COUVERTE. Barème : voir ETH-04 et ARB-08. |
+```
+
+Le même paragraphe canonique figure en 9.5, dans le commentaire de l'énumération
+`RaisonGem` de `prisma/schema.prisma`, et dans celui du `CHECK
+gem_ledger_delta_max_un` de `supabase/policies.sql`. Quatre endroits, une seule
+formulation, et le numéro d'arbitrage partout : `recette-finale` tombera dessus
+quel que soit le fichier par lequel elle entre.
+
 ---
 
 # 17. Sorties réelles de mes commandes
@@ -1433,7 +1556,9 @@ couverte par l'interface + Web Speech (arbitrage Orchestrateur, G2 tour 1). |
 
 `$SP` est mon répertoire de travail temporaire, hors du dépôt. Le schéma a été
 modifié au tour 2 (`session_id` obligatoire, `bonus_soiree_complete`, en-tête des
-huit contraintes) : il est reformaté puis revalidé.
+huit contraintes), puis de nouveau après ARB-12 (le commentaire de `RaisonGem`
+cite désormais ARB-08 et l'écart à la section 3.7). Sortie ci-dessous : celle de
+ma dernière exécution, postérieure à toutes les corrections.
 
 ```
 $ cd /home/user/Tipi && npm install prisma@5.22.0 --prefix $SP --no-audit --no-fund
@@ -1443,7 +1568,7 @@ $ export DATABASE_URL="postgresql://u:p@localhost:5432/postgres" \
          DIRECT_URL="postgresql://u:p@localhost:5432/postgres"
 $ $SP/node_modules/.bin/prisma format --schema prisma/schema.prisma
 Prisma schema loaded from prisma/schema.prisma
-Formatted prisma/schema.prisma in 34ms 🚀
+Formatted prisma/schema.prisma in 36ms 🚀
 
 $ $SP/node_modules/.bin/prisma validate --schema prisma/schema.prisma
 Prisma schema loaded from prisma/schema.prisma
@@ -1462,8 +1587,8 @@ The schema at prisma/schema.prisma is valid 🚀
 ```
 
 Deux précisions d'honnêteté sur ce bloc. La durée affichée par `prisma format`
-varie d'une exécution à l'autre (33 ms au tour 1, 34 ms ici) : c'est la sortie
-réelle de ma dernière exécution, pas un chiffre stable. Et le cadre « Update
+varie d'une exécution à l'autre (33 ms au tour 1, 34 puis 36 ms au tour 2) :
+c'est la sortie réelle de ma dernière exécution, pas un chiffre stable. Et le cadre « Update
 available » est la bannière que le CLI imprime de lui-même ; je la laisse plutôt
 que de la couper, puisque `controle-architecture` la verra en rejouant.
 Le choix de la version 5.22.0 est délibéré : c'est la dernière 5.x stable, et
@@ -1658,38 +1783,20 @@ $ grep -cE '^NEXT_PUBLIC_' .env.example
 
 # 18. Points que je veux voir tranchés
 
-Les cinq points du tour 1 sont tranchés et appliqués (section 0.3). Il en reste
-trois, tous nés des corrections du tour 2. Aucun n'engage une refonte.
+Les cinq points du tour 1 sont tranchés et appliqués (0.3). Les deux points que
+j'avais laissés ouverts à la fin du tour 2 le sont par ARB-12 (0.4) :
 
-**1. Deux familles de clés de contenu perdent leur consommateur.**
-ARB-08 — « une étape vide n'est jamais créée » — supprime la transition
-qui jouait `lecture.vide.corps`, `lecture.vide.corps_2.suite`,
-`lecture.vide.corps_2.fin` et leurs miroirs `maths.vide.*`, décrits en 7.5 et
-7.6 du livrable marketing. Ces six clés n'ont plus de moment où elles seraient
-dites. Je ne les fais pas disparaître de mon côté : ce sont des textes enfant, et
-leur sort appartient au produit. **Question fermée : `contenu-enfant` les
-retire-t-il de `content/ui-enfant.json`, ou faut-il conserver une transition
-défensive pour un cas qui ne peut plus se produire ?** Ma recommandation : les
-retirer, et ne pas écrire une transition dont aucun test ne pourrait produire les
-conditions.
+- **les six clés `lecture.vide.*` / `maths.vide.*`** : la vérification demandée
+  est faite, état limite par état limite, en **section 10.3**. Les cinq états
+  gardent une couverture propre, les six clés partent, et deux points
+  d'exécution sont écrits pour `contenu-enfant` ;
+- **le barème** : formulation canonique en **9.5**, reprise dans les quatre
+  endroits qui l'énoncent, et trois lignes de `TRACEABILITY.md` prêtes à coller
+  en **16.2**.
 
-**2. Le bonus s'écarte de la lettre de la section 3.7 — ARB-08 le couvre, mais
-`recette-finale` ne lira pas ARB-08, elle lira 3.7.** Le barème devient « +1 si
-toutes les étapes programmées sont terminées », là où 3.7 écrit « +1 bonus si
-les 2 étapes du soir sont terminées ». Conséquence concrète, que je pose noir
-sur blanc : **une soirée à une seule étape rapporte désormais 2 pierres, comme
-une soirée complète.** C'est cohérent avec ARB-06 — le Soir léger doit rester
-indétectable par l'enfant, y compris dans son coffre — et c'est bien ce
-qu'ARB-08 décide. Mon point n'est donc plus l'arbitrage, qui est pris : c'est sa
-survie jusqu'à G8. La fiche de `recette-finale` lui impose de vérifier chaque
-exigence « dans le code et les tests » contre la section 2 du prompt maître, et
-la règle 3 de la section 7 du prompt maître dit qu'une exigence partiellement
-couverte est non couverte. **Il faut donc que la ligne de `TRACEABILITY.md` qui
-porte le barème cite ARB-08 explicitement**, sinon un contrôleur consciencieux
-rouvrira ce débat au dernier moment, avec raison. C'est la même mécanique
-qu'ARB-11 pour TEC-09, et c'est le seul endroit où je peux la signaler.
+Il ne reste donc **qu'un seul point ouvert**, et il n'est pas de mon ressort.
 
-**3. Le glob de `30-copy-enfant.mdc` reste faux tant que personne ne l'écrit.**
+**Le glob de `30-copy-enfant.mdc` reste faux tant que personne ne l'écrit.**
 Le fichier de règles n'est pas un de mes quatre livrables. La valeur complète,
 qui suit la recommandation du contrôleur et supprime `gwenn` au lieu de le
 conserver :

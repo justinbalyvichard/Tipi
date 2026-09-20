@@ -71,12 +71,18 @@ enum StatutTentative {
   bloquee
 }
 
-/// Motif d'un crédit de pierres. Barème de 3.7 : +1 par étape terminée,
-/// +1 bonus quand TOUTES les étapes programmées du soir sont terminées.
-/// Le bonus ne porte pas un « 2 » en dur : une étape vide n'étant jamais
-/// programmée (arbitrage de l'Orchestrateur, tour 1), une soirée à une seule
-/// étape est une soirée complète. Aucune autre valeur n'existe : jamais de
-/// pierre par bonne réponse (PED-05).
+/// Motif d'un crédit de pierres. Barème : +1 par étape terminée, +1 quand
+/// TOUTES les étapes programmées du soir sont terminées.
+///
+/// ÉCART ASSUMÉ ET TRACÉ : la section 3.7 du prompt maître écrit « +1 bonus si
+/// les 2 étapes du soir sont terminées ». **ARB-08** (docs/agents/GATES.md)
+/// remplace ce « 2 » en dur par « toutes les étapes programmées », parce
+/// qu'une étape vide n'est plus jamais programmée : sans ce changement, un
+/// découpage incomplet de l'IA coûterait deux pierres à un enfant qui n'en est
+/// pas responsable. Conséquence : une soirée à une seule étape rapporte
+/// 2 pierres, comme une soirée complète.
+///
+/// Aucune autre valeur n'existe : jamais de pierre par bonne réponse (PED-05).
 /// Sert aussi de clé d'idempotence avec sessionId (@@unique ci-dessous).
 enum RaisonGem {
   etape_lecture_terminee
