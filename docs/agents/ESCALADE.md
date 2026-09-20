@@ -171,4 +171,65 @@ Au troisième `FAIL` sur une même porte, l'Orchestrateur ouvre ici une entrée 
 porte concernée, désaccord en trois lignes, options avec leurs conséquences,
 question fermée.
 
-*(aucune pour l'instant — G1 en est à l'aller-retour 2 sur 3)*
+---
+
+## ESC-002 — Porte G2 : troisième `FAIL`, sur un défaut découvert au dernier tour
+
+Ouverte le : 2026-09-20 · Par : Orchestrateur · Porte : **G2, bloquée** · Statut : **en attente**
+
+### Le désaccord en trois lignes
+
+Il n'y a **pas** de désaccord entre le producteur et le contrôleur. Les trois
+tours ont convergé : 24 des 25 constats des tours 1 et 2 sont clos, `prisma
+validate` passe, et le contrôleur n'a relevé **aucun chiffre faux sur 26
+grandeurs, pour le troisième tour consécutif**.
+
+Le troisième `FAIL` porte sur un défaut **né au tour 3**, que personne n'avait
+pu voir plus tôt parce qu'il n'apparaît qu'une fois ARB-13 appliqué : le
+prédicat qui déclenche le bonus est défini sur les lignes `attempt`, écrites par
+une autre route sans ordre garanti, alors que le crédit d'étape est déclenché
+par l'événement de transition. Conséquence : **l'enfant termine sa soirée et
+reçoit 2 pierres au lieu de 3**, et le « Soir léger » redevient détectable.
+
+Le contrôleur écrit lui-même que « l'architecture est bonne et prête », que la
+correction tient en **une phrase en §9.4 et une ligne de commentaire en §9.5**,
+sans aucun changement de schéma, de route, de contrainte ni de chiffre — et
+qu'il ne minore pas le constat parce que c'est le dernier tour. Il a raison sur
+les deux points.
+
+### Ce qui bloque, et pourquoi je ne décide pas seul
+
+La règle 6.4 du prompt maître est mécanique : au troisième `FAIL`, l'Orchestrateur
+escalade et s'arrête sur la phase. Je l'applique plutôt que de m'accorder un
+quatrième tour, parce que c'est exactement le genre de dérogation qui vide un
+protocole de sa substance — et parce que le mode d'emploi de ce projet prévoit
+que tu n'interviens qu'ici.
+
+| Option | Conséquence |
+| --- | --- |
+| **A. Autoriser un quatrième tour sur G2** *(recommandé)* | Le producteur applique la correction d'une ligne, le contrôleur la vérifie, G2 s'ouvre. Coût : un aller-retour. Risque : aucun, la correction est spécifiée mot pour mot par le contrôleur et ne touche ni le schéma ni les contrats de routes. |
+| **B. Ouvrir G2 en `PASS_AVEC_RESERVES` et verser le constat en V2** | P3 démarre tout de suite. Mais un enfant recevrait 2 pierres au lieu de 3 sur le chemin nominal, et ARB-06 serait violé dès la première soirée réelle. Le contrôleur a qualifié ce constat `[MAJEUR]` en connaissance de cause. Je le déconseille. |
+| **C. Laisser G2 bloquée jusqu'à une revue humaine du dossier** | Le projet s'arrête sur P2 et P3. Seuls les travaux indépendants avancent : `contenu-enfant` produit `ui-enfant.json` et `ui-parent.json` (ARB-10) et retire les six clés d'ARB-12. |
+
+### Question fermée
+
+> **Autorises-tu un quatrième aller-retour sur la porte G2, par dérogation à la
+> règle des trois tours — oui ou non ?**
+
+Si oui, je relance immédiatement et je te préviens à l'ouverture de G2.
+Si non, dis-moi laquelle des options B ou C tu préfères.
+
+**Réponse humaine** : _(en attente)_
+
+---
+
+### Ce qui avance pendant ce temps, sans attendre ta réponse
+
+- `contenu-enfant` produit `content/ui-enfant.json` et `content/ui-parent.json`,
+  sous contrôle de `controle-produit` (ARB-10) — requis avant G3 de toute façon.
+- Le retrait des six clés `lecture.vide.*` / `maths.vide.*` dans les trois
+  fichiers concernés (ARB-12).
+- La table d'amendements du prompt maître est complétée : le contrôleur a relevé
+  qu'elle oubliait **ARB-04** — la fiche `contenu-enfant.md` énumère 16
+  situations là où le fichier validé en G1 en porte 23, et cet agent est
+  justement relancé maintenant.

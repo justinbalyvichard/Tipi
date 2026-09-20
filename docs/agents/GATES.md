@@ -9,7 +9,7 @@ sa porte amont n'est pas verte.
 | Porte | Phase | Producteur | Contrôleur | Statut | Date | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
 | G1 | P1 Produit & marketing + P1bis Contenu enfant | `produit-marketing`, `contenu-enfant` | `controle-produit` | **verte** | 2026-09-20 | [marketing](P1/produit-marketing.review.md) · [contenu](P1/contenu-enfant.review.md) |
-| G2 | P2 Architecture | `architecte` | `controle-architecture` | en cours | 2026-09-20 | — |
+| G2 | P2 Architecture | `architecte` | `controle-architecture` | **bloquée** | 2026-09-20 | [verdict](P2/architecture.review.md) · [ESC-002](ESCALADE.md) |
 | G3 | P3 Design system | `design-system` | `controle-design` | ouverte | — | — |
 | G4.V1 | P4 V1 Socle | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V2 | P4 V2 Capture & analyse IA | `dev-feature` | `controle-code` | ouverte | — | — |
@@ -71,4 +71,5 @@ tous les agents en aval.
 | 2026-09-20 | **G1 verte.** Les deux réserves mineures restantes sont corrigées hors porte. P2 ouverte, `architecte` lancé. |
 | 2026-09-20 | Architecture, tour 1 : `FAIL` (7 majeurs, 12 mineurs). `prisma validate` rejoué et reproduit par le contrôleur : le FAIL ne porte pas sur le schéma. Fuite découverte — le cache TTS public aurait contenu 14 clips prononçant le prénom de l'enfant. Arbitrages ARB-08 à ARB-11, puis ARB-12. |
 | 2026-09-20 | Architecture, tour 2 : `FAIL` (3 majeurs, 3 mineurs). Les 19 constats du tour 1 tous fermés, vérifiés dans les fichiers ; aucun écart sur 23 grandeurs recomptées. Les trois majeurs sont nés du tour 2, tous sur le barème et la clôture automatique. Arbitrage ARB-13. |
+| 2026-09-20 | Architecture, tour 3 : `FAIL` (1 majeur, 2 mineurs), sur un défaut né au tour 3 et invisible avant l'application d'ARB-13. Aucun écart sur 26 grandeurs, troisième tour consécutif. **Troisième FAIL : G2 bloquée, ESC-002 ouverte** conformément à la règle 6.4. |
 | 2026-09-20 | Deux manquements de l'Orchestrateur relevés par `controle-architecture` et réparés : ARB-12 rendu par message mais jamais inscrit dans ce tableau, et aucune entrée de journal pour G2 après deux tours. Un arbitrage non écrit n'est opposable à personne. |
