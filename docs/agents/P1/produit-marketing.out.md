@@ -38,6 +38,23 @@ l'ouverture d'une ligne dans `docs/agents/ESCALADE.md` pour le constat 9, qui
 revient à l'Orchestrateur : voir « Constats mineurs non repris » en fin de
 document.
 
+## Tour 2 — verdict PASS_AVEC_RESERVES, trois réserves mineures
+
+Passe courte, limitée à trois points. Le reste du livrable n'est pas rouvert.
+
+| Réserve | Ce qui a changé | Où |
+| --- | --- | --- |
+| T2-1 | La section 1.1 affirmait « aucun chiffre montré à l'enfant », en contradiction avec 7.9 qui en admet trois. C'est 7.9 qui fait foi : 1.1 parle désormais d'« aucun chiffre **de performance** » et renvoie nommément aux trois nombres d'inventaire de pierres | 1.1, preuve de la promesse |
+| T2-2 | La section 7.12 renvoyait le parent vers la sous-page Paliers pour un solde qu'aucune clé n'y affichait. La clé manquante est ajoutée : `reglages.paliers.solde` = « Evan a {n} pierres aujourd'hui. », et le renvoi de 7.12 la nomme | 7.12, 7.14 sous-page Paliers |
+| T2-3 | « Le prochain palier » est hors vocabulaire de CE1. `coffre.palier.titre` devient « Où tu en es ». Le mot « palier » est retiré de **toutes** les chaînes enfant, pas seulement de celle qui était citée : `coffre.palier.atteint` devient « Ça y est. Tu y es arrivé. » et `coffre.palier.vide` devient « Il n'y a rien à atteindre pour l'instant. ». Les noms de clés `coffre.palier.*` ne changent pas : ce sont des identifiants techniques, jamais lus ni affichés. « Palier » reste un mot de Réglages, côté parent | 7.9, progression et état vide |
+
+**Extension assumée sur T2-3** : la réserve ne citait que
+`coffre.palier.titre`. Corriger cette seule chaîne aurait laissé le mot
+« palier » dans deux autres chaînes enfant, dont une lue à voix haute par Pilou,
+c'est-à-dire le même défaut au même endroit. Les trois sont donc traitées
+ensemble. Si l'Orchestrateur préfère s'en tenir à la lettre de la réserve, seules
+les deux chaînes supplémentaires sont à reverser.
+
 ---
 
 ## Sommaire
@@ -1124,10 +1141,15 @@ là. Elles ne partent jamais. »
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `coffre.palier.titre` | « Le prochain palier » | affiche |
+| `coffre.palier.titre` | « Où tu en es » | affiche |
 | `coffre.palier.reste` | « Encore {n} pierres. » | dit_affiche |
-| `coffre.palier.atteint` | « Tu as atteint le palier. » | dit_affiche |
+| `coffre.palier.atteint` | « Ça y est. Tu y es arrivé. » | dit_affiche |
 | `coffre.palier.maison` | « Je garde tes pierres. Le reste se décide à la maison. » | dit_affiche |
+
+**Décision de vocabulaire** (tour 2) : le mot « palier » reste un mot de
+Réglages, côté parent. Il ne figure dans **aucune chaîne enfant** : il est hors
+du vocabulaire de CE1. Les clés gardent leur nom `coffre.palier.*`, qui est un
+identifiant technique et n'est jamais lu ni affiché.
 
 **Décision ETH-05, écrite noir sur blanc, en deux temps.**
 
@@ -1161,7 +1183,7 @@ parent sur un écran enfant est un défaut bloquant.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `coffre.palier.vide` | « Il n'y a pas de palier pour l'instant. » | dit_affiche |
+| `coffre.palier.vide` | « Il n'y a rien à atteindre pour l'instant. » | dit_affiche |
 | `coffre.palier.vide_2` | « Tes pierres s'accumulent. C'est bien. » | dit_affiche |
 
 Aucune incitation à demander un palier au parent.
