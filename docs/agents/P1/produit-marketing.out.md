@@ -1400,8 +1400,8 @@ validation explicite du parent** (TEC-06).
 | Clé | Texte |
 | --- | --- |
 | `parent.apercu.titre` | « Le programme de ce soir » |
-| `parent.apercu.resume` | « 2 étapes ce soir : lecture, maths. Environ 12 minutes. » |
-| `parent.apercu.resume_une` | « 1 étape ce soir : lecture. Environ 6 minutes. » |
+| `parent.apercu.resume` | « 2 étapes ce soir : {matieres}. Environ {duree} min. » |
+| `parent.apercu.resume_une` | « 1 étape ce soir : {matiere}. Environ {duree} min. » |
 | `parent.apercu.etape_lecture` | « Lecture » |
 | `parent.apercu.etape_maths` | « Maths » |
 | `parent.apercu.duree` | « environ {n} min » |
@@ -1411,6 +1411,31 @@ validation explicite du parent** (TEC-06).
 | `parent.apercu.bouton_modifier` | « Modifier la consigne » |
 | `parent.apercu.bouton_principal` | « Lancer la session » |
 | `parent.apercu.bouton_retour` | « Revenir aux photos » |
+
+**Les deux résumés sont exclusifs et tokenisés** (ARB-15, ARB-14) :
+
+| Clé | Quand | Jetons |
+| --- | --- | --- |
+| `parent.apercu.resume` | **exactement 2** étapes programmées | `{matieres}`, `{duree}` |
+| `parent.apercu.resume_une` | **exactement 1** étape programmée | `{matiere}`, `{duree}` |
+
+Jamais les deux à la fois, jamais aucune des deux : le nombre d'étapes
+programmées vaut toujours 1 ou 2 (PED-06, et ARB-08 qui écarte toute étape vide).
+
+- `{matieres}` est la liste des matières **déjà assemblée par l'appelant**, dans
+  l'ordre réel des étapes, séparateur compris. Le texte ne la construit pas et ne
+  s'accorde pas avec elle : elle arrive après un deux-points, où rien ne
+  s'accorde. C'est ce qui rend la clé juste dans les six configurations C1 à C6
+  de 7.0, y compris « maths seule » et « maths en premier ».
+- `{matiere}` est la matière unique de la seule étape programmée.
+- `{duree}` est la durée **calculée** de la soirée, jamais une constante.
+  L'unité est écrite « min », abréviation invariable, exactement comme
+  `parent.apercu.duree`. « minutes » en toutes lettres est proscrit ici : il
+  s'accorderait avec `{duree}` et se casserait sur la valeur 1 (ARB-14).
+
+Ces deux chaînes figeaient « lecture, maths » et « 12 minutes » jusqu'à ARB-15.
+C'est le défaut corrigé en G1 sur quatre textes enfant, resté en dehors du
+traitement des configurations C1 à C6 parce qu'il vivait sur un écran parent.
 
 **Mode basse énergie** (PRD-04) :
 
@@ -1439,7 +1464,7 @@ mode enfant : l'engrenage Réglages disparaît, le retour arrière ne ramène pa
 
 | Clé | Texte |
 | --- | --- |
-| `parent.apercu.regroupe` | « Tout a été regroupé en 2 étapes. Le reste attendra demain. » |
+| `parent.apercu.regroupe` | « Le programme a été regroupé pour ce soir. Le reste attendra demain. » |
 | `parent.apercu.reporte` | « Reporté à demain : {liste} » |
 
 **État vide — rien d'exploitable dans les photos** :
