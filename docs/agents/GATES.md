@@ -8,8 +8,8 @@ sa porte amont n'est pas verte.
 
 | Porte | Phase | Producteur | Contrôleur | Statut | Date | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
-| G1 | P1 Produit & marketing + P1bis Contenu enfant | `produit-marketing`, `contenu-enfant` | `controle-produit` | en cours | 2026-09-20 | — |
-| G2 | P2 Architecture | `architecte` | `controle-architecture` | ouverte | — | — |
+| G1 | P1 Produit & marketing + P1bis Contenu enfant | `produit-marketing`, `contenu-enfant` | `controle-produit` | **verte** | 2026-09-20 | [marketing](P1/produit-marketing.review.md) · [contenu](P1/contenu-enfant.review.md) |
+| G2 | P2 Architecture | `architecte` | `controle-architecture` | en cours | 2026-09-20 | — |
 | G3 | P3 Design system | `design-system` | `controle-design` | ouverte | — | — |
 | G4.V1 | P4 V1 Socle | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V2 | P4 V2 Capture & analyse IA | `dev-feature` | `controle-code` | ouverte | — | — |
@@ -60,3 +60,6 @@ tous les agents en aval.
 | 2026-09-20 | Marketing, tour 2 : `PASS_AVEC_RESERVES` (3 mineurs), gardien-charte CONFORME, aucun écart de chiffres. |
 | 2026-09-20 | Marketing, tour 3 : `PASS_AVEC_RESERVES` (2 mineurs), deuxième tour consécutif sans écart de chiffres. Arbitrages ARB-01 et ARB-05. |
 | 2026-09-20 | Banque de phrases, tour 1 : `FAIL` (8 majeurs, 5 mineurs), gardien-charte NON CONFORME. Les 23 grandeurs annoncées vérifiées à l'unité près. Arbitrages ARB-02, ARB-03, ARB-04. |
+| 2026-09-20 | Banque de phrases, tour 2 : `FAIL` (2 majeurs, 4 mineurs), gardien-charte CONFORME. Rendu agrammatical du jeton `{matiere}` découvert ; 3 grandeurs fausses sur 24, toutes sur le recouvrement. Arbitrage ARB-07 révoquant une décision antérieure. |
+| 2026-09-20 | Banque de phrases, tour 3 : `PASS_AVEC_RESERVES` (2 mineurs), gardien-charte CONFORME, **aucun écart sur 24 grandeurs**. Piège d'outillage jugé maîtrisé après contre-mesure indépendante. |
+| 2026-09-20 | **G1 verte.** Les deux réserves mineures restantes sont corrigées hors porte. P2 ouverte, `architecte` lancé. |

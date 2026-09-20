@@ -29,6 +29,29 @@ lui-même : s'il ne reproduit pas, le verdict est `FAIL`. Un agent qui invente
 une sortie de commande est une faute grave du système : le contrôleur le
 signale explicitement dans son verdict.
 
+## Corriger un instrument de mesure
+
+Leçon tirée de la porte G1, applicable à tout script de contrôle, toute
+assertion de test et tout seuil.
+
+Un agent qui mesure son propre travail finit par corriger son instrument de
+mesure. C'est souvent légitime. Mais **une correction méthodologiquement juste
+peut effacer le défaut qu'elle devait révéler** : sur G1, neutraliser un jeton
+compté à tort comme un mot plein a fait passer deux doublons réels de
+« au-dessus du seuil » à « exactement au seuil », donc hors détection.
+
+Règles :
+
+1. Quand tu corriges un instrument, **re-mesure avec l'ancienne version** et
+   publie ce qu'elle signalait, pas seulement ce que la nouvelle trouve.
+2. **Publie l'ancienne version de l'instrument**, pas seulement son résultat :
+   un contrôleur qui ne peut pas reconstituer ta procédure ne vérifie que ton
+   résultat, et il doit alors le dire comme une limite de son contrôle.
+3. Un seuil se déclare avec son sens exact : `>` et `>=` ne détectent pas la
+   même chose. Publie aussi le **compte des cas pile au seuil**.
+4. Un détecteur qui ne trouve plus rien après avoir été élargi est suspect
+   jusqu'à preuve du contraire.
+
 ## Boucle et escalade
 
 Trois allers-retours producteur/contrôleur maximum par porte. Au troisième
