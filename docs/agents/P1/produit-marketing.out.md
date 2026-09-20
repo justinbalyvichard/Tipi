@@ -56,6 +56,14 @@ Passe courte, limitée à trois points. Le reste du livrable n'est pas rouvert.
 | T3-2a | La formulation en creux « Il n'y a rien à atteindre pour l'instant. » est remplacée par `coffre.palier.vide` = « Ton coffre se remplit tout doucement. ». La phrase décrit ce qui est, et non ce qui manque : plus rien ne suggère à l'enfant qu'il devrait réclamer un palier | 7.9, état vide du palier |
 | T3-2b | L'accord de genre figé de « Tu y es arrivé. » est supprimé. `coffre.palier.atteint` devient « Ça y est. Tu as assez de pierres. » : aucun participe ni adjectif accordé, la phrase vaut pour n'importe quel enfant | 7.9, palier atteint |
 
+| ARB-02 | **L'énumération du canal de diffusion fait foi dans `content/`, pas dans ce document.** Les valeurs sont `tts`, `affiche` et `les_deux`. Ce livrable employait `dit`, `affiche` et `dit_affiche` pour la même notion : 107 colonnes de tableau et 6 mentions en prose sont converties. `affiche` ne change pas. La prose française « texte dit par Pilou » n'est pas l'énumération et reste telle quelle | 6.2, 6.3, les tableaux de clés de 7.1 à 7.14, item TON-4 |
+
+**Portée d'ARB-02, pour qu'un agent qui arrive après ne rouvre pas le sujet** :
+le code consomme `content/encouragements.json` et `content/gwenn-scripts.json` ;
+ce document les décrit. Un document ne dicte pas son vocabulaire aux fichiers
+qu'il décrit. Toute divergence future entre les deux se tranche donc en faveur de
+`content/`, et `dit` comme `dit_affiche` ne doivent plus réapparaître nulle part.
+
 **Règle héritée de `contenu-enfant`, désormais applicable ici** : aucune chaîne
 destinée à l'enfant ne contient de participe passé ni d'adjectif accordé au genre
 de l'enfant. Les phrases se construisent sur des verbes et des noms
@@ -393,19 +401,20 @@ A13 en section 11.
 
 ## 6.2 Annotation de chaque texte enfant
 
-Chaque entrée porte un champ `mode` :
+Chaque entrée porte un champ `mode`, dont les trois valeurs sont celles de
+`content/*.json` (arbitrage ARB-02, voir la section de reprise) :
 
-- `dit` — lu par Pilou en TTS uniquement
-- `affiche` — affiché uniquement
-- `dit_affiche` — les deux, avec le même texte mot pour mot
+- `tts` — lu par Pilou à voix haute, jamais affiché
+- `affiche` — affiché uniquement, jamais lu
+- `les_deux` — lu et affiché, avec le même texte mot pour mot
 
 **Règle** : tout texte porteur d'une information nécessaire à l'action est en
-`dit_affiche` (PED-10). Un texte en `affiche` seul ne peut être que décoratif ou
+`les_deux` (PED-10). Un texte en `affiche` seul ne peut être que décoratif ou
 redondant.
 
 ## 6.3 Règle de longueur, vérifiable
 
-Toute chaîne en `dit_affiche` ou `dit` destinée à l'enfant : **chaque phrase
+Toute chaîne en `les_deux` ou `tts` destinée à l'enfant : **chaque phrase
 compte 12 mots maximum**. Un point, un point d'interrogation ou un point
 d'exclamation termine une phrase. Un contrôleur peut mesurer mécaniquement.
 
@@ -522,8 +531,8 @@ Aucun bouton « passer » : l'onboarding dure moins de 40 secondes.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `bienvenue.1.titre` | « Bonjour, moi c'est Pilou. » | dit_affiche |
-| `bienvenue.1.corps` | « J'habite ici, dans le tipi. » | dit_affiche |
+| `bienvenue.1.titre` | « Bonjour, moi c'est Pilou. » | les_deux |
+| `bienvenue.1.corps` | « J'habite ici, dans le tipi. » | les_deux |
 | `bienvenue.1.bouton` | « Bonjour Pilou » | affiche |
 
 Texte dit par Pilou, en entier : « Bonjour, moi c'est Pilou. J'habite ici, dans
@@ -533,8 +542,8 @@ le tipi. »
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `bienvenue.2.titre` | « On fait les devoirs ensemble. » | dit_affiche |
-| `bienvenue.2.corps` | « Deux choses par soir. Pas plus. » | dit_affiche |
+| `bienvenue.2.titre` | « On fait les devoirs ensemble. » | les_deux |
+| `bienvenue.2.corps` | « Deux choses par soir. Pas plus. » | les_deux |
 | `bienvenue.2.bouton` | « D'accord » | affiche |
 
 Texte dit par Pilou : « On fait les devoirs ensemble. Deux choses par soir. Pas
@@ -544,9 +553,9 @@ plus. » (PED-06, annoncé dès le premier soir.)
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `bienvenue.3.titre` | « Tu peux t'arrêter quand tu veux. » | dit_affiche |
-| `bienvenue.3.corps` | « Appuie sur la pause. Je t'attends. » | dit_affiche |
-| `bienvenue.3.corps_2` | « Tu gagnes des pierres. Elles restent à toi. » | dit_affiche |
+| `bienvenue.3.titre` | « Tu peux t'arrêter quand tu veux. » | les_deux |
+| `bienvenue.3.corps` | « Appuie sur la pause. Je t'attends. » | les_deux |
+| `bienvenue.3.corps_2` | « Tu gagnes des pierres. Elles restent à toi. » | les_deux |
 | `bienvenue.3.bouton` | « On y va » | affiche |
 
 Texte dit par Pilou : « Tu peux t'arrêter quand tu veux. Appuie sur la pause. Je
@@ -570,8 +579,8 @@ pourcentage. Jamais « écran 1/3 » écrit.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.accueil.titre` | « Bonsoir {prenom}. » | dit_affiche |
-| `enfant.accueil.corps` | « Je suis contente de te voir. » | dit_affiche |
+| `enfant.accueil.titre` | « Bonsoir {prenom}. » | les_deux |
+| `enfant.accueil.corps` | « Je suis contente de te voir. » | les_deux |
 | `enfant.accueil.bouton` | « On commence » | affiche |
 
 Texte dit par Pilou, situation `accueil` de la banque (PED-11, 20 variantes
@@ -581,8 +590,8 @@ minimum) : « Bonsoir {prenom}. Je suis contente de te voir. »
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.accueil.reprise.titre` | « Te revoilà, {prenom}. » | dit_affiche |
-| `enfant.accueil.reprise.corps` | « On reprend là où on s'était arrêtés. » | dit_affiche |
+| `enfant.accueil.reprise.titre` | « Te revoilà, {prenom}. » | les_deux |
+| `enfant.accueil.reprise.corps` | « On reprend là où on s'était arrêtés. » | les_deux |
 | `enfant.accueil.reprise.bouton` | « On continue » | affiche |
 
 Aucune mention du temps écoulé, aucune remarque sur l'interruption (ETH-02).
@@ -591,8 +600,8 @@ Aucune mention du temps écoulé, aucune remarque sur l'interruption (ETH-02).
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.accueil.vide.titre` | « Ce soir, il n'y a pas de devoirs. » | dit_affiche |
-| `enfant.accueil.vide.corps` | « On se voit demain. Bonne soirée. » | dit_affiche |
+| `enfant.accueil.vide.titre` | « Ce soir, il n'y a pas de devoirs. » | les_deux |
+| `enfant.accueil.vide.corps` | « On se voit demain. Bonne soirée. » | les_deux |
 | `enfant.accueil.vide.bouton` | « Voir mon coffre » | affiche |
 
 Texte dit par Pilou, situation `pas_de_devoirs` : « Ce soir, il n'y a pas de
@@ -603,8 +612,8 @@ justification, aucune impasse : le bouton mène au coffre.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.accueil.souci.titre` | « Je cherche encore tes devoirs. » | dit_affiche |
-| `enfant.accueil.souci.corps` | « Tu peux aller voir ton coffre. » | dit_affiche |
+| `enfant.accueil.souci.titre` | « Je cherche encore tes devoirs. » | les_deux |
+| `enfant.accueil.souci.corps` | « Tu peux aller voir ton coffre. » | les_deux |
 | `enfant.accueil.souci.bouton` | « Voir mon coffre » | affiche |
 
 Le sujet du problème est Pilou, jamais l'enfant. Aucun code technique affiché.
@@ -614,7 +623,7 @@ Le sujet du problème est Pilou, jamais l'enfant. Aucun code technique affiché.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.attente.pilou` | « Je regarde tes devoirs. J'arrive. » | dit_affiche |
+| `enfant.attente.pilou` | « Je regarde tes devoirs. J'arrive. » | les_deux |
 
 Aucune durée n'est annoncée à l'enfant, même approximative (PED-07), et aucune
 figure de style n'est employée : un enfant de 6 ans prend tout au premier degré.
@@ -631,11 +640,11 @@ aucune liste d'exercices (PED-07).
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.programme.titre` | « Ce soir, on fait deux choses. » | dit_affiche |
-| `enfant.programme.carte.lecture` | « La lecture » | dit_affiche |
-| `enfant.programme.carte.maths` | « Les maths » | dit_affiche |
-| `enfant.programme.corps.lecture_maths` | « D'abord la lecture. Après, les maths. » | dit_affiche |
-| `enfant.programme.corps.maths_lecture` | « D'abord les maths. Après, la lecture. » | dit_affiche |
+| `enfant.programme.titre` | « Ce soir, on fait deux choses. » | les_deux |
+| `enfant.programme.carte.lecture` | « La lecture » | les_deux |
+| `enfant.programme.carte.maths` | « Les maths » | les_deux |
+| `enfant.programme.corps.lecture_maths` | « D'abord la lecture. Après, les maths. » | les_deux |
+| `enfant.programme.corps.maths_lecture` | « D'abord les maths. Après, la lecture. » | les_deux |
 | `enfant.programme.bouton` | « Je commence » | affiche |
 
 L'ordre des deux cartes à l'écran suit toujours l'ordre réel des étapes : la
@@ -652,9 +661,9 @@ le parent, ou mode basse énergie, PRD-04) :
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.programme.une.titre` | « Ce soir, on fait une seule chose. » | dit_affiche |
-| `enfant.programme.une.corps.lecture` | « On fait la lecture. Et c'est tout. » | dit_affiche |
-| `enfant.programme.une.corps.maths` | « On fait les maths. Et c'est tout. » | dit_affiche |
+| `enfant.programme.une.titre` | « Ce soir, on fait une seule chose. » | les_deux |
+| `enfant.programme.une.corps.lecture` | « On fait la lecture. Et c'est tout. » | les_deux |
+| `enfant.programme.une.corps.maths` | « On fait les maths. Et c'est tout. » | les_deux |
 | `enfant.programme.une.bouton` | « Je commence » | affiche |
 
 Une seule carte est affichée, centrée. Pilou dit, configuration C4 ou C6 : « Ce
@@ -674,8 +683,8 @@ on bascule sur l'état vide de `/enfant` (7.3).
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.programme.souci.titre` | « Je n'arrive pas à ouvrir le programme. » | dit_affiche |
-| `enfant.programme.souci.corps` | « On regarde ton coffre en attendant. » | dit_affiche |
+| `enfant.programme.souci.titre` | « Je n'arrive pas à ouvrir le programme. » | les_deux |
+| `enfant.programme.souci.corps` | « On regarde ton coffre en attendant. » | les_deux |
 | `enfant.programme.souci.bouton` | « Voir mon coffre » | affiche |
 
 ---
@@ -690,9 +699,9 @@ on bascule sur l'état vide de `/enfant` (7.3).
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.intro.titre.premier` | « On commence par la lecture. » | dit_affiche |
-| `lecture.intro.titre.apres` | « Maintenant, la lecture. » | dit_affiche |
-| `lecture.intro.corps` | « Je lis d'abord. Tu écoutes. » | dit_affiche |
+| `lecture.intro.titre.premier` | « On commence par la lecture. » | les_deux |
+| `lecture.intro.titre.apres` | « Maintenant, la lecture. » | les_deux |
+| `lecture.intro.corps` | « Je lis d'abord. Tu écoutes. » | les_deux |
 | `lecture.intro.bouton` | « Écouter Pilou » | affiche |
 
 `lecture.intro.titre.premier` est joué quand la lecture est la première étape du
@@ -703,7 +712,7 @@ quand elle suit les maths (configuration C2). Voir la table de sélection de 7.0
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.modele.corps` | « Voilà. Maintenant, c'est ton tour. » | dit_affiche |
+| `lecture.modele.corps` | « Voilà. Maintenant, c'est ton tour. » | les_deux |
 | `lecture.modele.bouton` | « À mon tour » | affiche |
 | `lecture.modele.relire` | « Réécouter » | affiche |
 
@@ -713,7 +722,7 @@ Le bouton « Réécouter » est disponible sans limite. Aucun compteur d'écoute
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.micro.consigne` | « Appuie sur le micro. Lis à voix haute. » | dit_affiche |
+| `lecture.micro.consigne` | « Appuie sur le micro. Lis à voix haute. » | les_deux |
 | `lecture.micro.bouton` | « Parler » | affiche |
 | `lecture.micro.en_cours` | « Je t'écoute. » | affiche |
 | `lecture.micro.bouton_stop` | « J'ai fini » | affiche |
@@ -727,8 +736,8 @@ de la banque (PED-11). Exemples canoniques :
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.retour.effort` | « Bravo. Tu as lu jusqu'au bout. » | dit_affiche |
-| `lecture.retour.effort_2` | « Tu as bien cherché tes mots. » | dit_affiche |
+| `lecture.retour.effort` | « Bravo. Tu as lu jusqu'au bout. » | les_deux |
+| `lecture.retour.effort_2` | « Tu as bien cherché tes mots. » | les_deux |
 | `lecture.retour.bouton` | « Continuer » | affiche |
 
 Aucun pourcentage de correspondance, aucun nombre de mots justes, aucune note
@@ -738,7 +747,7 @@ Aucun pourcentage de correspondance, aucun nombre de mots justes, aucune note
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.hesitation.corps` | « On regarde ce mot ensemble ? » | dit_affiche |
+| `lecture.hesitation.corps` | « On regarde ce mot ensemble ? » | les_deux |
 | `lecture.hesitation.bouton` | « D'accord » | affiche |
 | `lecture.hesitation.bouton_2` | « Je continue » | affiche |
 
@@ -748,8 +757,8 @@ Pilou **propose**, elle n'impose pas. « Je continue » est toujours disponible.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.pas_entendu.corps` | « Je n'ai pas bien entendu. » | dit_affiche |
-| `lecture.pas_entendu.corps_2` | « Tu peux redire, s'il te plaît ? » | dit_affiche |
+| `lecture.pas_entendu.corps` | « Je n'ai pas bien entendu. » | les_deux |
+| `lecture.pas_entendu.corps_2` | « Tu peux redire, s'il te plaît ? » | les_deux |
 | `lecture.pas_entendu.bouton` | « Je redis » | affiche |
 | `lecture.pas_entendu.bouton_2` | « On passe à la suite » | affiche |
 
@@ -758,8 +767,8 @@ et propose deux issues.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.blocage.corps` | « Le micro n'entend pas bien ce soir. » | dit_affiche |
-| `lecture.blocage.corps_2` | « On fait une pause, ou on continue ? » | dit_affiche |
+| `lecture.blocage.corps` | « Le micro n'entend pas bien ce soir. » | les_deux |
+| `lecture.blocage.corps_2` | « On fait une pause, ou on continue ? » | les_deux |
 | `lecture.blocage.bouton` | « Faire une pause » | affiche |
 | `lecture.blocage.bouton_2` | « Continuer » | affiche |
 
@@ -769,10 +778,10 @@ Le problème est attribué au micro, jamais à l'enfant.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.question.intro` | « J'ai une petite question sur l'histoire. » | dit_affiche |
+| `lecture.question.intro` | « J'ai une petite question sur l'histoire. » | les_deux |
 | `lecture.question.bouton` | « Répondre » | affiche |
-| `lecture.question.retour_ok` | « Oui, c'est bien ça. Tu as bien écouté. » | dit_affiche |
-| `lecture.question.retour_autre` | « Tu veux relire le début, pour voir ? » | dit_affiche |
+| `lecture.question.retour_ok` | « Oui, c'est bien ça. Tu as bien écouté. » | les_deux |
+| `lecture.question.retour_autre` | « Tu veux relire le début, pour voir ? » | les_deux |
 | `lecture.question.passer` | « Je ne sais pas » | affiche |
 
 `lecture.question.retour_autre` remplace toute forme de « c'est faux » (PED-04).
@@ -783,9 +792,9 @@ TTS ni de STT :
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.breton.intro` | « Ce texte est en breton. » | dit_affiche |
-| `lecture.breton.corps` | « Je ne sais pas le lire. Toi, oui. » | dit_affiche |
-| `lecture.breton.consigne` | « Lis-le à voix haute, tranquillement. » | dit_affiche |
+| `lecture.breton.intro` | « Ce texte est en breton. » | les_deux |
+| `lecture.breton.corps` | « Je ne sais pas le lire. Toi, oui. » | les_deux |
+| `lecture.breton.consigne` | « Lis-le à voix haute, tranquillement. » | les_deux |
 | `lecture.breton.bouton` | « J'ai lu » | affiche |
 | `lecture.breton.bouton_2` | « M'enregistrer » | affiche |
 
@@ -817,9 +826,9 @@ moteur passe directement à l'étape suivante et Pilou dit :
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.vide.corps` | « Ce soir, il n'y a pas de lecture. » | dit_affiche |
-| `lecture.vide.corps_2.suite` | « On passe aux maths. » | dit_affiche |
-| `lecture.vide.corps_2.fin` | « On a fini. Viens voir. » | dit_affiche |
+| `lecture.vide.corps` | « Ce soir, il n'y a pas de lecture. » | les_deux |
+| `lecture.vide.corps_2.suite` | « On passe aux maths. » | les_deux |
+| `lecture.vide.corps_2.fin` | « On a fini. Viens voir. » | les_deux |
 
 `lecture.vide.corps_2.suite` n'est joué que si une étape maths suit réellement.
 Sinon, `lecture.vide.corps_2.fin` mène directement à `/enfant/bravo`.
@@ -828,8 +837,8 @@ Sinon, `lecture.vide.corps_2.fin` mène directement à `/enfant/bravo`.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.micro_absent.corps` | « Le micro ne marche pas ce soir. » | dit_affiche |
-| `lecture.micro_absent.corps_2` | « Lis à voix haute. Appuie quand tu as fini. » | dit_affiche |
+| `lecture.micro_absent.corps` | « Le micro ne marche pas ce soir. » | les_deux |
+| `lecture.micro_absent.corps_2` | « Lis à voix haute. Appuie quand tu as fini. » | les_deux |
 | `lecture.micro_absent.bouton` | « J'ai fini de lire » | affiche |
 
 L'étape reste terminable sans micro. Aucune impasse (PRD-16).
@@ -846,8 +855,8 @@ l'enfant lit, aucun message technique.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `lecture.reprise.corps` | « On reprend la lecture. » | dit_affiche |
-| `lecture.reprise.corps_2` | « On était ici. » | dit_affiche |
+| `lecture.reprise.corps` | « On reprend la lecture. » | les_deux |
+| `lecture.reprise.corps_2` | « On était ici. » | les_deux |
 
 ---
 
@@ -863,9 +872,9 @@ affichée (3.5). L'enfant dit quand il a fini, Pilou félicite l'effort.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.intro.titre.premier` | « On commence par les maths. » | dit_affiche |
-| `maths.intro.titre.apres` | « Maintenant, les maths. » | dit_affiche |
-| `maths.intro.corps` | « On regarde d'abord les objets. » | dit_affiche |
+| `maths.intro.titre.premier` | « On commence par les maths. » | les_deux |
+| `maths.intro.titre.apres` | « Maintenant, les maths. » | les_deux |
+| `maths.intro.corps` | « On regarde d'abord les objets. » | les_deux |
 | `maths.intro.bouton` | « Je regarde » | affiche |
 
 `maths.intro.titre.premier` est joué quand les maths sont la première étape du
@@ -878,14 +887,14 @@ d'abord, seules, puis l'opération apparaît sous elles.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.concret.corps` | « Regarde les ronds. Tu peux les compter. » | dit_affiche |
+| `maths.concret.corps` | « Regarde les ronds. Tu peux les compter. » | les_deux |
 | `maths.concret.bouton` | « Voir le calcul » | affiche |
 
 **Consigne de l'exercice**
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.consigne.titre` | « Voilà ce qu'il faut faire. » | dit_affiche |
+| `maths.consigne.titre` | « Voilà ce qu'il faut faire. » | les_deux |
 | `maths.exo.bouton_indice` | « Un petit indice ? » | affiche |
 | `maths.exo.bouton_fini` | « J'ai trouvé » | affiche |
 
@@ -894,11 +903,11 @@ Textes d'habillage, le contenu de chaque indice est pré-généré à l'analyse.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.indice.1.amorce` | « Je te pose une question, pour t'aider. » | dit_affiche |
-| `maths.indice.2.amorce` | « On peut faire autrement. Écoute. » | dit_affiche |
-| `maths.indice.3.amorce` | « Je te montre un exemple plus facile. » | dit_affiche |
-| `maths.indice.4.amorce` | « On le fait ensemble, tout doucement. » | dit_affiche |
-| `maths.indice.epuise` | « Je t'ai tout dit. À toi de chercher. » | dit_affiche |
+| `maths.indice.1.amorce` | « Je te pose une question, pour t'aider. » | les_deux |
+| `maths.indice.2.amorce` | « On peut faire autrement. Écoute. » | les_deux |
+| `maths.indice.3.amorce` | « Je te montre un exemple plus facile. » | les_deux |
+| `maths.indice.4.amorce` | « On le fait ensemble, tout doucement. » | les_deux |
+| `maths.indice.epuise` | « Je t'ai tout dit. À toi de chercher. » | les_deux |
 
 Aucune amorce n'indique le rang de l'indice. **Jamais « indice 2 sur 4 »**, ni
 aucun compteur d'indices visible par l'enfant (PED-07). Le nombre d'indices
@@ -910,10 +919,10 @@ reproche, quel que soit le nombre de demandes :
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.demande_resultat.1` | « Je ne donne pas les réponses. Je t'aide à chercher. » | dit_affiche |
-| `maths.demande_resultat.2` | « Je garde la réponse pour toi. Tu vas trouver. » | dit_affiche |
-| `maths.demande_resultat.3` | « C'est toi qui trouves. Moi, je t'aide. » | dit_affiche |
-| `maths.demande_resultat.4` | « Non, je ne la dis pas. Veux-tu un indice ? » | dit_affiche |
+| `maths.demande_resultat.1` | « Je ne donne pas les réponses. Je t'aide à chercher. » | les_deux |
+| `maths.demande_resultat.2` | « Je garde la réponse pour toi. Tu vas trouver. » | les_deux |
+| `maths.demande_resultat.3` | « C'est toi qui trouves. Moi, je t'aide. » | les_deux |
+| `maths.demande_resultat.4` | « Non, je ne la dis pas. Veux-tu un indice ? » | les_deux |
 
 La 4e formulation est aussi la dernière : au-delà, Pilou propose une pause ou de
 passer à autre chose (PED-08), sans jamais céder et sans jamais s'agacer.
@@ -922,8 +931,8 @@ passer à autre chose (PED-08), sans jamais céder et sans jamais s'agacer.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.blocage.corps` | « Celui-là est difficile. C'est normal. » | dit_affiche |
-| `maths.blocage.corps_2` | « On souffle un peu, ou on passe à la suite ? » | dit_affiche |
+| `maths.blocage.corps` | « Celui-là est difficile. C'est normal. » | les_deux |
+| `maths.blocage.corps_2` | « On souffle un peu, ou on passe à la suite ? » | les_deux |
 | `maths.blocage.bouton` | « Faire une pause » | affiche |
 | `maths.blocage.bouton_2` | « Passer à la suite » | affiche |
 
@@ -934,8 +943,8 @@ pierre et n'est jamais commenté (ETH-04).
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.fini.retour` | « Bravo. Tu as bien cherché. » | dit_affiche |
-| `maths.fini.retour_2` | « Tu as trouvé ta façon de faire. » | dit_affiche |
+| `maths.fini.retour` | « Bravo. Tu as bien cherché. » | les_deux |
+| `maths.fini.retour_2` | « Tu as trouvé ta façon de faire. » | les_deux |
 | `maths.fini.bouton` | « Continuer » | affiche |
 
 Aucune vérification affichée, aucune coche verte, aucune croix (3.5, PED-04).
@@ -945,10 +954,10 @@ micro-animation, annonce de la suivante :
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `transition.felicitation.lecture` | « C'est fait. Tu as terminé la lecture. » | dit_affiche |
-| `transition.felicitation.maths` | « C'est fait. Tu as terminé les maths. » | dit_affiche |
-| `transition.annonce.maths` | « Maintenant, on passe aux maths. » | dit_affiche |
-| `transition.annonce.lecture` | « Maintenant, on passe à la lecture. » | dit_affiche |
+| `transition.felicitation.lecture` | « C'est fait. Tu as terminé la lecture. » | les_deux |
+| `transition.felicitation.maths` | « C'est fait. Tu as terminé les maths. » | les_deux |
+| `transition.annonce.maths` | « Maintenant, on passe aux maths. » | les_deux |
+| `transition.annonce.lecture` | « Maintenant, on passe à la lecture. » | les_deux |
 | `transition.bouton` | « Continuer » | affiche |
 
 La félicitation nomme l'étape **qui vient de finir**, l'annonce nomme l'étape
@@ -972,9 +981,9 @@ aucun flash (DES-08). Son `son_etape_finie` puis `son_pierre`.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.vide.corps` | « Ce soir, il n'y a pas de maths. » | dit_affiche |
-| `maths.vide.corps_2.suite` | « On passe à la lecture. » | dit_affiche |
-| `maths.vide.corps_2.fin` | « On a fini. Viens voir. » | dit_affiche |
+| `maths.vide.corps` | « Ce soir, il n'y a pas de maths. » | les_deux |
+| `maths.vide.corps_2.suite` | « On passe à la lecture. » | les_deux |
+| `maths.vide.corps_2.fin` | « On a fini. Viens voir. » | les_deux |
 
 `maths.vide.corps_2.suite` n'est joué que si une étape lecture suit réellement
 (configuration C2). Sinon, `maths.vide.corps_2.fin` mène directement à
@@ -984,8 +993,8 @@ aucun flash (DES-08). Son `son_etape_finie` puis `son_pierre`.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.sans_indice.corps` | « Je n'ai pas d'indice pour celui-là. » | dit_affiche |
-| `maths.sans_indice.corps_2` | « Compte sur tes doigts, ça marche bien. » | dit_affiche |
+| `maths.sans_indice.corps` | « Je n'ai pas d'indice pour celui-là. » | les_deux |
+| `maths.sans_indice.corps_2` | « Compte sur tes doigts, ça marche bien. » | les_deux |
 | `maths.sans_indice.bouton` | « J'ai trouvé » | affiche |
 | `maths.sans_indice.bouton_2` | « Passer à la suite » | affiche |
 
@@ -996,8 +1005,8 @@ Le repli **ne donne jamais** le résultat, y compris en cas de panne IA
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `maths.reprise.corps` | « On reprend les maths. » | dit_affiche |
-| `maths.reprise.corps_2` | « On était sur celui-là. » | dit_affiche |
+| `maths.reprise.corps` | « On reprend les maths. » | les_deux |
+| `maths.reprise.corps_2` | « On était sur celui-là. » | les_deux |
 
 Les indices déjà déroulés restent déroulés à la reprise : l'enfant ne recommence
 pas à zéro.
@@ -1015,11 +1024,11 @@ aucune pierre, n'a **aucune durée imposée, aucun décompte et aucun minuteur**
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `pause.titre` | « On souffle un peu. » | dit_affiche |
-| `pause.corps` | « Regarde le rond. Respire avec lui. » | dit_affiche |
-| `pause.inspire` | « On inspire. » | dit_affiche |
-| `pause.expire` | « On souffle. » | dit_affiche |
-| `pause.rassurance` | « Tu reviens quand tu veux. » | dit_affiche |
+| `pause.titre` | « On souffle un peu. » | les_deux |
+| `pause.corps` | « Regarde le rond. Respire avec lui. » | les_deux |
+| `pause.inspire` | « On inspire. » | les_deux |
+| `pause.expire` | « On souffle. » | les_deux |
+| `pause.rassurance` | « Tu reviens quand tu veux. » | les_deux |
 | `pause.bouton` | « Je reviens » | affiche |
 
 Texte dit par Pilou à l'entrée, situation `demande_pause` : « On souffle un peu.
@@ -1033,7 +1042,7 @@ Aucun chiffre, aucun nombre de cycles affiché, aucune barre. Son
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `pause.retour.corps` | « Te revoilà. On y retourne tranquillement. » | dit_affiche |
+| `pause.retour.corps` | « Te revoilà. On y retourne tranquillement. » | les_deux |
 
 Aucune mention de la durée de la pause, aucun commentaire sur le fait d'avoir
 fait une pause (PED-05, ETH-02).
@@ -1057,11 +1066,11 @@ Séquence fixe, dans cet ordre :
 
 | Ordre | Clé | Texte | Mode |
 | --- | --- | --- | --- |
-| 1 | `bravo.titre` | « Bravo {prenom}. » | dit_affiche |
-| 2 | `bravo.corps` | « Tu as fait tes devoirs ce soir. » | dit_affiche |
-| 3 | `bravo.pierres` | « Tu as gagné des pierres. » | dit_affiche |
-| 4 | `bravo.coffre` | « Je les range dans ton coffre. » | dit_affiche |
-| 5 | `bravo.fin` | « C'est fini. Tu peux aller jouer. » | dit_affiche |
+| 1 | `bravo.titre` | « Bravo {prenom}. » | les_deux |
+| 2 | `bravo.corps` | « Tu as fait tes devoirs ce soir. » | les_deux |
+| 3 | `bravo.pierres` | « Tu as gagné des pierres. » | les_deux |
+| 4 | `bravo.coffre` | « Je les range dans ton coffre. » | les_deux |
+| 5 | `bravo.fin` | « C'est fini. Tu peux aller jouer. » | les_deux |
 | 6 | `bravo.bouton_principal` | « Aller jouer » | affiche |
 | 7 | `bravo.bouton_secondaire` | « Voir mon coffre » | affiche |
 
@@ -1103,8 +1112,8 @@ l'interruption.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `bravo.pierres_plus_tard` | « Je range tes pierres un peu plus tard. » | dit_affiche |
-| `bravo.pierres_plus_tard_2` | « Elles sont à toi. Elles ne se perdent pas. » | dit_affiche |
+| `bravo.pierres_plus_tard` | « Je range tes pierres un peu plus tard. » | les_deux |
+| `bravo.pierres_plus_tard_2` | « Elles sont à toi. Elles ne se perdent pas. » | les_deux |
 
 Le crédit est rejoué côté serveur. L'enfant n'est jamais informé d'un échec
 technique et **aucune pierre n'est jamais perdue** (ETH-04).
@@ -1148,10 +1157,10 @@ est accessible à tout moment, y compris en dehors d'une session.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `coffre.titre` | « Ton coffre à trésors » | dit_affiche |
-| `coffre.solde.label` | « Tes pierres » | dit_affiche |
+| `coffre.titre` | « Ton coffre à trésors » | les_deux |
+| `coffre.solde.label` | « Tes pierres » | les_deux |
 | `coffre.solde.valeur` | « {n} » | affiche |
-| `coffre.rassurance` | « Tes pierres restent là. Elles ne partent jamais. » | dit_affiche |
+| `coffre.rassurance` | « Tes pierres restent là. Elles ne partent jamais. » | les_deux |
 | `coffre.bouton` | « Retour » | affiche |
 
 Texte dit par Pilou à l'ouverture : « Ton coffre à trésors. Tes pierres restent
@@ -1162,9 +1171,9 @@ là. Elles ne partent jamais. »
 | Clé | Texte | Mode |
 | --- | --- | --- |
 | `coffre.palier.titre` | « Où tu en es » | affiche |
-| `coffre.palier.reste` | « Encore {n} pierres. » | dit_affiche |
-| `coffre.palier.atteint` | « Ça y est. Tu as assez de pierres. » | dit_affiche |
-| `coffre.palier.maison` | « Je garde tes pierres. Le reste se décide à la maison. » | dit_affiche |
+| `coffre.palier.reste` | « Encore {n} pierres. » | les_deux |
+| `coffre.palier.atteint` | « Ça y est. Tu as assez de pierres. » | les_deux |
+| `coffre.palier.maison` | « Je garde tes pierres. Le reste se décide à la maison. » | les_deux |
 
 **Décision de vocabulaire** (tour 2) : le mot « palier » reste un mot de
 Réglages, côté parent. Il ne figure dans **aucune chaîne enfant** : il est hors
@@ -1203,8 +1212,8 @@ parent sur un écran enfant est un défaut bloquant.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `coffre.palier.vide` | « Ton coffre se remplit tout doucement. » | dit_affiche |
-| `coffre.palier.vide_2` | « Tes pierres s'accumulent. C'est bien. » | dit_affiche |
+| `coffre.palier.vide` | « Ton coffre se remplit tout doucement. » | les_deux |
+| `coffre.palier.vide_2` | « Tes pierres s'accumulent. C'est bien. » | les_deux |
 
 Aucune incitation à demander un palier au parent.
 
@@ -1212,11 +1221,11 @@ Aucune incitation à demander un palier au parent.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `coffre.cosmetiques.titre` | « Habiller Pilou » | dit_affiche |
+| `coffre.cosmetiques.titre` | « Habiller Pilou » | les_deux |
 | `coffre.cosmetiques.bouton_appliquer` | « Mettre à Pilou » | affiche |
-| `coffre.cosmetiques.verrouille` | « Il faut {n} pierres pour celui-là. » | dit_affiche |
-| `coffre.cosmetiques.debloque` | « Celui-là est à toi. » | dit_affiche |
-| `coffre.cosmetiques.vide` | « Il n'y a rien à mettre pour l'instant. » | dit_affiche |
+| `coffre.cosmetiques.verrouille` | « Il faut {n} pierres pour celui-là. » | les_deux |
+| `coffre.cosmetiques.debloque` | « Celui-là est à toi. » | les_deux |
+| `coffre.cosmetiques.vide` | « Il n'y a rien à mettre pour l'instant. » | les_deux |
 
 Un cosmétique verrouillé est affiché en silhouette neutre, **jamais avec un
 cadenas rouge, jamais avec un compte à rebours, jamais avec une mention
@@ -1231,8 +1240,8 @@ tiers.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `coffre.souci.corps` | « Je n'arrive pas à ouvrir le coffre. » | dit_affiche |
-| `coffre.souci.corps_2` | « Tes pierres sont bien là. Reviens tout à l'heure. » | dit_affiche |
+| `coffre.souci.corps` | « Je n'arrive pas à ouvrir le coffre. » | les_deux |
+| `coffre.souci.corps_2` | « Tes pierres sont bien là. Reviens tout à l'heure. » | les_deux |
 | `coffre.souci.bouton` | « Retour » | affiche |
 
 ---
@@ -1842,7 +1851,7 @@ Un seul « non » est bloquant.
 | TON-1 | Aucune chaîne destinée à l'enfant ne contient « c'est faux », « erreur », « tu t'es trompé », « faire mieux » ? | `content/**` | [ ] |
 | TON-2 | Chaque phrase destinée à l'enfant compte 12 mots maximum ? | Mesure automatique sur `content/**` | [ ] |
 | TON-3 | Aucun emoji n'apparaît dans `content/**`, `src/**` et les icônes ? | Recherche de plages Unicode d'emoji | [ ] |
-| TON-4 | Toute information nécessaire à l'action est en `dit_affiche` ? | Champ `mode` de chaque entrée de contenu | [ ] |
+| TON-4 | Toute information nécessaire à l'action est en `les_deux` ? | Champ `mode` de chaque entrée de contenu | [ ] |
 | TON-5 | Aucun message de difficulté n'a « tu » pour sujet ? | États d'erreur des écrans enfant | [ ] |
 | TON-6 | Aucune référence à la Bretagne hors contenu de devoir et hors réglage parent ? Le nom de fichier `content/gwenn-scripts.json` est la seule exception connue, imposée par le prompt maître et en attente d'arbitrage (A13) : elle ne vaut pas non-conformité tant que A13 n'est pas tranché | `content/**`, visuels, sons, nom du produit, nom de la mascotte | [ ] |
 | TON-7 | Les seuls nombres affichés à l'enfant sont les trois nombres d'inventaire de `/enfant/coffre` listés en 7.9 ? | Les 8 écrans enfant, en session réelle : aucun nombre sur les sept autres | [ ] |
