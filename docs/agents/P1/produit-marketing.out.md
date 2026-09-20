@@ -45,7 +45,7 @@ Passe courte, limitée à trois points. Le reste du livrable n'est pas rouvert.
 | Réserve | Ce qui a changé | Où |
 | --- | --- | --- |
 | T2-1 | La section 1.1 affirmait « aucun chiffre montré à l'enfant », en contradiction avec 7.9 qui en admet trois. C'est 7.9 qui fait foi : 1.1 parle désormais d'« aucun chiffre **de performance** » et renvoie nommément aux trois nombres d'inventaire de pierres | 1.1, preuve de la promesse |
-| T2-2 | La section 7.12 renvoyait le parent vers la sous-page Paliers pour un solde qu'aucune clé n'y affichait. La clé manquante est ajoutée : `reglages.paliers.solde` = « {prenom} a {n} pierres aujourd'hui. », et le renvoi de 7.12 la nomme | 7.12, 7.14 sous-page Paliers |
+| T2-2 | La section 7.12 renvoyait le parent vers la sous-page Paliers pour un solde qu'aucune clé n'y affichait. La clé manquante est ajoutée : `reglages.paliers.solde` = « Pierres de {prenom} aujourd'hui : {n} », et le renvoi de 7.12 la nomme | 7.12, 7.14 sous-page Paliers |
 | T2-3 | « Le prochain palier » est hors vocabulaire de CE1. `coffre.palier.titre` devient « Où tu en es ». Le mot « palier » est retiré de **toutes** les chaînes enfant, pas seulement de celle qui était citée : `coffre.palier.atteint` devient « Ça y est. Tu y es arrivé. » et `coffre.palier.vide` devient « Il n'y a rien à atteindre pour l'instant. ». Les noms de clés `coffre.palier.*` ne changent pas : ce sont des identifiants techniques, jamais lus ni affichés. « Palier » reste un mot de Réglages, côté parent | 7.9, progression et état vide |
 
 ## Tour 3 — deux arbitrages tranchés par l'Orchestrateur
@@ -69,6 +69,31 @@ destinée à l'enfant ne contient de participe passé ni d'adjectif accordé au 
 de l'enfant. Les phrases se construisent sur des verbes et des noms
 (« Tu as assez de pierres. ») plutôt que sur des attributs (« Tu es arrivé. »).
 Cette règle est vérifiable et s'ajoute aux contrôles de ton.
+
+**Règle étendue au nombre (ARB-14)** : la même interdiction vaut pour l'accord de
+**nombre**. Un jeton emporte son genre, son nombre et son article : rien de ce
+qui l'entoure ne doit s'accorder avec lui. `« {matiere} : terminée »` se casse
+sur « Maths », `« Encore {n} pierres. »` se casse sur 1. La correction consiste à
+**supprimer l'accord**, jamais à dupliquer la chaîne en variantes
+conditionnelles : le fichier de contenu n'a pas à connaître la grammaire de ses
+jetons. Deux formes sont tolérées uniquement là où elles sont déjà déclarées
+explicitement en paire, pour un simple comptage — `parent.scan.compteur` et
+`parent.apercu.exercices`.
+
+> **Exception permanente, à ne jamais « réparer » : Pilou parle d'elle au
+> féminin.**
+>
+> `enfant.accueil.corps` = « Je suis contente de te voir. » porte un adjectif
+> accordé au féminin. Ce féminin est celui de **Pilou**, pas celui de l'enfant.
+> TEC-08 fige une voix féminine unique pour toute la durée de vie de
+> l'application, et la section 1.3 du prompt maître décrit Pilou comme une
+> petite loutre à la voix féminine chaleureuse.
+>
+> Un balayage automatique de neutralité remonte cette chaîne comme un faux
+> positif. **Un agent qui la corrigerait dégenrerait la mascotte**, ce qui est un
+> défaut bloquant et non une amélioration. La règle de neutralité ne porte que
+> sur les accords qui décrivent **l'enfant**. Toute chaîne où Pilou parle
+> d'elle-même reste accordée au féminin.
 
 **Extension assumée sur T2-3** : la réserve ne citait que
 `coffre.palier.titre`. Corriger cette seule chaîne aurait laissé le mot
@@ -1181,8 +1206,8 @@ Liste exhaustive des **trois** nombres admis devant l'enfant, tous dans
 | # | Clé | Texte | Ce que le nombre compte |
 | --- | --- | --- | --- |
 | 1 | `coffre.solde.valeur` | « {n} » | Les pierres possédées. Ne baisse jamais (ETH-04) |
-| 2 | `coffre.palier.reste` | « Encore {n} pierres. » | Les pierres restant avant le palier. Diminue seulement parce que le solde monte |
-| 3 | `coffre.cosmetiques.verrouille` | « Il faut {n} pierres pour celui-là. » | Le seuil fixe d'un cosmétique. Constant |
+| 2 | `coffre.palier.reste` | « Il t'en faut encore {n}. » | Les pierres restant avant le palier. Diminue seulement parce que le solde monte |
+| 3 | `coffre.cosmetiques.verrouille` | « Il en faut {n} pour celui-là. » | Le seuil fixe d'un cosmétique. Constant |
 
 **Interdiction correspondante** : **aucun nombre, d'aucune sorte, sur les sept
 autres écrans enfant** — `/bienvenue`, `/enfant`, `/enfant/programme`,
@@ -1209,7 +1234,7 @@ là. Elles ne partent jamais. »
 | Clé | Texte | Mode |
 | --- | --- | --- |
 | `coffre.palier.titre` | « Où tu en es » | affiche |
-| `coffre.palier.reste` | « Encore {n} pierres. » | les_deux |
+| `coffre.palier.reste` | « Il t'en faut encore {n}. » | les_deux |
 | `coffre.palier.atteint` | « Ça y est. Tu as assez de pierres. » | les_deux |
 | `coffre.palier.maison` | « Je garde tes pierres. Le reste se décide à la maison. » | les_deux |
 
@@ -1261,7 +1286,7 @@ Aucune incitation à demander un palier au parent.
 | --- | --- | --- |
 | `coffre.cosmetiques.titre` | « Habiller Pilou » | les_deux |
 | `coffre.cosmetiques.bouton_appliquer` | « Mettre à Pilou » | affiche |
-| `coffre.cosmetiques.verrouille` | « Il faut {n} pierres pour celui-là. » | les_deux |
+| `coffre.cosmetiques.verrouille` | « Il en faut {n} pour celui-là. » | les_deux |
 | `coffre.cosmetiques.debloque` | « Celui-là est à toi. » | les_deux |
 | `coffre.cosmetiques.vide` | « Il n'y a rien à mettre pour l'instant. » | les_deux |
 
@@ -1464,8 +1489,8 @@ mesure rien.
 | `parent.resume.titre` | « La soirée d'{prenom} » |
 | `parent.resume.date` | « {date} » |
 | `parent.resume.etapes.titre` | « Ce qui a été fait » |
-| `parent.resume.etape_faite` | « {matiere} : terminée » |
-| `parent.resume.etape_passee` | « {matiere} : passée » |
+| `parent.resume.etape_faite` | « {matiere} : c'est fait » |
+| `parent.resume.etape_passee` | « {matiere} : pas ce soir » |
 | `parent.resume.observation.titre` | « Observation » |
 | `parent.resume.pierres` | « Les pierres de ce soir sont dans le coffre. » |
 | `parent.resume.bouton` | « Fermer » |
@@ -1557,7 +1582,7 @@ possible. Aucun retour visuel ne se déclenche avant le dixième chiffre.
 | Clé | Texte |
 | --- | --- |
 | `reglages.code.refuse` | « Ce code ne correspond pas. » |
-| `reglages.code.refuse_reste` | « Il reste {n} essais avant un blocage temporaire. » |
+| `reglages.code.refuse_reste` | « Essais restants avant blocage : {n} » |
 | `reglages.code.bloque.titre` | « Saisie bloquée » |
 | `reglages.code.bloque.corps` | « Trop d'essais. Réessayez dans {duree}. » |
 | `reglages.code.bloque.aide` | « Le blocage se lève tout seul. Rien n'est perdu. » |
@@ -1650,7 +1675,7 @@ sélectionné est appliqué dès l'écran de lancement (section 4.2).
 | --- | --- |
 | `reglages.paliers.titre` | « Paliers de récompense » |
 | `reglages.paliers.corps` | « Vous définissez le palier et vous donnez la récompense. Tipi compte seulement les pierres. » |
-| `reglages.paliers.solde` | « {prenom} a {n} pierres aujourd'hui. » |
+| `reglages.paliers.solde` | « Pierres de {prenom} aujourd'hui : {n} » |
 | `reglages.paliers.ajouter` | « Ajouter un palier » |
 | `reglages.paliers.gems` | « Nombre de pierres » |
 | `reglages.paliers.description` | « Ce que vous proposez » |
@@ -1744,7 +1769,7 @@ tiers, ni achat.
 | --- | --- |
 | `reglages.calibration.titre` | « Calibration des photos » |
 | `reglages.calibration.corps` | « Les premières photos sont conservées avec leur analyse, pour régler la lecture automatique. » |
-| `reglages.calibration.restantes` | « {n} photos encore enregistrées pour la calibration. » |
+| `reglages.calibration.restantes` | « Photos enregistrées pour la calibration : {n} » |
 | `reglages.calibration.voir` | « Voir le détail d'une analyse » |
 | `reglages.calibration.desactiver` | « Arrêter la calibration » |
 
