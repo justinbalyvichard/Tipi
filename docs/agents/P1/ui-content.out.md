@@ -1,8 +1,9 @@
 # P1bis — Fichiers d'interface et retrait des clés mortes
 
 Livrable de l'agent `contenu-enfant`, mission ARB-10 et ARB-12, après la
-fermeture de G1. **Version 2 : reprise du `VERDICT: FAIL` du tour 1**
-(1 [MAJEUR], 4 [MINEUR]), et application d'ARB-14. Sources : `docs/agents/P1/produit-marketing.out.md`,
+fermeture de G1. **Version 3** : reprise du `VERDICT: FAIL` du tour 1
+(1 [MAJEUR], 4 [MINEUR]), application d'ARB-14, puis reprise du
+`VERDICT: FAIL` du tour 2 (1 [MAJEUR], 3 [MINEUR]). Sources : `docs/agents/P1/produit-marketing.out.md`,
 `docs/agents/GATES.md` (ARB-08, ARB-10, ARB-12, ARB-13), et le bloc
 **AMENDEMENTS** en tête de `TIPI-PROMPT-CURSOR.md`.
 
@@ -21,6 +22,7 @@ Aucun emoji, aucun prénom en dur, aucun commit git.
 ## Sommaire
 
 0. Reprise après verdict du tour 1
+0 bis. Reprise après verdict du tour 2
 1. Ce que portent les deux fichiers neufs, et ce qu'ils ne portent pas
 2. Schéma des `ui-*.json`
 3. Répartition enfant / parent
@@ -47,19 +49,21 @@ J'ai choisi la **voie (a)** : renseigner `condition`, et non assouplir la règle
 
 | Origine | Entrées | Comment |
 | --- | --- | --- |
-| `intertitre` | 71 | Reprise **mot pour mot** de l'intertitre du marketing : « État d'erreur — micro refusé ou indisponible », « Variante de reprise (l'app a été fermée en cours de soirée, PRD-18) », « Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT ». 27 intertitres distincts, recollés quand ils courent sur plusieurs lignes |
-| `segment_de_cle` | 41 | Là où l'intertitre du marketing est générique (« États d'erreur », 22 lignes) ou absent, la condition met en phrase **l'état que la clé nomme déjà** : `camera_refusee` → « l'accès à l'appareil photo est refusé ». La table des 25 segments est **publiée dans les deux fichiers** (`regles.conditions_par_segment`) |
-| `definie_ici` | 21 | Les 9 observations du résumé parent, et 12 clés dont **aucune convention de nommage** ne dit la condition |
-| **Total** | **133 / 288** | |
+| `intertitre` | 72 | Reprise **mot pour mot** de l'intertitre du marketing : « État d'erreur — micro refusé ou indisponible », « Variante de reprise (l'app a été fermée en cours de soirée, PRD-18) », « Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT ». **27 valeurs distinctes dans les fichiers**, toutes retrouvées mot pour mot dans la source par le contrôle. Les intertitres qui courent sur plusieurs lignes sont recollés |
+| `segment_de_cle` | 43 | Là où l'intertitre du marketing est générique (« États d'erreur », 22 lignes) ou absent, la condition met en phrase **l'état que la clé nomme déjà** : `camera_refusee` → « l'accès à l'appareil photo est refusé ». La table des 26 segments est **publiée dans les deux fichiers** (`regles.conditions_par_segment`), l'appariement se fait par **segments exacts**, et le générateur échoue si deux segments apparient la même clé |
+| `definie_ici` | 22 | Les 9 observations du résumé parent, et 13 clés dont **aucune convention de nommage** ne dit la condition |
+| **Total** | **137 / 288** | |
 
 Chaque entrée porte désormais `condition_source`, pour qu'un lecteur sache si la
 condition vient de la source ou de ce livrable. Le contrôle 5 bis vérifie qu'il
-ne reste **aucune entrée à marqueur d'état sans condition** : 0, et les 15
-entrées que vous citiez en exemple sont toutes traitées.
+ne reste **aucune entrée à marqueur d'état sans condition** : 0 sur les 98 qui
+en portent un, la liste des 27 marqueurs étant imprimée à côté du chiffre. Les 19
+entrées citées par les deux tours de contrôle sont toutes traitées.
 
 **Les paires mutuellement exclusives sont dites dans le fichier, pas dans le
 rapport.** Chaque entrée porte `exclusif_avec`, généré depuis une liste de
-groupes, donc réciproque par construction. 15 entrées en portent une :
+groupes, donc réciproque par construction à l'intérieur des fichiers UI.
+21 entrées en portent une, pour 33 liens :
 
 | Paire | Conditions écrites |
 | --- | --- |
@@ -101,6 +105,82 @@ Les deux versions et le motif du resserrement sont imprimés à chaque exécutio
 `parent.resume.etape_faite`, qui disait « {matiere} : terminée » — le cas
 « nombre » d'ARB-14 — a été corrigé à la source et vaut maintenant
 « {matiere} : c'est fait » dans mon fichier, par répercussion automatique.
+
+---
+
+# 0 bis. Reprise après verdict du tour 2
+
+## [MAJEUR] 6 — l'appariement, et l'instrument qui ne l'a pas vu
+
+Le constat est exact, et le plus grave des deux défauts n'est pas la condition
+fausse : c'est que **mon contrôle imprimait la ligne absurde et concluait
+`AUCUN PROBLEME`**. Une preuve verte produite par un instrument aveugle vaut
+moins que pas de preuve du tout. J'ai relu la section « Corriger un instrument de
+mesure » du protocole avant de reprendre.
+
+**L'appariement.** `condition_de_cle` retenait la première entrée de table dont
+le motif était une **sous-chaîne** de la clé : `bloque` capturait `debloque`.
+Trois changements :
+
+1. **appariement par segments exacts** : la clé est découpée sur les points, le
+   motif aussi, et il faut une égalité de segments consécutifs. « bloque » ne
+   peut plus apparier « debloque » ;
+2. **plus aucune dépendance à l'ordre de la table** : le générateur collecte
+   *toutes* les entrées qui apparient, et **échoue** si elles donnent deux
+   conditions différentes. L'ordre ne porte donc plus de sens — la dépendance
+   n'est pas documentée, elle est supprimée, comme vous le demandiez ;
+3. `coffre.cosmetiques.debloque` porte désormais « le cosmétique est débloqué ».
+
+**L'instrument.** Il ne se contente plus d'imprimer, il **re-dérive** :
+
+| Contrôle ajouté | Résultat |
+| --- | --- |
+| Ré-implémentation indépendante de l'appariement, comparée à ce que porte le fichier | 43 conditions `segment_de_cle` re-dérivées à l'identique, **0 écart** |
+| Clé appariant deux segments donnant des conditions différentes | **0** |
+| Segment déclaré dans la table et jamais employé — le signal que vous relevez | **0** sur 26 |
+| Condition `intertitre` retrouvée **mot pour mot** dans le marketing | **27 / 27** |
+| Garde-fou sur la table 7.12 | 9 lignes dans la source, 9 clés créées ici |
+
+**Ce que le nouvel instrument a trouvé à son premier passage**, et que je publie
+parce que c'est le cœur du sujet : il a levé **deux drapeaux, tous deux dus à
+lui-même**. Il comparait la condition nettoyée de ses marqueurs de gras à une
+source qui les portait encore — 48 faux « intertitre introuvable » — et il
+comptait `parent.resume.observation.titre`, une clé du marketing, parmi mes neuf
+observations. Les deux sont corrigés, et l'instrument a **échoué** au lieu de
+conclure vert : c'est exactement le comportement qui manquait au tour 2.
+
+## Le garde-fou sur les ajouts
+
+Vous avez raison : ma mécanique d'extraction est réelle pour les **corrections**
+— les six textes corrigés à la source sont arrivés ici sans ressaisie, et le
+septième l'a fait pendant ce tour même, `parent.apercu.resume` devenant
+« 2 étapes ce soir : {matieres}. Environ {duree} min. » — mais elle était
+**muette pour les ajouts**, la table 7.12 n'ayant aucune clé.
+
+Le garde-fou est posé **des deux côtés** : le générateur **refuse de produire**
+et le contrôle **échoue** si le nombre de lignes de la table 7.12 diffère du
+nombre de clés `observation.*` créées ici. Un ajout de ligne ou un renommage de
+libellé arrête la chaîne au lieu de passer inaperçu. J'ai ajouté le même réflexe
+sur les jetons : un jeton employé par la source et non documenté fait échouer le
+générateur avec un message explicite, au lieu de planter sur une clé manquante —
+c'est ainsi que `{matieres}` a été vu et documenté dans le même passage.
+
+## Les trois [MINEUR]
+
+| # | Constat | Sort |
+| --- | --- | --- |
+| 7 | Quatre entrées non nominales sans condition, et la liste de marqueurs non publiée | **Corrigé.** `enfant.attente.pilou` reçoit son intertitre « Attente IA supérieure à 400 ms (TEC-12) » — l'ajout de « Attente IA » à la liste des intertitres conditionnels a suffi, l'information était bien là où ma méthode regarde ; `parent.resume.indispo.*` reçoivent le segment `indispo` ; `maths.indice.epuise` reçoit « les quatre indices ont été donnés (PED-02) », en `definie_ici`. **La liste des 27 marqueurs est désormais imprimée à côté du chiffre qu'elle fonde** : 98 entrées à marqueur, **0 sans condition** |
+| 8 | « 27 intertitres distincts » annoncés, 26 réels | **Corrigé.** J'avais publié le nombre d'intertitres moissonnés dans le document, pas celui des valeurs présentes dans les fichiers. Le contrôle imprime désormais la grandeur qui décrit le fichier : « conditions distinctes d'origine intertitre : 27, pour 72 entrées », et vérifie chacune contre la source |
+| 9 | `exclusif_avec` incomplet | **Corrigé sur les deux familles, et la règle publiée dit maintenant la vérité.** Le corps de `/enfant/programme` déclare ses **quatre** candidats, dont deux portés par `encouragements.json` ; les familles de boutons de `/enfant` (4 clés) et de `/enfant/programme` (2 clés) sont déclarées. 21 entrées, 33 liens. La règle ne dit plus « réciproque par construction » tout court, mais « réciproque par construction **à l'intérieur des deux fichiers ui-\*** », et nomme le cas unidirectionnel |
+
+## Le [MINEUR] 3 du tour 1
+
+Vous l'avez tranché et confié à `produit-marketing` : il est corrigé à la source
+pendant ce tour, et **arrivé ici par régénération**, jetons `{matieres}` et
+`{duree}` compris. Je garde la condition et l'exclusivité de la paire, comme
+demandé. Je retiens la remarque du contrôleur sur « à verser au backlog si » :
+c'est la formule par laquelle un défaut disparaît, et je ne la réemploierai pas
+sans nommer qui reprend le défaut et quand.
 
 ---
 
@@ -186,9 +266,9 @@ repli ne s'appelle plus `texte` : un composant qui lit `indetermine` sait qu'il
 n'a pas l'information, là où `texte` l'invitait à rendre du corps de texte.
 
 **Sur le champ `condition`** : il dit la vérité sur les 288 entrées, et son
-contenu est **récupéré** de la source dans 112 cas sur 133 — intertitre du
+contenu est **récupéré** de la source dans 115 cas sur 137 — intertitre du
 marketing, ou état que la clé nomme elle-même via une table de segments publiée
-dans le fichier. Les 21 restants sont écrits ici et marqués comme tels.
+dans le fichier. Les 22 restants sont écrits ici et marqués comme tels.
 
 **Toujours aucun champ `etat`.** L'état reste lisible dans la clé
 (`*.vide.*`, `*.souci.*`) et dans `condition` ; un troisième emplacement pour la
@@ -319,10 +399,11 @@ content/ui-enfant.json : JSON VALIDE, schema=tipi.ui-enfant.v1, entrees=101
 content/ui-parent.json : JSON VALIDE, schema=tipi.ui-parent.v1, entrees=187
 content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, entrees=460
 content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, entrees=19
-conditions renseignees : 133 / 288
-origine : {"intertitre":71,"definie_ici":21,"segment_de_cle":41}
-exclusivites declarees : 15
-roles : {"bouton":62,"indetermine":111,"titre":39,"corps":42,"action":23,"valeur":2,"aide":9}
+conditions renseignees : 137 / 288
+origine : {"intertitre":72,"definie_ici":22,"segment_de_cle":43}
+exclusivites : 21 entrees, 33 liens
+table de segments publiee : 26 entrees
+false
 ---exit:0---
 ```
 
@@ -330,13 +411,16 @@ roles : {"bouton":62,"indetermine":111,"titre":39,"corps":42,"action":23,"valeur
 
 Le script est conservé hors du dépôt. Il vérifie : que chaque clé du marketing a
 un fichier propriétaire ; qu'aucune n'en a deux ; que les six clés mortes ont
-disparu des trois fichiers ; **que plus aucune entrée à marqueur d'état n'est
-sans condition, et que les 15 entrées citées par le contrôle du tour 1 sont
-traitées** ; que les exclusivités déclarées sont réciproques et pointent sur des
-clés existantes ; que les jetons déclarés sont ceux employés ; que chaque texte
-est **identique** à sa source ; la forme des entrées, les canaux, les rôles ; la
-charte sur les textes enfant ; ARB-14 ; les emoji et le prénom en dur ; et
-ARB-13.
+disparu des trois fichiers ; **qu'aucune entrée à marqueur d'état n'est sans
+condition, la liste des marqueurs étant imprimée avec le chiffre** ; **que les
+conditions tirées d'un segment sont re-dérivables par une implémentation
+indépendante, qu'aucun segment n'est ambigu et qu'aucun segment déclaré ne reste
+inemployé** ; que chaque condition d'origine `intertitre` existe mot pour mot
+dans le marketing ; **le garde-fou sur la table 7.12** ; que les exclusivités
+sont réciproques dans les fichiers UI ; que les jetons déclarés sont ceux
+employés ; que chaque texte est identique à sa source ; la forme des entrées, les
+canaux, les rôles ; la charte sur les textes enfant ; ARB-14 ; les emoji et le
+prénom en dur ; et ARB-13.
 
 ```
 ========================================================================
@@ -383,40 +467,43 @@ entrees comparees : 288, ecarts : 0
 ========================================================================
 5. SCHEMA DES DEUX FICHIERS UI
 ========================================================================
-ui-enfant.json   101 entrees, 62 avec condition, canaux {'affiche': 47, 'les_deux': 54}, roles {'bouton': 38, 'indetermine': 33, 'titre': 7, 'corps': 19, 'action': 3, 'valeur': 1}
+ui-enfant.json   101 entrees, 64 avec condition, canaux {'affiche': 47, 'les_deux': 54}, roles {'bouton': 38, 'indetermine': 33, 'titre': 7, 'corps': 19, 'action': 3, 'valeur': 1}
                  ecrans : {'/enfant': 5, '/enfant/programme': 10, '/enfant/session/lecture': 40, '/enfant/session/maths': 23, '/enfant/pause': 4, '/enfant/coffre': 19}
-ui-parent.json   187 entrees, 71 avec condition, canaux {'affiche': 187}, roles {'indetermine': 78, 'titre': 32, 'corps': 23, 'bouton': 24, 'action': 20, 'aide': 9, 'valeur': 1}
+ui-parent.json   187 entrees, 73 avec condition, canaux {'affiche': 187}, roles {'indetermine': 78, 'titre': 32, 'corps': 23, 'bouton': 24, 'action': 20, 'aide': 9, 'valeur': 1}
                  ecrans : {'/parent': 31, '/parent/programme': 28, '/parent/resume': 23, '/reglages/code': 19, '/reglages': 82, 'notification': 4}
 
 ========================================================================
-5 bis. [MAJEUR] 1 — le champ condition
+5 bis. [MAJEUR] 1 et 6 — le champ condition, et l'instrument qui le controle
 ========================================================================
-entrees avec une condition : 133 / 288
-origine : {'intertitre': 71, 'definie_ici': 21, 'segment_de_cle': 41}
+liste de marqueurs employee (publiee avec le chiffre) : vide, souci, echec, illisible, absent, sans_, refus, expiree, breton, reprise, plus_tard, actif, regroupe, reporte, verrouille, atteint, bloque, pas_entendu, discordance, avert, sans_voix, sans_indice, camera_, basse_energie, attente, epuise, indispo
+entrees portant un marqueur d'etat : 98
+entrees avec une condition : 137 / 288
+origine : {'intertitre': 72, 'definie_ici': 22, 'segment_de_cle': 43}
+conditions distinctes d'origine intertitre : 27, pour 72 entrees
 entrees a marqueur d'etat SANS condition : 0
-echantillon du controle (15 entrees) encore a null : 0
-exemples de conditions reprises de l'intertitre :
-   enfant.accueil.reprise.bouton            Variante de reprise (l'app a été fermée en cours de soirée, PRD-18)
-   enfant.accueil.vide.bouton               État vide — aucun devoir préparé ce soir (PRD-16)
-   enfant.accueil.souci.bouton              État d'erreur — les devoirs n'ont pas pu être chargés
-   enfant.programme.une.titre               Variante à une seule étape (une seule matière reconnue, matière retirée par le parent, ou mode basse énergie, PRD-04)
-   enfant.programme.une.bouton              Variante à une seule étape (une seule matière reconnue, matière retirée par le parent, ou mode basse énergie, PRD-04)
-   enfant.programme.souci.titre             État d'erreur — le programme n'a pas pu être lu
-exemples de conditions tirees du segment de cle :
-   coffre.cosmetiques.verrouille            le cosmétique n'est pas encore débloqué
-   coffre.cosmetiques.debloque              la saisie est bloquée après cinq essais (SEC-02)
-   coffre.cosmetiques.vide                  aucun cosmétique n'est disponible
-   parent.scan.camera_refusee.titre         l'accès à l'appareil photo est refusé
-   parent.scan.camera_refusee.corps         l'accès à l'appareil photo est refusé
-   parent.scan.camera_refusee.bouton        l'accès à l'appareil photo est refusé
+echantillon des controles (19 entrees) encore a null : 0
+
+--- l'instrument re-derive au lieu de se contenter d'imprimer ---
+table de segments publiee dans le fichier : 26 entrees
+conditions d'origine segment_de_cle re-derivees a l'identique : 43, ecarts : 0
+cles appariant deux segments differents : 0
+segments declares JAMAIS employes : 0 
+conditions d'origine intertitre retrouvees mot pour mot dans le marketing : 27 / 27
+garde-fou 7.12 : 9 lignes dans la source, 9 cles observation.* ici
 
 ========================================================================
 5 ter. EXCLUSIVITE MUTUELLE DECLAREE DANS LE FICHIER
 ========================================================================
-entrees portant une exclusivite : 15, liens : 15
-   enfant.programme.corps.lecture_maths       exclusif avec enfant.programme.corps.maths_lecture
-   enfant.programme.corps.maths_lecture       exclusif avec enfant.programme.corps.lecture_maths
+entrees portant une exclusivite : 21, liens : 33
+   enfant.accueil.bouton                      exclusif avec enfant.accueil.reprise.bouton, enfant.accueil.vide.bouton, enfant.accueil.souci.bouton
+   enfant.accueil.reprise.bouton              exclusif avec enfant.accueil.bouton, enfant.accueil.vide.bouton, enfant.accueil.souci.bouton
+   enfant.accueil.vide.bouton                 exclusif avec enfant.accueil.bouton, enfant.accueil.reprise.bouton, enfant.accueil.souci.bouton
+   enfant.accueil.souci.bouton                exclusif avec enfant.accueil.bouton, enfant.accueil.reprise.bouton, enfant.accueil.vide.bouton
+   enfant.programme.corps.lecture_maths       exclusif avec enfant.programme.corps.maths_lecture, enfant.programme.une.corps.lecture, enfant.programme.une.corps.maths
+   enfant.programme.corps.maths_lecture       exclusif avec enfant.programme.corps.lecture_maths, enfant.programme.une.corps.lecture, enfant.programme.une.corps.maths
+   enfant.programme.bouton                    exclusif avec enfant.programme.une.bouton
    enfant.programme.une.titre                 exclusif avec enfant.programme.titre
+   enfant.programme.une.bouton                exclusif avec enfant.programme.bouton
    lecture.intro.titre.premier                exclusif avec lecture.intro.titre.apres
    lecture.intro.titre.apres                  exclusif avec lecture.intro.titre.premier
    maths.intro.titre.premier                  exclusif avec maths.intro.titre.apres
@@ -437,8 +524,8 @@ roles : {'bouton': 62, 'indetermine': 111, 'titre': 39, 'corps': 42, 'action': 2
 commandes citees par le controle encore typees corps de texte : 0
 ui-enfant.json   jetons declares ['{n}']
                  jetons employes ['{n}']
-ui-parent.json   jetons declares ['{date}', '{duree}', '{liste}', '{matiere}', '{n}', '{prenom}', '{version}']
-                 jetons employes ['{date}', '{duree}', '{liste}', '{matiere}', '{n}', '{prenom}', '{version}']
+ui-parent.json   jetons declares ['{date}', '{duree}', '{liste}', '{matieres}', '{matiere}', '{n}', '{prenom}', '{version}']
+                 jetons employes ['{date}', '{duree}', '{liste}', '{matieres}', '{matiere}', '{n}', '{prenom}', '{version}']
 
 ========================================================================
 5 quinquies. ARB-14 — un jeton emporte son genre, son nombre et son article
