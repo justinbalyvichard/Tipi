@@ -1,7 +1,8 @@
 # P1bis — Fichiers d'interface et retrait des clés mortes
 
 Livrable de l'agent `contenu-enfant`, mission ARB-10 et ARB-12, après la
-fermeture de G1. Sources : `docs/agents/P1/produit-marketing.out.md`,
+fermeture de G1. **Version 2 : reprise du `VERDICT: FAIL` du tour 1**
+(1 [MAJEUR], 4 [MINEUR]), et application d'ARB-14. Sources : `docs/agents/P1/produit-marketing.out.md`,
 `docs/agents/GATES.md` (ARB-08, ARB-10, ARB-12, ARB-13), et le bloc
 **AMENDEMENTS** en tête de `TIPI-PROMPT-CURSOR.md`.
 
@@ -19,6 +20,7 @@ Aucun emoji, aucun prénom en dur, aucun commit git.
 
 ## Sommaire
 
+0. Reprise après verdict du tour 1
 1. Ce que portent les deux fichiers neufs, et ce qu'ils ne portent pas
 2. Schéma des `ui-*.json`
 3. Répartition enfant / parent
@@ -27,6 +29,78 @@ Aucun emoji, aucun prénom en dur, aucun commit git.
 6. ARB-13 — le barème et les textes
 7. Contrôles mécaniques et sorties réelles
 8. Réserves et ce qui reste ouvert
+
+---
+
+# 0. Reprise après verdict du tour 1
+
+## [MAJEUR] 1 — le champ `condition`
+
+Le constat est juste et je ne le discute pas : le fichier publiait que `null`
+signifie « cas nominal », et 85 entrées le démentaient. Votre remarque sur
+l'origine de l'information a décidé la correction : **elle n'était pas à
+inventer, elle était à récupérer.** Le marketing la porte en intertitre au-dessus
+de chaque table, et mon extraction gardait la colonne « Texte » en jetant
+l'intertitre.
+
+J'ai choisi la **voie (a)** : renseigner `condition`, et non assouplir la règle.
+
+| Origine | Entrées | Comment |
+| --- | --- | --- |
+| `intertitre` | 71 | Reprise **mot pour mot** de l'intertitre du marketing : « État d'erreur — micro refusé ou indisponible », « Variante de reprise (l'app a été fermée en cours de soirée, PRD-18) », « Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT ». 27 intertitres distincts, recollés quand ils courent sur plusieurs lignes |
+| `segment_de_cle` | 41 | Là où l'intertitre du marketing est générique (« États d'erreur », 22 lignes) ou absent, la condition met en phrase **l'état que la clé nomme déjà** : `camera_refusee` → « l'accès à l'appareil photo est refusé ». La table des 25 segments est **publiée dans les deux fichiers** (`regles.conditions_par_segment`) |
+| `definie_ici` | 21 | Les 9 observations du résumé parent, et 12 clés dont **aucune convention de nommage** ne dit la condition |
+| **Total** | **133 / 288** | |
+
+Chaque entrée porte désormais `condition_source`, pour qu'un lecteur sache si la
+condition vient de la source ou de ce livrable. Le contrôle 5 bis vérifie qu'il
+ne reste **aucune entrée à marqueur d'état sans condition** : 0, et les 15
+entrées que vous citiez en exemple sont toutes traitées.
+
+**Les paires mutuellement exclusives sont dites dans le fichier, pas dans le
+rapport.** Chaque entrée porte `exclusif_avec`, généré depuis une liste de
+groupes, donc réciproque par construction. 15 entrées en portent une :
+
+| Paire | Conditions écrites |
+| --- | --- |
+| `parent.apercu.resume` / `.resume_une` | « deux étapes sont programmées » / « une seule étape est programmée » |
+| `enfant.programme.corps.lecture_maths` / `.maths_lecture` | « la lecture est programmée avant les maths » / l'inverse |
+| `lecture.intro.titre.premier` / `.apres`, `maths.intro.titre.premier` / `.apres` | « première étape du soir » / « vient après une autre étape » |
+| `coffre.palier.reste` / `.atteint`, `coffre.cosmetiques.verrouille` / `.debloque` | palier non atteint / atteint, cosmétique verrouillé / débloqué |
+| `parent.resume.etape_faite` / `.etape_passee` | « l'étape a été terminée » / « l'étape a été passée » |
+| `enfant.programme.une.titre` / `enfant.programme.titre` | la sœur vit dans `encouragements.json`, et le fichier le dit |
+
+Je n'ai pas rejoué mon argument de §2 sur le champ `etat`, comme vous me l'avez
+demandé : il était bon pour sa question et ne couvrait pas celle-ci.
+
+## Les quatre [MINEUR]
+
+| # | Constat | Sort |
+| --- | --- | --- |
+| 2 | Quatre accords de genre, pas un | **Corrigé en amont et répercuté ici.** `produit-marketing` a corrigé les quatre textes ; j'ai surtout changé la mécanique : les 9 observations ne sont plus recopiées dans mon générateur, elles sont **extraites de la table 7.12** comme les 279 autres. Une correction de la source se propage désormais par simple régénération, sans ressaisie. Mon fichier porte « {prenom} a fait une pause, puis a repris la séance. » et « Pilou a donné des indices, jamais les réponses. » |
+| 3 | `parent.apercu.resume` fige étapes, ordre et durée | **Non repris, transmis.** Le texte est verbatim dans le marketing, qui en est propriétaire, et mon mandat de ce tour se limite aux deux fichiers `ui-*.json`. J'ai fait ce qui relève de moi : la paire porte une condition explicite et une exclusivité déclarée, donc le défaut ne peut plus produire un écran faux en silence. Pour `BACKLOG-V2.md` si `produit-marketing` ne le reprend pas |
+| 4 | Six jetons déclarés jamais employés côté enfant | **Corrigé.** `jetons_connus` est désormais **calculé** à partir des jetons réellement employés par chaque fichier : `ui-enfant` déclare `{n}` et rien d'autre, `ui-parent` en déclare 7 et les emploie tous. Le contrôle 5 quater compare déclarés et employés à chaque exécution |
+| 5 | Le rôle `texte` attribué à des commandes | **Corrigé, par les deux voies que vous proposiez.** Ajout du rôle `action`, attribué par une liste publiée de verbes d'action en dernier segment : 23 entrées, dont « Tout supprimer », « Supprimer ce palier », « Réécouter », « Je ne sais pas ». Et la valeur de repli s'appelle maintenant `indetermine` et non `texte`, pour qu'aucun composant ne la rende en corps de texte par défaut. Rôles : `bouton` 62, `indetermine` 111, `corps` 42, `titre` 39, `action` 23, `aide` 9, `valeur` 2 |
+
+## ARB-14, tombé pendant ce tour
+
+« Un jeton emporte son genre, son nombre et son article. » Le contrôle
+5 quinquies applique un instrument en deux versions :
+
+- **version large** : toute préposition collée à gauche d'un jeton, et tout mot
+  accordé suivant un jeton. Elle signale 16 entrées ;
+- **version retenue** : la préposition ne compte que devant un jeton **qui porte
+  son article**, soit `{matiere}` — « à {prenom} » et « d'{prenom} » sont
+  corrects, un prénom n'a pas d'article ; et l'accord ne compte que s'il est
+  attribut du sujet ou participe avec COD antéposé — « a buté », « a demandé »
+  sont invariables. Elle signale 1 entrée, `notif.resume.titre`, dont le verdict
+  manuel est imprimé : « La séance d'{prenom} **est terminée** » s'accorde avec
+  « la séance », pas avec le jeton. Correct.
+
+Les deux versions et le motif du resserrement sont imprimés à chaque exécution.
+`parent.resume.etape_faite`, qui disait « {matiere} : terminée » — le cas
+« nombre » d'ARB-14 — a été corrigé à la source et vaut maintenant
+« {matiere} : c'est fait » dans mon fichier, par répercussion automatique.
 
 ---
 
@@ -70,17 +144,21 @@ accès direct en TypeScript.
   "version": "1.0.0",
   "public": "enfant",
   "canaux": ["tts", "affiche", "les_deux"],
-  "jetons_connus": { "{prenom}": "...", "{n}": "...", ... },
-  "regles": { "perimetre": "...", "propriete_des_cles": "...", "role": "...", ... },
+  "jetons_connus": { "{n}": "..." },
+  "regles": { "perimetre": "...", "propriete_des_cles": "...", "role": "...",
+              "condition": "...", "conditions_par_segment": [...],
+              "exclusif_avec": "..." },
   "textes": {
-    "lecture.micro.consigne": {
-      "id": "lecture.micro.consigne",
+    "lecture.micro_absent.corps": {
+      "id": "lecture.micro_absent.corps",
       "ecran": "/enfant/session/lecture",
-      "texte": "Appuie sur le micro. Lis à voix haute.",
+      "texte": "Le micro ne marche pas ce soir.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — micro refusé ou indisponible",
+      "condition_source": "intertitre",
+      "exclusif_avec": []
     }
   }
 }
@@ -92,19 +170,29 @@ accès direct en TypeScript.
 | `ecran` | `string` | Route de la section 3.1 où le texte s'affiche |
 | `texte` | `string` | Le texte, extrait du marketing mot pour mot |
 | `canal` | `"tts" \| "affiche" \| "les_deux"` | Vocabulaire d'ARB-02, le même que dans les deux autres fichiers |
-| `role` | `"titre" \| "bouton" \| "aide" \| "texte"` | Dérivé par **règle mécanique**, publiée : dernier segment commençant par « bouton » donne `bouton`, « titre » donne `titre`, un segment finissant par « aide » donne `aide`, tout le reste donne `texte`, valeur neutre |
-| `jetons` | `string[]` | Jetons présents dans `texte`, contrôlés contre le texte |
+| `role` | `"titre" \| "corps" \| "bouton" \| "action" \| "aide" \| "valeur" \| "indetermine"` | Dérivé par **règle mécanique publiée**, sans rien deviner. Le repli s'appelle `indetermine` |
+| `jetons` | `string[]` | Jetons présents dans `texte`, recalculés et contrôlés contre le texte |
 | `condition` | `string \| null` | `null` dans le cas nominal. Sinon la condition d'affichage en clair |
+| `condition_source` | `"intertitre" \| "segment_de_cle" \| "definie_ici" \| null` | D'où vient la condition, pour qu'un lecteur sache ce qui est repris de la source et ce qui est écrit ici |
+| `exclusif_avec` | `string[]` | Clés décrivant le même emplacement d'écran et qui ne peuvent pas s'afficher ensemble. Réciproque par construction |
 
-**Sur le champ `role`** : je ne dérive que ce que la clé énonce sans ambiguïté, et
-tout le reste tombe sur `texte`. Un rôle deviné serait pire qu'un rôle absent :
-le design system câblerait un libellé de bouton comme un titre sans que rien ne
-proteste. La règle est dans le fichier, pas seulement ici.
+**Sur le champ `role`** : sept valeurs, chacune déclenchée par un segment
+explicite de la clé ou par la forme du texte — jamais par une supposition. Un
+dernier segment commençant par « bouton » donne `bouton` ; un verbe d'action de
+la liste publiée donne `action` ; « titre » donne `titre` ; un segment finissant
+par « aide » donne `aide` ; un segment commençant par « corps » donne `corps` ;
+un texte réduit à un jeton donne `valeur` ; le reste donne `indetermine`. Le
+repli ne s'appelle plus `texte` : un composant qui lit `indetermine` sait qu'il
+n'a pas l'information, là où `texte` l'invitait à rendre du corps de texte.
 
-**Aucun champ dérivé pour l'état.** Les états limites se lisent dans la clé
-elle-même (`*.vide.*`, `*.souci.*`, `*.illisible.*`), qui est la convention du
-marketing. Ajouter un champ `etat` calculé par heuristique aurait créé une
-seconde source de vérité pour la même information.
+**Sur le champ `condition`** : il dit la vérité sur les 288 entrées, et son
+contenu est **récupéré** de la source dans 112 cas sur 133 — intertitre du
+marketing, ou état que la clé nomme elle-même via une table de segments publiée
+dans le fichier. Les 21 restants sont écrits ici et marqués comme tels.
+
+**Toujours aucun champ `etat`.** L'état reste lisible dans la clé
+(`*.vide.*`, `*.souci.*`) et dans `condition` ; un troisième emplacement pour la
+même information serait une source de divergence de plus.
 
 ---
 
@@ -231,16 +319,23 @@ content/ui-enfant.json : JSON VALIDE, schema=tipi.ui-enfant.v1, entrees=101
 content/ui-parent.json : JSON VALIDE, schema=tipi.ui-parent.v1, entrees=187
 content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, entrees=460
 content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, entrees=19
+conditions renseignees : 133 / 288
+origine : {"intertitre":71,"definie_ici":21,"segment_de_cle":41}
+exclusivites declarees : 15
+roles : {"bouton":62,"indetermine":111,"titre":39,"corps":42,"action":23,"valeur":2,"aide":9}
 ---exit:0---
 ```
 
-## 7.2 Couverture, propriété, fidélité, charte
+## 7.2 Couverture, propriété, conditions, fidélité, charte
 
 Le script est conservé hors du dépôt. Il vérifie : que chaque clé du marketing a
 un fichier propriétaire ; qu'aucune n'en a deux ; que les six clés mortes ont
-disparu des trois fichiers ; que chaque texte de `content/` est **identique** à
-sa source ; la forme des entrées, les canaux, les jetons ; la charte sur les
-textes enfant ; les emoji et le prénom en dur dans les quatre fichiers ; et
+disparu des trois fichiers ; **que plus aucune entrée à marqueur d'état n'est
+sans condition, et que les 15 entrées citées par le contrôle du tour 1 sont
+traitées** ; que les exclusivités déclarées sont réciproques et pointent sur des
+clés existantes ; que les jetons déclarés sont ceux employés ; que chaque texte
+est **identique** à sa source ; la forme des entrées, les canaux, les rôles ; la
+charte sur les textes enfant ; ARB-14 ; les emoji et le prénom en dur ; et
 ARB-13.
 
 ```
@@ -288,10 +383,95 @@ entrees comparees : 288, ecarts : 0
 ========================================================================
 5. SCHEMA DES DEUX FICHIERS UI
 ========================================================================
-ui-enfant.json   101 entrees, 0 avec condition, canaux {'affiche': 47, 'les_deux': 54}, roles {'bouton': 38, 'texte': 56, 'titre': 7}
+ui-enfant.json   101 entrees, 62 avec condition, canaux {'affiche': 47, 'les_deux': 54}, roles {'bouton': 38, 'indetermine': 33, 'titre': 7, 'corps': 19, 'action': 3, 'valeur': 1}
                  ecrans : {'/enfant': 5, '/enfant/programme': 10, '/enfant/session/lecture': 40, '/enfant/session/maths': 23, '/enfant/pause': 4, '/enfant/coffre': 19}
-ui-parent.json   187 entrees, 9 avec condition, canaux {'affiche': 187}, roles {'texte': 122, 'titre': 32, 'bouton': 24, 'aide': 9}
+ui-parent.json   187 entrees, 71 avec condition, canaux {'affiche': 187}, roles {'indetermine': 78, 'titre': 32, 'corps': 23, 'bouton': 24, 'action': 20, 'aide': 9, 'valeur': 1}
                  ecrans : {'/parent': 31, '/parent/programme': 28, '/parent/resume': 23, '/reglages/code': 19, '/reglages': 82, 'notification': 4}
+
+========================================================================
+5 bis. [MAJEUR] 1 — le champ condition
+========================================================================
+entrees avec une condition : 133 / 288
+origine : {'intertitre': 71, 'definie_ici': 21, 'segment_de_cle': 41}
+entrees a marqueur d'etat SANS condition : 0
+echantillon du controle (15 entrees) encore a null : 0
+exemples de conditions reprises de l'intertitre :
+   enfant.accueil.reprise.bouton            Variante de reprise (l'app a été fermée en cours de soirée, PRD-18)
+   enfant.accueil.vide.bouton               État vide — aucun devoir préparé ce soir (PRD-16)
+   enfant.accueil.souci.bouton              État d'erreur — les devoirs n'ont pas pu être chargés
+   enfant.programme.une.titre               Variante à une seule étape (une seule matière reconnue, matière retirée par le parent, ou mode basse énergie, PRD-04)
+   enfant.programme.une.bouton              Variante à une seule étape (une seule matière reconnue, matière retirée par le parent, ou mode basse énergie, PRD-04)
+   enfant.programme.souci.titre             État d'erreur — le programme n'a pas pu être lu
+exemples de conditions tirees du segment de cle :
+   coffre.cosmetiques.verrouille            le cosmétique n'est pas encore débloqué
+   coffre.cosmetiques.debloque              la saisie est bloquée après cinq essais (SEC-02)
+   coffre.cosmetiques.vide                  aucun cosmétique n'est disponible
+   parent.scan.camera_refusee.titre         l'accès à l'appareil photo est refusé
+   parent.scan.camera_refusee.corps         l'accès à l'appareil photo est refusé
+   parent.scan.camera_refusee.bouton        l'accès à l'appareil photo est refusé
+
+========================================================================
+5 ter. EXCLUSIVITE MUTUELLE DECLAREE DANS LE FICHIER
+========================================================================
+entrees portant une exclusivite : 15, liens : 15
+   enfant.programme.corps.lecture_maths       exclusif avec enfant.programme.corps.maths_lecture
+   enfant.programme.corps.maths_lecture       exclusif avec enfant.programme.corps.lecture_maths
+   enfant.programme.une.titre                 exclusif avec enfant.programme.titre
+   lecture.intro.titre.premier                exclusif avec lecture.intro.titre.apres
+   lecture.intro.titre.apres                  exclusif avec lecture.intro.titre.premier
+   maths.intro.titre.premier                  exclusif avec maths.intro.titre.apres
+   maths.intro.titre.apres                    exclusif avec maths.intro.titre.premier
+   coffre.palier.reste                        exclusif avec coffre.palier.atteint
+   coffre.cosmetiques.verrouille              exclusif avec coffre.cosmetiques.debloque
+   coffre.palier.atteint                      exclusif avec coffre.palier.reste
+   coffre.cosmetiques.debloque                exclusif avec coffre.cosmetiques.verrouille
+   parent.apercu.resume                       exclusif avec parent.apercu.resume_une
+   parent.apercu.resume_une                   exclusif avec parent.apercu.resume
+   parent.resume.etape_faite                  exclusif avec parent.resume.etape_passee
+   parent.resume.etape_passee                 exclusif avec parent.resume.etape_faite
+
+========================================================================
+5 quater. ROLES ET JETONS DECLARES
+========================================================================
+roles : {'bouton': 62, 'indetermine': 111, 'titre': 39, 'corps': 42, 'action': 23, 'valeur': 2, 'aide': 9}
+commandes citees par le controle encore typees corps de texte : 0
+ui-enfant.json   jetons declares ['{n}']
+                 jetons employes ['{n}']
+ui-parent.json   jetons declares ['{date}', '{duree}', '{liste}', '{matiere}', '{n}', '{prenom}', '{version}']
+                 jetons employes ['{date}', '{duree}', '{liste}', '{matiere}', '{n}', '{prenom}', '{version}']
+
+========================================================================
+5 quinquies. ARB-14 — un jeton emporte son genre, son nombre et son article
+========================================================================
+instrument, version LARGE puis version RETENUE, sur les 288 entrees.
+  (a) preposition contractante collee a gauche d'un jeton
+  (b) jeton suivi, dans la meme phrase, d'un mot en -e/-ee/-es/-ees
+  version LARGE   : (a) 12, (b) 4
+     (a) parent.scan.sans_devoir.valider              Ouvrir Tipi à {prenom}
+     (a) parent.apercu.passage_enfant                 Passez le téléphone à {prenom}. Pilou prend le relais.
+     (a) parent.resume.titre                          La soirée d'{prenom}
+     (a) reglages.code.creation.corps                 Ce code protège les réglages. Il n'est pas demandé à {prenom}.
+     (a) reglages.code.sortie.titre                   Arrêter la session d'{prenom}
+     (a) reglages.menu.enfant                         Profil d'{prenom}
+     (a) reglages.enfant.titre                        Profil d'{prenom}
+     (a) reglages.paliers.solde                       Pierres de {prenom} aujourd'hui : {n}
+     (a) reglages.paliers.description_aide            Ce texte reste ici. Il n'est pas affiché à {prenom}.
+     (a) reglages.donnees.ia                          Le texte des devoirs est analysé par un service d'intelligence artificielle. Le prénom d'{prenom} et les photos ne lui sont jamais envoyés.
+     (a) reglages.codeparent.corps                    Le code protège les réglages. Il n'est jamais montré à {prenom}.
+     (a) notif.resume.titre                           La séance d'{prenom} est terminée.
+     (b) reglages.donnees.ia                          Le prénom d'{prenom} et les photos ne lui sont jamais envoyés  [envoyés]
+     (b) notif.resume.titre                           La séance d'{prenom} est terminée  [terminée]
+     (b) parent.resume.observation.hesitations        {prenom} a buté sur quelques mots  [buté]
+     (b) parent.resume.observation.maths_indices      {prenom} a demandé de l'aide sur les maths  [demandé]
+  resserrement, motive :
+     (a) ne vaut que pour un jeton qui porte son article, soit {matiere}.
+         « à {prenom} », « d'{prenom} » sont corrects : un prenom n'a pas d'article.
+     (b) ne vaut que si le mot accorde est attribut du sujet (est/sont + participe)
+         ou participe avec COD anteposé (l'a guidé) : « a buté », « a demandé »
+         sont invariables avec avoir sans COD anteposé.
+  version RETENUE : (a) 0, (b) 1
+     (b) notif.resume.titre : La séance d'{prenom} est terminée
+         verdict manuel : accord sur un nom du texte (la séance, le prénom et les photos), pas sur le jeton. Correct.
 
 ========================================================================
 6. CHARTE SUR LES TEXTES ENFANT (ui-enfant.json)
