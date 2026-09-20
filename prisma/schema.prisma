@@ -1,0 +1,365 @@
+// Tipi — schéma de données
+// Conforme à la section 3.7 du prompt maître (TIPI-PROMPT-CURSOR.md).
+//
+// Conventions
+// - Les champs sont en camelCase côté TypeScript et mappés en snake_case côté
+//   Postgres avec @map, pour que les noms de colonnes soient EXACTEMENT ceux de
+//   la section 3.7. La table de correspondance champ par champ est dans
+//   docs/agents/P2/architecture.out.md, section 3.2.
+// - Trois contraintes ne sont pas exprimables en Prisma et vivent dans
+//   supabase/policies.sql, partie B : le CHECK `delta > 0` de gem_ledger
+//   (ETH-04), l'unicité partielle « une seule session active par enfant »
+//   (PRD-18) et le CHECK `tentatives_echouees >= 0` (SEC-02).
+// - Aucun accès client à cette base : toutes les lectures et écritures passent
+//   par une route serveur Next.js (TEC-11, TEC-13, SEC-06). Les politiques RLS
+//   de supabase/policies.sql refusent tout à `anon` et `authenticated` (SEC-03).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Énumérations
+// ---------------------------------------------------------------------------
+
+/// États de la machine à états de session (3.3, TEC-10).
+/// `pause` est un sur-état : l'étape de retour se déduit de `etapeCourante`.
+enum EtatSession {
+  idle
+  annonce
+  etape_lecture
+  transition
+  etape_maths
+  cloture
+  termine
+  pause
+  abandon_parent
+}
+
+/// Les deux seules matières de la V1 (PED-06).
+enum Matiere {
+  lecture
+  maths
+}
+
+/// Langue détectée par l'étape de structuration (3.2, PED-13).
+enum LangueDetectee {
+  fr
+  br
+  mixte
+}
+
+/// Issue d'une tentative sur un exercice. Aucune valeur ne porte de jugement
+/// juste/faux : `passee` et `bloquee` sont des faits, jamais des échecs (PED-04).
+enum StatutTentative {
+  en_cours
+  terminee
+  passee
+  bloquee
+}
+
+/// Motif d'un crédit de pierres. Barème de 3.7 : +1 par étape terminée,
+/// +1 bonus si les deux étapes du soir sont terminées. Aucune autre valeur
+/// n'existe : jamais de pierre par bonne réponse (PED-05).
+/// Sert aussi de clé d'idempotence avec sessionId (@@unique ci-dessous).
+enum RaisonGem {
+  etape_lecture_terminee
+  etape_maths_terminee
+  bonus_deux_etapes
+}
+
+/// Thèmes commutables (PRD-17, DES-01, DES-02).
+enum Theme {
+  pilou
+  apple
+}
+
+// ---------------------------------------------------------------------------
+// Tables de la section 3.7
+// ---------------------------------------------------------------------------
+
+/// Le foyer. Porte les réglages qui ne sont pas propres à un enfant.
+model Family {
+  id        String   @id @default(uuid()) @db.Uuid
+  nom       String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  /// SEC-05 — durée de conservation des audios de l'enfant, en jours.
+  /// 0 = ne rien conserver. Réglable dans Réglages > Enregistrements vocaux.
+  retentionAudioJours Int @default(7) @map("retention_audio_jours") @db.SmallInt
+
+  /// TEC-16 — mode calibration OCR actif. Se coupe tout seul une fois
+  /// CALIBRATION_NB_PHOTOS analyses journalisées, ou à la main dans Réglages.
+  calibrationActive Boolean @default(true) @map("calibration_active")
+
+  children       Child[]
+  settingsAccess SettingsAccess?
+
+  @@map("family")
+}
+
+/// Profil enfant. V1 = un seul enfant pré-rempli, schéma multi-enfants
+/// dès le départ (1.2, PRD-02).
+model Child {
+  id             String   @id @default(uuid()) @db.Uuid
+  familyId       String   @map("family_id") @db.Uuid
+  prenom         String
+  /// PRD-02 — l'âge n'est JAMAIS stocké : il se calcule depuis cette date.
+  dateNaissance  DateTime @map("date_naissance") @db.Date
+  niveauScolaire String   @map("niveau_scolaire")
+  classeBilingue Boolean  @default(false) @map("classe_bilingue")
+
+  /// TEC-11, SEC-06 — cache du solde. Toujours recalculé depuis gemLedger par
+  /// la route serveur, jamais écrit par le client. Invariant testé :
+  /// gemBalance == SUM(gem_ledger.delta).
+  gemBalance       Int     @default(0) @map("gem_balance")
+  themePrefere     Theme   @default(pilou) @map("theme_prefere")
+  cosmetiqueActive String? @map("cosmetique_active")
+
+  /// PRD-01 — marqueur d'onboarding joué. Non nul = jamais rejoué.
+  /// En base et pas seulement en local, comme tout état de parcours (TEC-18).
+  onboardingTermineLe DateTime? @map("onboarding_termine_le") @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  family     Family            @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  homeworks  Homework[]
+  sessions   Session[]
+  gemLedger  GemLedger[]
+  thresholds RewardThreshold[]
+
+  @@index([familyId])
+  @@map("child")
+}
+
+/// Un devoir scanné : une photo, un texte OCR, une langue.
+model Homework {
+  id             String          @id @default(uuid()) @db.Uuid
+  childId        String          @map("child_id") @db.Uuid
+  /// Chemin dans le bucket privé `devoirs` de Supabase Storage, jamais une URL
+  /// publique. L'accès se fait par URL signée émise par une route serveur.
+  photoUrl       String?         @map("photo_url")
+  texteOcr       String?         @map("texte_ocr")
+  langueDetectee LangueDetectee? @map("langue_detectee")
+  matiere        Matiere?
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  /// TEC-16 — score de confiance OCR retenu pour cette photo, comparé au seuil
+  /// de configuration `OCR_CONFIANCE_MIN`. Null = saisie manuelle du parent.
+  confianceOcr   Float?  @map("confiance_ocr")
+  /// PRD-16 — vrai quand la photo a été saisie à la main par le parent.
+  saisieManuelle Boolean @default(false) @map("saisie_manuelle")
+
+  child       Child           @relation(fields: [childId], references: [id], onDelete: Cascade)
+  exercises   Exercise[]
+  calibration CalibrationLog?
+
+  @@index([childId, createdAt])
+  @@map("homework")
+}
+
+/// Un exercice, issu du découpage fait par l'AiProvider (3.6, prompt 1).
+model Exercise {
+  id         String @id @default(uuid()) @db.Uuid
+  homeworkId String @map("homework_id") @db.Uuid
+  consigne   String
+  /// Type libre renvoyé par le modèle (« addition », « lecture de texte »…),
+  /// validé en chaîne non vide par Zod avant écriture.
+  type       String
+  contenu    String
+
+  /// TEC-07 — les 4 indices pré-générés à l'analyse.
+  /// Forme : { "niveaux": [string, string, string, string],
+  ///           "source": "pregenere" | "secours" }
+  /// Null = génération de secours à la demande, ou état `maths.sans_indice`.
+  indices Json?
+
+  ordre     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  homework Homework  @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  attempts Attempt[]
+
+  @@index([homeworkId, ordre])
+  @@map("exercise")
+}
+
+/// Une session du soir. Porte l'état de la machine (3.3) et sa persistance
+/// à chaque transition (PRD-18, TEC-18).
+model Session {
+  id      String      @id @default(uuid()) @db.Uuid
+  childId String      @map("child_id") @db.Uuid
+  /// Soirée à laquelle la session appartient, en date locale.
+  date    DateTime    @db.Date
+  etat    EtatSession @default(idle)
+
+  /// Le programme validé par le parent (TEC-06), figé au lancement.
+  /// Forme : [{ "matiere": "lecture"|"maths", "ordre": number,
+  ///            "dureeEstimeeMin": number, "exerciseIds": string[] }]
+  /// L'ordre de ce tableau fait foi pour les six configurations C1 à C6.
+  etapesPrevues Json @map("etapes_prevues")
+
+  /// Index de l'étape en cours dans `etapesPrevues`. Null avant `annonce`.
+  /// L'étape de retour après une pause s'en déduit : aucune colonne
+  /// `etat_avant_pause` n'est nécessaire.
+  etapeCourante Int? @map("etape_courante")
+
+  /// PRD-06 — résumé parent, qualitatif et sans aucun chiffre hormis la date.
+  resume String?
+
+  /// PRD-18, PRD-06 — journal append-only des transitions :
+  /// [{ "evenement": string, "de": EtatSession, "vers": EtatSession,
+  ///    "at": ISO8601, "evenementId": string }]
+  /// Sert la reprise, l'idempotence des doubles appuis, et les faits
+  /// qualitatifs du résumé (pause prise, blocage, arrêt parent).
+  evenements Json @default("[]")
+
+  /// PRD-04 — Soir léger. Aucun texte enfant ne l'expose (ARB-06).
+  soirLeger   Boolean @default(false) @map("soir_leger")
+  /// PRD-13 — session arrêtée par le parent. Le rituel de clôture reste
+  /// identique et les pierres acquises sont conservées (ETH-04).
+  arretParent Boolean @default(false) @map("arret_parent")
+
+  startedAt DateTime? @map("started_at") @db.Timestamptz(6)
+  endedAt   DateTime? @map("ended_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  child     Child       @relation(fields: [childId], references: [id], onDelete: Cascade)
+  attempts  Attempt[]
+  gemLedger GemLedger[]
+
+  @@index([childId, date])
+  @@index([childId, etat])
+  @@map("session")
+}
+
+/// Une tentative de l'enfant sur un exercice.
+model Attempt {
+  id         String @id @default(uuid()) @db.Uuid
+  exerciseId String @map("exercise_id") @db.Uuid
+  sessionId  String @map("session_id") @db.Uuid
+
+  /// Transcription STT, telle que rendue par le SpeechProvider.
+  /// Jamais comparée mot à mot à l'écran (3.4), jamais envoyée à l'IA (SEC-04).
+  transcriptionAudio String?         @map("transcription_audio")
+  /// Chemin dans le bucket privé `audios`. Purgé par SEC-05.
+  audioUrl           String?         @map("audio_url")
+  /// PED-02 — nombre d'indices déroulés, 0 à 4. Jamais affiché à l'enfant
+  /// (PED-07) ; sert le résumé parent et la reprise (PRD-18).
+  nbIndicesUtilises  Int             @default(0) @map("nb_indices_utilises")
+  statut             StatutTentative @default(en_cours)
+
+  /// PED-08 — nombre de sollicitations sans réponse exploitable, comparé au
+  /// seuil de configuration `BLOCAGE_NB_SOLLICITATIONS`.
+  nbSollicitations Int  @default(0) @map("nb_sollicitations")
+  /// 3.4 — mots sur lesquels l'enfant a hésité, pour « Mots à revoir » côté
+  /// parent. Forme : string[].
+  motsHesitants    Json @default("[]") @map("mots_hesitants")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  session  Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, exerciseId])
+  @@index([sessionId])
+  @@index([exerciseId])
+  @@map("attempt")
+}
+
+/// Historique des pierres. Source de vérité du solde (TEC-11, SEC-06).
+/// ETH-04 : aucun delta négatif, garanti par le CHECK `gem_ledger_delta_positif`
+/// de supabase/policies.sql, partie B — pas seulement par le code.
+model GemLedger {
+  id        String    @id @default(uuid()) @db.Uuid
+  childId   String    @map("child_id") @db.Uuid
+  sessionId String?   @map("session_id") @db.Uuid
+  delta     Int       @db.SmallInt
+  raison    RaisonGem
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  child   Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  session Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  /// Idempotence du crédit : une raison ne peut être créditée qu'une fois par
+  /// session. Un double appui sur le bouton principal ne crédite pas deux fois.
+  @@unique([sessionId, raison])
+  @@index([childId, createdAt])
+  @@map("gem_ledger")
+}
+
+/// Paliers définis par le parent (PRD-14). Le palier atteint ne retire jamais
+/// de pierre (ETH-04) et l'application ne délivre jamais la récompense (ETH-05).
+model RewardThreshold {
+  id          String    @id @default(uuid()) @db.Uuid
+  childId     String    @map("child_id") @db.Uuid
+  gemsRequis  Int       @map("gems_requis")
+  /// Texte libre saisi par le parent. Rendu UNIQUEMENT dans /reglages.
+  /// Aucun composant de src/app/enfant/** ne le lit (ETH-05, décision 7.9).
+  description String
+  atteintLe   DateTime? @map("atteint_le") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId, gemsRequis])
+  @@map("reward_threshold")
+}
+
+/// Accès Réglages : hash du code parent et limitation de tentatives
+/// (PRD-15, SEC-01, SEC-02). Le code en clair n'existe nulle part (SEC-08).
+model SettingsAccess {
+  id                 String    @id @default(uuid()) @db.Uuid
+  familyId           String    @unique @map("family_id") @db.Uuid
+  /// Hash argon2id. Jamais retourné par une route, jamais journalisé (SEC-01).
+  codeHash           String    @map("code_hash")
+  tentativesEchouees Int       @default(0) @map("tentatives_echouees") @db.SmallInt
+  bloqueJusquA       DateTime? @map("bloque_jusqu_a") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@map("settings_access")
+}
+
+// ---------------------------------------------------------------------------
+// Table hors 3.7, exigée nommément par TEC-16
+// ---------------------------------------------------------------------------
+
+/// TEC-16 — mode calibration OCR. Journalise, pour les N premières photos,
+/// le texte OCR brut, le score de confiance et le JSON renvoyé par le modèle.
+/// Consultable depuis Réglages > Calibration des photos.
+/// Ne contient aucune donnée identifiante : ni prénom, ni photo (SEC-04).
+model CalibrationLog {
+  id         String @id @default(uuid()) @db.Uuid
+  homeworkId String @unique @map("homework_id") @db.Uuid
+
+  texteOcrBrut           String  @map("texte_ocr_brut")
+  confianceOcr           Float   @map("confiance_ocr")
+  /// Payload EXACT envoyé au fournisseur d'IA, après anonymisation (SEC-04).
+  payloadIa              Json    @map("payload_ia")
+  /// Réponse brute du fournisseur, avant validation Zod.
+  reponseIaBrute         Json?   @map("reponse_ia_brute")
+  /// Null si la sortie était conforme ; sinon le code d'erreur applicatif.
+  erreurCode             String? @map("erreur_code")
+  /// Seuil de confiance en vigueur au moment de l'analyse, pour pouvoir
+  /// rejouer un réglage a posteriori sur de vraies photos.
+  seuilConfianceApplique Float   @map("seuil_confiance_applique")
+  dureeMs                Int     @map("duree_ms")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  homework Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@map("calibration_log")
+}
