@@ -34,14 +34,17 @@
       "les_deux": "Lue et affichée, mot pour mot identique (PED-10)."
     },
     "canal_decision": "Énumération tts / affiche / les_deux retenue pour tout le projet, tranchée par l'Orchestrateur le 2026-09-20. Le livrable marketing s'y aligne : dit devient tts, dit_affiche devient les_deux, affiche ne change pas.",
-    "jeton_prenom_regle": "Le prénom de l'enfant n'est jamais écrit en dur : il passe par le jeton {prenom} (PRD-02)."
+    "jeton_prenom_regle": "Le prénom de l'enfant n'est jamais écrit en dur : il passe par le jeton {prenom} (PRD-02).",
+    "jeton_matiere_regle": "Le jeton {matiere} vaut « la lecture » ou « les maths », selon la clé rendue. Il n'apparaît jamais en début de phrase et n'est jamais sujet d'un verbe : le texte reste juste au singulier comme au pluriel.",
+    "canal_tts_en_v1": "Aucune entrée n'emploie le canal tts en V1, et c'est voulu : toute information utile à l'action est doublée à l'oral (PED-10), donc affichée aussi. La valeur reste dans l'énumération pour une future réplique purement vocale, par exemple pendant une animation sans texte à l'écran."
   },
   "correspondance_mission": {
     "accueil": [
       "accueil"
     ],
     "annonce du programme": [
-      "annonce_programme"
+      "annonce_programme",
+      "annonce_programme_une_etape"
     ],
     "avant lecture": [
       "avant_lecture"
@@ -104,10 +107,9 @@
     },
     {
       "cles": [
-        "enfant.programme.une.corps.lecture",
-        "enfant.programme.une.corps.maths"
+        "enfant.programme.une.titre"
       ],
-      "motif": "Mode basse energie : une seule etape, un seul message, texte fixe."
+      "motif": "Titre de reperage de la soiree a une etape. La banque annonce_programme_une_etape fait varier le corps, pas le titre."
     },
     {
       "cles": [
@@ -895,6 +897,365 @@
                 "enfant.programme.titre"
               ],
               "texte": "Voilà le travail du soir. On s'y met ensemble."
+            }
+          ]
+        }
+      ]
+    },
+    "annonce_programme_une_etape": {
+      "id": "annonce_programme_une_etape",
+      "libelle": "Annonce du programme quand la soiree ne compte qu'une etape",
+      "ecran": "/enfant/programme",
+      "cles_ui": [
+        "enfant.programme.une.corps.lecture",
+        "enfant.programme.une.corps.maths"
+      ],
+      "req": [
+        "PRD-04",
+        "PRD-07",
+        "PED-06",
+        "PED-10",
+        "PED-11"
+      ],
+      "note": "Configurations C3 a C6 du marketing : une matiere retiree par le parent, ou Soir leger. Le jeton {matiere} vaut « la lecture » ou « les maths » selon la cle rendue : une seule banque couvre les deux cles, sans jamais nommer une matiere absente. AUCUNE variante ne laisse entendre que la soiree est raccourcie, allegee ou liee a la fatigue de l'enfant : un Soir leger reste indiscernable d'une soiree ordinaire (PRD-04, arbitrage A14 du marketing).",
+      "variantes": [
+        {
+          "id": "enc.annonce_programme_une_etape.01",
+          "texte": "On fait {matiere}. Et c'est tout.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On fait {matiere}. Et c'est tout."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.02",
+          "texte": "Ce soir, c'est {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Ce soir, c'est {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.03",
+          "texte": "On s'occupe de {matiere}, tous les deux.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On s'occupe de {matiere}, tous les deux."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.04",
+          "texte": "Au programme, il y a {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Au programme, il y a {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.05",
+          "texte": "On travaille {matiere} ensemble.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On travaille {matiere} ensemble."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.06",
+          "texte": "Je te propose {matiere} pour ce soir.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Je te propose {matiere} pour ce soir."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.07",
+          "texte": "On prend {matiere}, tranquillement.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On prend {matiere}, tranquillement."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.08",
+          "texte": "Ce soir, on fait {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Ce soir, on fait {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.09",
+          "texte": "On ouvre {matiere}, et on y va.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On ouvre {matiere}, et on y va."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.10",
+          "texte": "Il y a {matiere} ce soir.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Il y a {matiere} ce soir."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.11",
+          "texte": "Tu fais {matiere} avec moi.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Tu fais {matiere} avec moi."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.12",
+          "texte": "On commence {matiere} quand tu veux.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On commence {matiere} quand tu veux."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.13",
+          "texte": "Ce soir, on regarde {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Ce soir, on regarde {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.14",
+          "texte": "On y va pour {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On y va pour {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.15",
+          "texte": "Je t'accompagne sur {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Je t'accompagne sur {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.16",
+          "texte": "Notre programme du soir, c'est {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Notre programme du soir, c'est {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.17",
+          "texte": "On fait {matiere}, comme il faut.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On fait {matiere}, comme il faut."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.18",
+          "texte": "Ce soir, on passe du temps sur {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Ce soir, on passe du temps sur {matiere}."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.19",
+          "texte": "On avance sur {matiere}, doucement.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "On avance sur {matiere}, doucement."
+            }
+          ]
+        },
+        {
+          "id": "enc.annonce_programme_une_etape.20",
+          "texte": "Voilà notre travail du soir : {matiere}.",
+          "canal": "les_deux",
+          "jetons": [
+            "{matiere}"
+          ],
+          "parties": [
+            {
+              "cles_ui": [
+                "enfant.programme.une.corps.lecture",
+                "enfant.programme.une.corps.maths"
+              ],
+              "texte": "Voilà notre travail du soir : {matiere}."
             }
           ]
         }
