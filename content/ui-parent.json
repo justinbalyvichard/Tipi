@@ -110,6 +110,18 @@
       {
         "segment": "apercu.echec",
         "condition": "la préparation du programme a échoué"
+      },
+      {
+        "segment": "cosmetiques.verrouille",
+        "condition": "le cosmétique n'est pas encore débloqué"
+      },
+      {
+        "segment": "cosmetiques.debloque",
+        "condition": "le cosmétique est débloqué"
+      },
+      {
+        "segment": "cosmetiques.vide",
+        "condition": "aucun cosmétique n'est disponible"
       }
     ],
     "exclusif_avec": "Clés qui décrivent le même emplacement d'écran et ne peuvent pas s'afficher ensemble. Une clé sœur peut vivre dans un autre fichier de content/ : enfant.programme.titre est porté par la banque encouragements.json.",
@@ -125,7 +137,7 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": "État d'erreur** (état applicatif illisible, base injoignable)",
+      "condition": "État d'erreur (état applicatif illisible, base injoignable)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -237,7 +249,7 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": "État vide — aucune photo ajoutée** :",
+      "condition": "État vide — aucune photo ajoutée",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -248,7 +260,7 @@
       "canal": "affiche",
       "role": "corps",
       "jetons": [],
-      "condition": "État vide — aucune photo ajoutée** :",
+      "condition": "État vide — aucune photo ajoutée",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -259,7 +271,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État vide — aucune photo ajoutée** :",
+      "condition": "État vide — aucune photo ajoutée",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -270,7 +282,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État vide — pas de devoirs ce soir** (PRD-16)",
+      "condition": "État vide — pas de devoirs ce soir (PRD-16)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -281,7 +293,7 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": "État vide — pas de devoirs ce soir** (PRD-16)",
+      "condition": "État vide — pas de devoirs ce soir (PRD-16)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -294,7 +306,7 @@
       "jetons": [
         "{prenom}"
       ],
-      "condition": "État vide — pas de devoirs ce soir** (PRD-16)",
+      "condition": "État vide — pas de devoirs ce soir (PRD-16)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -448,7 +460,7 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Pendant l'analyse** :",
+      "condition": "Pendant l'analyse",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -459,7 +471,7 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Pendant l'analyse** :",
+      "condition": "Pendant l'analyse",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -481,8 +493,8 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "deux étapes sont programmées",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "parent.apercu.resume_une"
       ]
@@ -494,8 +506,8 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "une seule étape est programmée",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "parent.apercu.resume"
       ]
@@ -610,7 +622,7 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Mode basse énergie** (PRD-04) :",
+      "condition": "Mode basse énergie (PRD-04)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -621,7 +633,7 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": "Mode basse énergie** (PRD-04) :",
+      "condition": "Mode basse énergie (PRD-04)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -632,7 +644,7 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Mode basse énergie** (PRD-04) :",
+      "condition": "Mode basse énergie (PRD-04)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -656,7 +668,7 @@
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Plus de 2 étapes détectées** (PED-06) :",
+      "condition": "Plus de 2 étapes détectées (PED-06)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -669,7 +681,7 @@
       "jetons": [
         "{liste}"
       ],
-      "condition": "Plus de 2 étapes détectées** (PED-06) :",
+      "condition": "Plus de 2 étapes détectées (PED-06)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -680,7 +692,7 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "condition": "État vide — rien d'exploitable dans les photos",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -691,7 +703,7 @@
       "canal": "affiche",
       "role": "corps",
       "jetons": [],
-      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "condition": "État vide — rien d'exploitable dans les photos",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -702,7 +714,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "condition": "État vide — rien d'exploitable dans les photos",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -713,7 +725,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "condition": "État vide — rien d'exploitable dans les photos",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -823,14 +835,14 @@
     "parent.resume.etape_faite": {
       "id": "parent.resume.etape_faite",
       "ecran": "/parent/resume",
-      "texte": "{matiere} : terminée",
+      "texte": "{matiere} : c'est fait",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
         "{matiere}"
       ],
-      "condition": null,
-      "condition_source": null,
+      "condition": "l'étape a été terminée",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "parent.resume.etape_passee"
       ]
@@ -838,14 +850,14 @@
     "parent.resume.etape_passee": {
       "id": "parent.resume.etape_passee",
       "ecran": "/parent/resume",
-      "texte": "{matiere} : passée",
+      "texte": "{matiere} : pas ce soir",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
         "{matiere}"
       ],
-      "condition": null,
-      "condition_source": null,
+      "condition": "l'étape a été passée",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "parent.resume.etape_faite"
       ]
@@ -901,7 +913,7 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": "État vide — séance sans devoir** :",
+      "condition": "État vide — séance sans devoir",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -914,7 +926,7 @@
       "jetons": [
         "{prenom}"
       ],
-      "condition": "État vide — séance sans devoir** :",
+      "condition": "État vide — séance sans devoir",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1099,7 +1111,7 @@
     "reglages.code.refuse_reste": {
       "id": "reglages.code.refuse_reste",
       "ecran": "/reglages/code",
-      "texte": "Il reste {n} essais avant un blocage temporaire.",
+      "texte": "Essais restants avant blocage : {n}",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
@@ -1485,7 +1497,7 @@
     "reglages.paliers.solde": {
       "id": "reglages.paliers.solde",
       "ecran": "/reglages",
-      "texte": "{prenom} a {n} pierres aujourd'hui.",
+      "texte": "Pierres de {prenom} aujourd'hui : {n}",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
@@ -1947,7 +1959,7 @@
     "reglages.calibration.restantes": {
       "id": "reglages.calibration.restantes",
       "ecran": "/reglages",
-      "texte": "{n} photos encore enregistrées pour la calibration.",
+      "texte": "Photos enregistrées pour la calibration : {n}",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
@@ -2170,7 +2182,7 @@
     "parent.resume.observation.maths_indices": {
       "id": "parent.resume.observation.maths_indices",
       "ecran": "/parent/resume",
-      "texte": "{prenom} a demandé de l'aide sur les maths. Pilou l'a guidé sans donner les réponses.",
+      "texte": "{prenom} a demandé de l'aide sur les maths. Pilou a donné des indices, jamais les réponses.",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
@@ -2183,7 +2195,7 @@
     "parent.resume.observation.maths_sans_indice": {
       "id": "parent.resume.observation.maths_sans_indice",
       "ecran": "/parent/resume",
-      "texte": "{prenom} a fait les maths seul, sans demander d'indice.",
+      "texte": "{prenom} a fait les maths sans demander d'indice.",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
@@ -2196,7 +2208,7 @@
     "parent.resume.observation.pause": {
       "id": "parent.resume.observation.pause",
       "ecran": "/parent/resume",
-      "texte": "{prenom} a fait une pause. Il est revenu ensuite.",
+      "texte": "{prenom} a fait une pause, puis a repris la séance.",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [
@@ -2231,7 +2243,7 @@
     "parent.resume.observation.breton": {
       "id": "parent.resume.observation.breton",
       "ecran": "/parent/resume",
-      "texte": "Le texte en breton a été lu par {prenom} seul. Pilou ne le corrige pas.",
+      "texte": "{prenom} a lu le texte en breton sans aide. Pilou ne corrige pas le breton.",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [

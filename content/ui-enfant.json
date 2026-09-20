@@ -105,6 +105,18 @@
       {
         "segment": "apercu.echec",
         "condition": "la préparation du programme a échoué"
+      },
+      {
+        "segment": "cosmetiques.verrouille",
+        "condition": "le cosmétique n'est pas encore débloqué"
+      },
+      {
+        "segment": "cosmetiques.debloque",
+        "condition": "le cosmétique est débloqué"
+      },
+      {
+        "segment": "cosmetiques.vide",
+        "condition": "aucun cosmétique n'est disponible"
       }
     ],
     "exclusif_avec": "Clés qui décrivent le même emplacement d'écran et ne peuvent pas s'afficher ensemble. Une clé sœur peut vivre dans un autre fichier de content/ : enfant.programme.titre est porté par la banque encouragements.json.",
@@ -131,7 +143,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Variante de reprise** (l'app a été fermée en cours de soirée, PRD-18) :",
+      "condition": "Variante de reprise (l'app a été fermée en cours de soirée, PRD-18)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -142,7 +154,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État vide — aucun devoir préparé ce soir** (PRD-16) :",
+      "condition": "État vide — aucun devoir préparé ce soir (PRD-16)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -153,7 +165,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État d'erreur — les devoirs n'ont pas pu être chargés** :",
+      "condition": "État d'erreur — les devoirs n'ont pas pu être chargés",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -197,8 +209,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "la lecture est programmée avant les maths",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "enfant.programme.corps.maths_lecture"
       ]
@@ -210,8 +222,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "les maths sont programmées avant la lecture",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "enfant.programme.corps.lecture_maths"
       ]
@@ -234,7 +246,7 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": "Variante à une seule étape** (une seule matière reconnue, matière retirée par",
+      "condition": "Variante à une seule étape (une seule matière reconnue, matière retirée par le parent, ou mode basse énergie, PRD-04)",
       "condition_source": "intertitre",
       "exclusif_avec": [
         "enfant.programme.titre"
@@ -247,7 +259,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Variante à une seule étape** (une seule matière reconnue, matière retirée par",
+      "condition": "Variante à une seule étape (une seule matière reconnue, matière retirée par le parent, ou mode basse énergie, PRD-04)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -258,7 +270,7 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "condition": "État d'erreur — le programme n'a pas pu être lu",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -269,7 +281,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "condition": "État d'erreur — le programme n'a pas pu être lu",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -280,7 +292,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "condition": "État d'erreur — le programme n'a pas pu être lu",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -291,8 +303,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "la lecture est la première étape du soir",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "lecture.intro.titre.apres"
       ]
@@ -304,8 +316,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "la lecture vient après une autre étape",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "lecture.intro.titre.premier"
       ]
@@ -405,7 +417,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Hésitation détectée sur un mot** — situation `hesitation` :",
+      "condition": "Hésitation détectée sur un mot — situation `hesitation`",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -416,7 +428,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Hésitation détectée sur un mot** — situation `hesitation` :",
+      "condition": "Hésitation détectée sur un mot — situation `hesitation`",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -427,7 +439,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition": "Transcription non exploitable (PED-09) — jamais une sanction",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -438,7 +450,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition": "Transcription non exploitable (PED-09) — jamais une sanction",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -449,7 +461,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition": "Transcription non exploitable (PED-09) — jamais une sanction",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -460,7 +472,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition": "Transcription non exploitable (PED-09) — jamais une sanction",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -471,7 +483,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition": "Transcription non exploitable (PED-09) — jamais une sanction",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -482,7 +494,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition": "Transcription non exploitable (PED-09) — jamais une sanction",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -548,7 +560,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition": "Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -559,7 +571,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition": "Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -570,7 +582,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition": "Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -581,7 +593,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition": "Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -592,7 +604,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition": "Cas breton (PED-13) — texte affiché, consigne expliquée en français, pas de TTS ni de STT",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -614,7 +626,7 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition": "Sortie anticipée, parent uniquement (PRD-13)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -625,7 +637,7 @@
       "canal": "affiche",
       "role": "corps",
       "jetons": [],
-      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition": "Sortie anticipée, parent uniquement (PRD-13)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -636,7 +648,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition": "Sortie anticipée, parent uniquement (PRD-13)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -647,7 +659,7 @@
       "canal": "affiche",
       "role": "action",
       "jetons": [],
-      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition": "Sortie anticipée, parent uniquement (PRD-13)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -658,7 +670,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "condition": "État d'erreur — micro refusé ou indisponible",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -669,7 +681,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "condition": "État d'erreur — micro refusé ou indisponible",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -680,7 +692,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "condition": "État d'erreur — micro refusé ou indisponible",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -691,7 +703,7 @@
       "canal": "affiche",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — voix de Pilou indisponible**",
+      "condition": "État d'erreur — voix de Pilou indisponible",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -702,7 +714,7 @@
       "canal": "affiche",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — voix de Pilou indisponible**",
+      "condition": "État d'erreur — voix de Pilou indisponible",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -713,7 +725,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition": "Reprise d'étape après fermeture (PRD-18)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -724,7 +736,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition": "Reprise d'étape après fermeture (PRD-18)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -735,8 +747,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "les maths sont la première étape du soir",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "maths.intro.titre.apres"
       ]
@@ -748,8 +760,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "les maths viennent après une autre étape",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "maths.intro.titre.premier"
       ]
@@ -838,7 +850,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition": "L'enfant demande le résultat (PED-01) — refus constant, chaleureux, sans reproche, quel que soit le nombre de demandes",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -849,7 +861,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition": "L'enfant demande le résultat (PED-01) — refus constant, chaleureux, sans reproche, quel que soit le nombre de demandes",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -860,7 +872,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition": "L'enfant demande le résultat (PED-01) — refus constant, chaleureux, sans reproche, quel que soit le nombre de demandes",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -871,7 +883,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition": "L'enfant demande le résultat (PED-01) — refus constant, chaleureux, sans reproche, quel que soit le nombre de demandes",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -882,7 +894,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Blocage détecté** (PED-08, après 3 sollicitations sans réponse exploitable) :",
+      "condition": "Blocage détecté (PED-08, après 3 sollicitations sans réponse exploitable)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -893,7 +905,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Blocage détecté** (PED-08, après 3 sollicitations sans réponse exploitable) :",
+      "condition": "Blocage détecté (PED-08, après 3 sollicitations sans réponse exploitable)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -926,7 +938,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition": "État d'erreur — indices indisponibles (secours de TEC-07 en échec)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -937,7 +949,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition": "État d'erreur — indices indisponibles (secours de TEC-07 en échec)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -948,7 +960,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition": "État d'erreur — indices indisponibles (secours de TEC-07 en échec)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -959,7 +971,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition": "État d'erreur — indices indisponibles (secours de TEC-07 en échec)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -970,7 +982,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition": "Reprise d'étape après fermeture (PRD-18)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -981,7 +993,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition": "Reprise d'étape après fermeture (PRD-18)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1045,14 +1057,14 @@
     "coffre.palier.reste": {
       "id": "coffre.palier.reste",
       "ecran": "/enfant/coffre",
-      "texte": "Encore {n} pierres.",
+      "texte": "Il t'en faut encore {n}.",
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
-      "condition_source": "intertitre",
+      "condition": "un palier est défini et n'est pas encore atteint",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "coffre.palier.atteint"
       ]
@@ -1060,14 +1072,14 @@
     "coffre.cosmetiques.verrouille": {
       "id": "coffre.cosmetiques.verrouille",
       "ecran": "/enfant/coffre",
-      "texte": "Il faut {n} pierres pour celui-là.",
+      "texte": "Il en faut {n} pour celui-là.",
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": "Cosmétiques de Pilou",
-      "condition_source": "intertitre",
+      "condition": "le cosmétique n'est pas encore débloqué",
+      "condition_source": "segment_de_cle",
       "exclusif_avec": [
         "coffre.cosmetiques.debloque"
       ]
@@ -1123,7 +1135,7 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "condition": "Progression vers le palier suivant (PRD-14, ETH-05)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1134,8 +1146,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
-      "condition_source": "intertitre",
+      "condition": "le palier est atteint",
+      "condition_source": "definie_ici",
       "exclusif_avec": [
         "coffre.palier.reste"
       ]
@@ -1147,7 +1159,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "condition": "Progression vers le palier suivant (PRD-14, ETH-05)",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1158,7 +1170,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Aucun palier défini** — état vide :",
+      "condition": "Aucun palier défini — état vide",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1169,7 +1181,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Aucun palier défini** — état vide :",
+      "condition": "Aucun palier défini — état vide",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1180,8 +1192,8 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": "Cosmétiques de Pilou",
-      "condition_source": "intertitre",
+      "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.cosmetiques.bouton_appliquer": {
@@ -1191,8 +1203,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "Cosmétiques de Pilou",
-      "condition_source": "intertitre",
+      "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.cosmetiques.debloque": {
@@ -1202,8 +1214,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Cosmétiques de Pilou",
-      "condition_source": "intertitre",
+      "condition": "la saisie est bloquée après cinq essais (SEC-02)",
+      "condition_source": "segment_de_cle",
       "exclusif_avec": [
         "coffre.cosmetiques.verrouille"
       ]
@@ -1215,8 +1227,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "Cosmétiques de Pilou",
-      "condition_source": "intertitre",
+      "condition": "aucun cosmétique n'est disponible",
+      "condition_source": "segment_de_cle",
       "exclusif_avec": []
     },
     "coffre.souci.corps": {
@@ -1226,7 +1238,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — solde non récupérable** :",
+      "condition": "État d'erreur — solde non récupérable",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1237,7 +1249,7 @@
       "canal": "les_deux",
       "role": "corps",
       "jetons": [],
-      "condition": "État d'erreur — solde non récupérable** :",
+      "condition": "État d'erreur — solde non récupérable",
       "condition_source": "intertitre",
       "exclusif_avec": []
     },
@@ -1248,7 +1260,7 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": "État d'erreur — solde non récupérable** :",
+      "condition": "État d'erreur — solde non récupérable",
       "condition_source": "intertitre",
       "exclusif_avec": []
     }
