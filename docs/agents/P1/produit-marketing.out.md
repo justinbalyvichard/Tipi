@@ -77,7 +77,9 @@ Aucune communication Tipi, interne ou externe, ne contient les mots
 
 **Preuve de la promesse** : deux étapes maximum par soir quel que soit le volume
 de devoirs (PED-06), une pause toujours accessible et toujours gratuite
-(PRD-12), aucun chiffre montré à l'enfant (PED-07).
+(PRD-12), et aucun chiffre de performance montré à l'enfant (PED-07) — les seuls
+nombres qu'il voit sont les trois nombres d'inventaire de pierres du coffre,
+énumérés en 7.9, qui ne mesurent pas l'enfant et ne baissent jamais.
 
 ## 1.2 Territoire : le tipi comme abri
 
@@ -1361,8 +1363,9 @@ Il contient des faits qualitatifs et une observation utile pour le lendemain.
 La durée de séance a été retirée à la reprise du 2026-09-20 : c'est la donnée la
 plus directement lisible en performance d'un soir sur l'autre, ce que le reste du
 produit refuse partout ailleurs (ETH-02). Le nombre de pierres a été retiré pour
-la même raison de lecture comparative. Le parent qui veut le solde exact l'ouvre
-dans `/reglages`, sous-page Paliers, hors du résumé du soir.
+la même raison de lecture comparative. Le parent qui veut le solde exact le lit
+dans `/reglages`, sous-page Paliers, via la clé `reglages.paliers.solde`, hors du
+résumé du soir.
 
 La seule donnée numérique restante est la **date**, qui identifie la séance et ne
 mesure rien.
@@ -1558,6 +1561,7 @@ sélectionné est appliqué dès l'écran de lancement (section 4.2).
 | --- | --- |
 | `reglages.paliers.titre` | « Paliers de récompense » |
 | `reglages.paliers.corps` | « Vous définissez le palier et vous donnez la récompense. Tipi compte seulement les pierres. » |
+| `reglages.paliers.solde` | « Evan a {n} pierres aujourd'hui. » |
 | `reglages.paliers.ajouter` | « Ajouter un palier » |
 | `reglages.paliers.gems` | « Nombre de pierres » |
 | `reglages.paliers.description` | « Ce que vous proposez » |
