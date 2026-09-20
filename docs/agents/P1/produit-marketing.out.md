@@ -45,8 +45,22 @@ Passe courte, limitée à trois points. Le reste du livrable n'est pas rouvert.
 | Réserve | Ce qui a changé | Où |
 | --- | --- | --- |
 | T2-1 | La section 1.1 affirmait « aucun chiffre montré à l'enfant », en contradiction avec 7.9 qui en admet trois. C'est 7.9 qui fait foi : 1.1 parle désormais d'« aucun chiffre **de performance** » et renvoie nommément aux trois nombres d'inventaire de pierres | 1.1, preuve de la promesse |
-| T2-2 | La section 7.12 renvoyait le parent vers la sous-page Paliers pour un solde qu'aucune clé n'y affichait. La clé manquante est ajoutée : `reglages.paliers.solde` = « Evan a {n} pierres aujourd'hui. », et le renvoi de 7.12 la nomme | 7.12, 7.14 sous-page Paliers |
+| T2-2 | La section 7.12 renvoyait le parent vers la sous-page Paliers pour un solde qu'aucune clé n'y affichait. La clé manquante est ajoutée : `reglages.paliers.solde` = « {prenom} a {n} pierres aujourd'hui. », et le renvoi de 7.12 la nomme | 7.12, 7.14 sous-page Paliers |
 | T2-3 | « Le prochain palier » est hors vocabulaire de CE1. `coffre.palier.titre` devient « Où tu en es ». Le mot « palier » est retiré de **toutes** les chaînes enfant, pas seulement de celle qui était citée : `coffre.palier.atteint` devient « Ça y est. Tu y es arrivé. » et `coffre.palier.vide` devient « Il n'y a rien à atteindre pour l'instant. ». Les noms de clés `coffre.palier.*` ne changent pas : ce sont des identifiants techniques, jamais lus ni affichés. « Palier » reste un mot de Réglages, côté parent | 7.9, progression et état vide |
+
+## Tour 3 — deux arbitrages tranchés par l'Orchestrateur
+
+| Réserve | Ce qui a changé | Où |
+| --- | --- | --- |
+| T3-1 | **Le prénom ne s'écrit plus jamais en dur.** Les 27 chaînes de contenu qui portaient « Evan » utilisent désormais le jeton `{prenom}`, écrans enfant et écrans parent compris, y compris `reglages.paliers.solde` et les exemples de notifications interdites. Convention alignée sur `content/`, seul jeu de fichiers réellement consommé par le code, et sur le schéma multi-enfants posé en 1.2 du prompt maître. La convention est écrite en 2.3 | 2.3, et les 27 chaînes dans 7.3, 7.8, 7.10 à 7.14 et section 8 |
+| T3-2a | La formulation en creux « Il n'y a rien à atteindre pour l'instant. » est remplacée par `coffre.palier.vide` = « Ton coffre se remplit tout doucement. ». La phrase décrit ce qui est, et non ce qui manque : plus rien ne suggère à l'enfant qu'il devrait réclamer un palier | 7.9, état vide du palier |
+| T3-2b | L'accord de genre figé de « Tu y es arrivé. » est supprimé. `coffre.palier.atteint` devient « Ça y est. Tu as assez de pierres. » : aucun participe ni adjectif accordé, la phrase vaut pour n'importe quel enfant | 7.9, palier atteint |
+
+**Règle héritée de `contenu-enfant`, désormais applicable ici** : aucune chaîne
+destinée à l'enfant ne contient de participe passé ni d'adjectif accordé au genre
+de l'enfant. Les phrases se construisent sur des verbes et des noms
+(« Tu as assez de pierres. ») plutôt que sur des attributs (« Tu es arrivé. »).
+Cette règle est vérifiable et s'ajoute aux contrôles de ton.
 
 **Extension assumée sur T2-3** : la réserve ne citait que
 `coffre.palier.titre`. Corriger cette seule chaîne aurait laissé le mot
@@ -194,8 +208,14 @@ Valable pour tout texte affiché ou dit à l'enfant (section 1.3 du prompt maît
 9. Toute information importante est aussi **dite** par Pilou, jamais seulement
    écrite (PED-10).
 
-**Tutoiement systématique.** Le prénom « Evan » est utilisé à l'accueil et à la
-clôture, pas à chaque phrase : au-delà, il devient insistant.
+**Tutoiement systématique.** Le prénom de l'enfant est utilisé à l'accueil et à
+la clôture, pas à chaque phrase : au-delà, il devient insistant.
+
+**Convention de nommage, décidée au tour 3** : aucune chaîne de contenu n'écrit
+un prénom en dur. Le prénom est rendu par le jeton `{prenom}`, dans les textes
+enfant comme dans les textes parent, conformément à `content/` et au schéma de
+données multi-enfants (section 1.2 du prompt maître). « Evan » ne subsiste que
+dans la prose de ce document, quand il désigne l'utilisateur réel.
 
 ## 2.4 Ton de voix, parent
 
@@ -550,18 +570,18 @@ pourcentage. Jamais « écran 1/3 » écrit.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.accueil.titre` | « Bonsoir Evan. » | dit_affiche |
+| `enfant.accueil.titre` | « Bonsoir {prenom}. » | dit_affiche |
 | `enfant.accueil.corps` | « Je suis contente de te voir. » | dit_affiche |
 | `enfant.accueil.bouton` | « On commence » | affiche |
 
 Texte dit par Pilou, situation `accueil` de la banque (PED-11, 20 variantes
-minimum) : « Bonsoir Evan. Je suis contente de te voir. »
+minimum) : « Bonsoir {prenom}. Je suis contente de te voir. »
 
 **Variante de reprise** (l'app a été fermée en cours de soirée, PRD-18) :
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `enfant.accueil.reprise.titre` | « Te revoilà, Evan. » | dit_affiche |
+| `enfant.accueil.reprise.titre` | « Te revoilà, {prenom}. » | dit_affiche |
 | `enfant.accueil.reprise.corps` | « On reprend là où on s'était arrêtés. » | dit_affiche |
 | `enfant.accueil.reprise.bouton` | « On continue » | affiche |
 
@@ -1037,7 +1057,7 @@ Séquence fixe, dans cet ordre :
 
 | Ordre | Clé | Texte | Mode |
 | --- | --- | --- | --- |
-| 1 | `bravo.titre` | « Bravo Evan. » | dit_affiche |
+| 1 | `bravo.titre` | « Bravo {prenom}. » | dit_affiche |
 | 2 | `bravo.corps` | « Tu as fait tes devoirs ce soir. » | dit_affiche |
 | 3 | `bravo.pierres` | « Tu as gagné des pierres. » | dit_affiche |
 | 4 | `bravo.coffre` | « Je les range dans ton coffre. » | dit_affiche |
@@ -1057,7 +1077,7 @@ soirée sur le décompte de ce qui a été obtenu, ce que PRD-11 et PED-05 refus
 Le coffre reste accessible, mais il n'est jamais la destination proposée en
 premier.
 
-Texte dit par Pilou, en entier, chaque soir : « Bravo Evan. Tu as fait tes
+Texte dit par Pilou, en entier, chaque soir : « Bravo {prenom}. Tu as fait tes
 devoirs ce soir. Tu as gagné des pierres. Je les range dans ton coffre. C'est
 fini. Tu peux aller jouer. »
 
@@ -1143,7 +1163,7 @@ là. Elles ne partent jamais. »
 | --- | --- | --- |
 | `coffre.palier.titre` | « Où tu en es » | affiche |
 | `coffre.palier.reste` | « Encore {n} pierres. » | dit_affiche |
-| `coffre.palier.atteint` | « Ça y est. Tu y es arrivé. » | dit_affiche |
+| `coffre.palier.atteint` | « Ça y est. Tu as assez de pierres. » | dit_affiche |
 | `coffre.palier.maison` | « Je garde tes pierres. Le reste se décide à la maison. » | dit_affiche |
 
 **Décision de vocabulaire** (tour 2) : le mot « palier » reste un mot de
@@ -1183,7 +1203,7 @@ parent sur un écran enfant est un défaut bloquant.
 
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `coffre.palier.vide` | « Il n'y a rien à atteindre pour l'instant. » | dit_affiche |
+| `coffre.palier.vide` | « Ton coffre se remplit tout doucement. » | dit_affiche |
 | `coffre.palier.vide_2` | « Tes pierres s'accumulent. C'est bien. » | dit_affiche |
 
 Aucune incitation à demander un palier au parent.
@@ -1261,7 +1281,7 @@ soirée sans devoir.
 | --- | --- |
 | `parent.scan.sans_devoir.bouton` | « Pas de devoirs ce soir » |
 | `parent.scan.sans_devoir.confirmation` | « Pilou dira simplement qu'il n'y a rien ce soir. Le coffre reste accessible. » |
-| `parent.scan.sans_devoir.valider` | « Ouvrir Tipi à Evan » |
+| `parent.scan.sans_devoir.valider` | « Ouvrir Tipi à {prenom} » |
 
 Aucune alerte, aucun message qui suggère qu'il manque quelque chose (ETH-02).
 
@@ -1341,7 +1361,7 @@ mode enfant : l'engrenage Réglages disparaît, le retour arrière ne ramène pa
 
 | Clé | Texte |
 | --- | --- |
-| `parent.apercu.passage_enfant` | « Passez le téléphone à Evan. Pilou prend le relais. » |
+| `parent.apercu.passage_enfant` | « Passez le téléphone à {prenom}. Pilou prend le relais. » |
 
 **Plus de 2 étapes détectées** (PED-06) :
 
@@ -1394,7 +1414,7 @@ mesure rien.
 
 | Clé | Texte |
 | --- | --- |
-| `parent.resume.titre` | « La soirée d'Evan » |
+| `parent.resume.titre` | « La soirée d'{prenom} » |
 | `parent.resume.date` | « {date} » |
 | `parent.resume.etapes.titre` | « Ce qui a été fait » |
 | `parent.resume.etape_faite` | « {matiere} : terminée » |
@@ -1408,14 +1428,14 @@ mesure rien.
 
 | Situation | Texte |
 | --- | --- |
-| Lecture fluide | « Evan a lu le texte en entier, sans s'arrêter longtemps. » |
-| Hésitations en lecture | « Evan a buté sur quelques mots. Ils sont listés ci-dessous, si vous voulez les revoir. » |
-| Maths avec indices | « Evan a demandé de l'aide sur les maths. Pilou l'a guidé sans donner les réponses. » |
-| Maths sans indice | « Evan a fait les maths seul, sans demander d'indice. » |
-| Pause prise | « Evan a fait une pause. Il est revenu ensuite. » |
+| Lecture fluide | « {prenom} a lu le texte en entier, sans s'arrêter longtemps. » |
+| Hésitations en lecture | « {prenom} a buté sur quelques mots. Ils sont listés ci-dessous, si vous voulez les revoir. » |
+| Maths avec indices | « {prenom} a demandé de l'aide sur les maths. Pilou l'a guidé sans donner les réponses. » |
+| Maths sans indice | « {prenom} a fait les maths seul, sans demander d'indice. » |
+| Pause prise | « {prenom} a fait une pause. Il est revenu ensuite. » |
 | Blocage | « Un exercice a bloqué. Il pourrait valoir le coup de le refaire ensemble, à tête reposée. » |
 | Soir léger | « Soirée en mode Soir léger : une seule étape. » |
-| Exercice breton | « Le texte en breton a été lu par Evan seul. Pilou ne le corrige pas. » |
+| Exercice breton | « Le texte en breton a été lu par {prenom} seul. Pilou ne le corrige pas. » |
 | Session arrêtée par le parent | « La séance a été arrêtée avant la fin. Les pierres acquises sont conservées. » |
 
 **Mots hésitants** : listés en clair, sans commentaire, sans nombre, sous le
@@ -1431,7 +1451,7 @@ historique comparatif dans l'interface parent en V1.
 | Clé | Texte |
 | --- | --- |
 | `parent.resume.vide.titre` | « Pas de devoirs ce soir. » |
-| `parent.resume.vide.corps` | « Evan a ouvert Tipi. Il n'y avait rien à faire. » |
+| `parent.resume.vide.corps` | « {prenom} a ouvert Tipi. Il n'y avait rien à faire. » |
 
 **États d'erreur**
 
@@ -1461,7 +1481,7 @@ n'existe aucun lien vers lui depuis un écran enfant (SEC-08).
 | Clé | Texte |
 | --- | --- |
 | `reglages.code.creation.titre` | « Choisissez un code à 10 chiffres » |
-| `reglages.code.creation.corps` | « Ce code protège les réglages. Il n'est pas demandé à Evan. » |
+| `reglages.code.creation.corps` | « Ce code protège les réglages. Il n'est pas demandé à {prenom}. » |
 | `reglages.code.creation.avert` | « Notez-le : il ne peut pas être récupéré. » |
 | `reglages.code.creation.confirmer.titre` | « Saisissez-le une seconde fois » |
 | `reglages.code.creation.bouton` | « Enregistrer le code » |
@@ -1508,7 +1528,7 @@ l'application revient au résumé parent, pas à l'écran enfant.
 
 | Clé | Texte |
 | --- | --- |
-| `reglages.code.sortie.titre` | « Arrêter la session d'Evan » |
+| `reglages.code.sortie.titre` | « Arrêter la session d'{prenom} » |
 | `reglages.code.sortie.corps` | « Les pierres déjà gagnées sont conservées. » |
 
 **Écran enfant** : cet écran n'est jamais visible par l'enfant. L'appui long qui
@@ -1529,7 +1549,7 @@ y mène dure 2 secondes, sans indication visuelle qui le signalerait à l'enfant
 
 | Clé | Libellé | Sous-titre |
 | --- | --- | --- |
-| `reglages.menu.enfant` | « Profil d'Evan » | « Prénom, date de naissance, classe » |
+| `reglages.menu.enfant` | « Profil d'{prenom} » | « Prénom, date de naissance, classe » |
 | `reglages.menu.theme` | « Apparence » | « Pilou ou Apple » |
 | `reglages.menu.paliers` | « Paliers de récompense » | « Ce que vous décidez de donner » |
 | `reglages.menu.sons` | « Sons » | « Sons de l'application et voix de Pilou » |
@@ -1539,11 +1559,11 @@ y mène dure 2 secondes, sans indication visuelle qui le signalerait à l'enfant
 | `reglages.menu.calibration` | « Calibration des photos » | « Réglage de la lecture des photos » |
 | `reglages.menu.apropos` | « À propos » | « Version de Tipi » |
 
-### Sous-page « Profil d'Evan » (PRD-02)
+### Sous-page Profil de l'enfant (PRD-02)
 
 | Clé | Texte |
 | --- | --- |
-| `reglages.enfant.titre` | « Profil d'Evan » |
+| `reglages.enfant.titre` | « Profil d'{prenom} » |
 | `reglages.enfant.prenom` | « Prénom » |
 | `reglages.enfant.naissance` | « Date de naissance » |
 | `reglages.enfant.age` | « {n} ans » |
@@ -1583,12 +1603,12 @@ sélectionné est appliqué dès l'écran de lancement (section 4.2).
 | --- | --- |
 | `reglages.paliers.titre` | « Paliers de récompense » |
 | `reglages.paliers.corps` | « Vous définissez le palier et vous donnez la récompense. Tipi compte seulement les pierres. » |
-| `reglages.paliers.solde` | « Evan a {n} pierres aujourd'hui. » |
+| `reglages.paliers.solde` | « {prenom} a {n} pierres aujourd'hui. » |
 | `reglages.paliers.ajouter` | « Ajouter un palier » |
 | `reglages.paliers.gems` | « Nombre de pierres » |
 | `reglages.paliers.description` | « Ce que vous proposez » |
 | `reglages.paliers.description_ex` | « Par exemple : ce que vous avez prévu de faire ensemble. » |
-| `reglages.paliers.description_aide` | « Ce texte reste ici. Il n'est pas affiché à Evan. » |
+| `reglages.paliers.description_aide` | « Ce texte reste ici. Il n'est pas affiché à {prenom}. » |
 | `reglages.paliers.atteint` | « Atteint le {date} » |
 | `reglages.paliers.supprimer` | « Supprimer ce palier » |
 | `reglages.paliers.vide` | « Aucun palier pour l'instant. Les pierres s'accumulent quand même. » |
@@ -1634,9 +1654,9 @@ d'information n'est exclusivement vocal.
 | `reglages.donnees.photos` | « Les photos des devoirs, pour lire les consignes. » |
 | `reglages.donnees.textes` | « Le texte des devoirs, pour préparer la séance. » |
 | `reglages.donnees.audio` | « Les enregistrements vocaux, pour que vous puissiez les réécouter. » |
-| `reglages.donnees.session` | « Le déroulé des séances, pour reprendre là où Evan s'est arrêté. » |
+| `reglages.donnees.session` | « Le déroulé des séances, pour reprendre là où {prenom} s'est arrêté. » |
 | `reglages.donnees.pierres` | « L'historique des pierres, pour que le compte soit toujours juste. » |
-| `reglages.donnees.ia` | « Le texte des devoirs est analysé par un service d'intelligence artificielle. Le prénom d'Evan et les photos ne lui sont jamais envoyés. » |
+| `reglages.donnees.ia` | « Le texte des devoirs est analysé par un service d'intelligence artificielle. Le prénom d'{prenom} et les photos ne lui sont jamais envoyés. » |
 | `reglages.donnees.export` | « Exporter mes données » |
 | `reglages.donnees.supprimer` | « Tout supprimer » |
 | `reglages.donnees.supprimer_conf` | « Cette suppression est définitive. Les pierres et l'historique seront effacés. » |
@@ -1666,7 +1686,7 @@ tiers, ni achat.
 | Clé | Texte |
 | --- | --- |
 | `reglages.codeparent.titre` | « Code parent » |
-| `reglages.codeparent.corps` | « Le code protège les réglages. Il n'est jamais montré à Evan. » |
+| `reglages.codeparent.corps` | « Le code protège les réglages. Il n'est jamais montré à {prenom}. » |
 | `reglages.codeparent.changer` | « Changer le code » |
 | `reglages.codeparent.actuel` | « Code actuel » |
 | `reglages.codeparent.nouveau` | « Nouveau code » |
@@ -1687,7 +1707,7 @@ tiers, ni achat.
 | --- | --- |
 | `reglages.apropos.titre` | « À propos » |
 | `reglages.apropos.version` | « Version {version} » |
-| `reglages.apropos.corps` | « Tipi accompagne Evan dans ses devoirs du soir. » |
+| `reglages.apropos.corps` | « Tipi accompagne {prenom} dans ses devoirs du soir. » |
 
 **Aucun slogan, aucun texte marketing, aucun lien de partage, aucune invitation
 à noter l'application.**
@@ -1717,19 +1737,19 @@ l'application.
 
 | Clé | Texte |
 | --- | --- |
-| `notif.resume.titre` | « La séance d'Evan est terminée. » |
+| `notif.resume.titre` | « La séance d'{prenom} est terminée. » |
 | `notif.resume.corps` | « Le résumé est prêt. » |
 | `notif.resume.sans_devoir.titre` | « Pas de devoirs ce soir. » |
-| `notif.resume.sans_devoir.corps` | « Evan a ouvert Tipi. Il n'y avait rien à faire. » |
+| `notif.resume.sans_devoir.corps` | « {prenom} a ouvert Tipi. Il n'y avait rien à faire. » |
 
 **Notifications formellement interdites** (ETH-01, ETH-02) :
 
 | Notification interdite | Pourquoi |
 | --- | --- |
-| « Evan n'a pas fait ses devoirs ce soir » | Culpabilisante (ETH-02) |
+| « {prenom} n'a pas fait ses devoirs ce soir » | Culpabilisante (ETH-02) |
 | « 3 soirs d'affilée, ne cassez pas la série » | Série à ne pas casser (ETH-02) |
 | « Plus que 2 heures pour faire les devoirs » | Urgence artificielle (ETH-01) |
-| « Evan vous attend » | Pression sur le parent |
+| « {prenom} vous attend » | Pression sur le parent |
 | Toute notification envoyée à l'enfant | Aucune sollicitation d'un enfant de 6 ans |
 | Toute notification de relance à J+1, J+3, J+7 | Réengagement forcé (ETH-02) |
 

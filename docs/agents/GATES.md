@@ -32,6 +32,20 @@ sa porte amont n'est pas verte.
 - G4.V9 en dernier, après toutes les autres verticales
 - G4.* toutes vertes → G5 → G6 → G7 → G8
 
+## Arbitrages de l'Orchestrateur
+
+Décisions prises par l'Orchestrateur lorsqu'un désaccord dépasse le périmètre
+d'un agent, sans atteindre le seuil d'une escalade humaine. Elles font foi pour
+tous les agents en aval.
+
+| # | Porte | Décision | Motif |
+| --- | --- | --- | --- |
+| ARB-01 | G1 | Le prénom de l'enfant est un jeton `{prenom}` dans toute chaîne de contenu, écrans parent compris. « Evan » ne subsiste que dans la prose qui parle de lui comme personne réelle. | Le prompt maître pose en 1.2 un schéma multi-enfants dès le départ. `content/` tenait déjà cette convention, le livrable marketing non : les verticales auraient hérité des deux. |
+| ARB-02 | G1 | Le vocabulaire des canaux est celui de `contenu-enfant` : `tts`, `affiche`, `les_deux`. Le livrable marketing s'aligne. | Ce sont les fichiers de `content/` que le code consomme. Un document ne dicte pas son vocabulaire aux fichiers qu'il décrit. |
+| ARB-03 | G1 | Les boutons du rituel de fermeture suivent l'arbitrage DES-06 du livrable marketing. `contenu-enfant` s'aligne et corrige ses identifiants. | DES-06 impose une seule action principale par écran, toujours au même endroit, et la copie d'écran appartient au marketing. |
+| ARB-04 | G1 | Aucune situation distincte n'est regroupée sous une clé unique pour tenir le compte de 20 variantes. Une situation = un moment de la session qui a son propre sens. Les quatre niveaux d'indices sont quatre situations ; le blocage en lecture et le blocage en maths sont deux situations. | PED-11 exige 20 variantes par situation. Tenir le compte en fusionnant des sens différents couvrirait l'exigence sur le papier et pas devant l'enfant, qui les entendra toutes. Surcoût de volume assumé. |
+| ARB-05 | G1 | Deux réserves `[MINEUR]` du contrôle marketing ont été corrigées au lieu d'être versées au backlog, par dérogation à la règle 6.2. | Ce livrable est la source que liront l'architecte, le design system et les neuf verticales. Une contradiction interne s'y serait propagée en code. |
+
 ## Journal
 
 | Date | Événement |
@@ -39,3 +53,8 @@ sa porte amont n'est pas verte.
 | 2026-09-20 | PHASE 0 : équipe d'agents et fichiers de protocole mis en place. |
 | 2026-09-20 | ESCALADE initiale écrite : demande des six éléments humains (section 8). |
 | 2026-09-20 | G1 passée en `en cours` : lancement de `produit-marketing` et `contenu-enfant`. |
+| 2026-09-20 | ESC-001 ouverte : nom de fichier `gwenn-scripts.json` incohérent avec la mascotte Pilou. |
+| 2026-09-20 | Marketing, tour 1 : `FAIL` (5 majeurs, 5 mineurs), gardien-charte NON CONFORME. |
+| 2026-09-20 | Marketing, tour 2 : `PASS_AVEC_RESERVES` (3 mineurs), gardien-charte CONFORME, aucun écart de chiffres. |
+| 2026-09-20 | Marketing, tour 3 : `PASS_AVEC_RESERVES` (2 mineurs), deuxième tour consécutif sans écart de chiffres. Arbitrages ARB-01 et ARB-05. |
+| 2026-09-20 | Banque de phrases, tour 1 : `FAIL` (8 majeurs, 5 mineurs), gardien-charte NON CONFORME. Les 23 grandeurs annoncées vérifiées à l'unité près. Arbitrages ARB-02, ARB-03, ARB-04. |
