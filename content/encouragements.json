@@ -1,6 +1,6 @@
 {
   "schema": "tipi.encouragements.v2",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "personnage": "Pilou",
   "jeton_prenom": "{prenom}",
   "jeton_matiere": {
@@ -43,7 +43,7 @@
     },
     "canal_decision": "Énumération tts / affiche / les_deux retenue pour tout le projet, tranchée par l'Orchestrateur le 2026-09-20. Le livrable marketing s'y aligne : dit devient tts, dit_affiche devient les_deux, affiche ne change pas.",
     "jeton_prenom_regle": "Le prénom de l'enfant n'est jamais écrit en dur : il passe par le jeton {prenom} (PRD-02).",
-    "jeton_matiere_regle": "Le jeton {matiere} vaut « la lecture » ou « les maths », selon la clé rendue. Il n'apparaît jamais en début de phrase et n'est jamais sujet d'un verbe : le texte reste juste au singulier comme au pluriel.",
+    "jeton_matiere_regle": "Le jeton {matiere} vaut « la lecture » ou « les maths », selon la clé rendue. Trois contraintes, toutes vérifiées mécaniquement sur les deux rendus. À DROITE : il n'est jamais sujet d'un verbe. EN TÊTE : il n'ouvre jamais une phrase ni un segment, à cause de la majuscule. À GAUCHE : aucune préposition contractante (de, à) ne le précède immédiatement, car le jeton porte son article et les deux valeurs ne se contractent pas de la même façon (de la lecture, mais des maths).",
     "canal_tts_en_v1": "Aucune entrée n'emploie le canal tts en V1, et c'est voulu : toute information utile à l'action est doublée à l'oral (PED-10), donc affichée aussi. La valeur reste dans l'énumération pour une future réplique purement vocale, par exemple pendant une animation sans texte à l'écran."
   },
   "correspondance_mission": {
@@ -171,13 +171,23 @@
     },
     {
       "cles": [
+        "maths.concret.corps",
+        "pause.rassurance",
+        "enfant.attente.pilou",
+        "lecture.reprise.corps",
+        "maths.reprise.corps"
+      ],
+      "motif": "Reperes constants d'un soir a l'autre : une formulation stable vaut mieux qu'une variante (PED-03, PRD-12, PRD-18)."
+    },
+    {
+      "cles": [
         "tous les libelles de bouton"
       ],
       "motif": "Un libelle d'action ne varie pas d'un soir a l'autre (DES-06)."
     }
   ],
   "statut_cles": {
-    "transition.cloture.corps": "Créée côté marketing le 2026-09-20 (texte canonique : « Tu as bien travaillé. Viens avec moi. »). Elle existe pour que la banque cloture n'alimente aucune clé de l'écran /enfant/bravo (PED-12). Les 35 clés déclarées par ce fichier existent donc toutes."
+    "session.fin_travail.corps": "Renommée depuis transition.cloture.corps, sur demande du contrôle du tour 2 : le préfixe transition. désigne partout ailleurs un écran suivi d'une étape, or ici aucune ne suit. Texte canonique du marketing : « Tu as bien travaillé. Viens avec moi. » La clé existe pour que la banque cloture n'alimente aucune clé de /enfant/bravo (PED-12). Le renommage côté marketing est demandé en parallèle par l'Orchestrateur."
   },
   "situations": {
     "accueil": {
@@ -405,7 +415,7 @@
         },
         {
           "id": "enc.accueil.11",
-          "texte": "Salut. Je suis contente que tu sois là.",
+          "texte": "Salut. On va passer un bon moment.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -419,7 +429,7 @@
               "cles_ui": [
                 "enfant.accueil.corps"
               ],
-              "texte": "Je suis contente que tu sois là."
+              "texte": "On va passer un bon moment."
             }
           ]
         },
@@ -770,7 +780,7 @@
         },
         {
           "id": "enc.annonce_programme.11",
-          "texte": "Voilà notre chemin de ce soir. On le suit.",
+          "texte": "Je te dis tout de suite le programme.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -778,7 +788,7 @@
               "cles_ui": [
                 "enfant.programme.titre"
               ],
-              "texte": "Voilà notre chemin de ce soir. On le suit."
+              "texte": "Je te dis tout de suite le programme."
             }
           ]
         },
@@ -946,7 +956,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.02",
-          "texte": "Ce soir, c'est {matiere}, tranquillement.",
+          "texte": "Ce soir, tu travailles {matiere} avec moi.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -957,13 +967,13 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "Ce soir, c'est {matiere}, tranquillement."
+              "texte": "Ce soir, tu travailles {matiere} avec moi."
             }
           ]
         },
         {
           "id": "enc.annonce_programme_une_etape.03",
-          "texte": "On s'occupe de {matiere}, tous les deux.",
+          "texte": "On prépare {matiere}, tous les deux.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -974,7 +984,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "On s'occupe de {matiere}, tous les deux."
+              "texte": "On prépare {matiere}, tous les deux."
             }
           ]
         },
@@ -1184,7 +1194,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.16",
-          "texte": "Notre programme du soir, c'est {matiere}.",
+          "texte": "Au programme du soir, on met {matiere}.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -1195,7 +1205,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "Notre programme du soir, c'est {matiere}."
+              "texte": "Au programme du soir, on met {matiere}."
             }
           ]
         },
@@ -1252,7 +1262,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.20",
-          "texte": "Notre travail du soir, c'est {matiere}.",
+          "texte": "On va travailler {matiere} ce soir.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -1263,7 +1273,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "Notre travail du soir, c'est {matiere}."
+              "texte": "On va travailler {matiere} ce soir."
             }
           ]
         }
@@ -1749,7 +1759,7 @@
         },
         {
           "id": "enc.encouragement_pendant_lecture.13",
-          "texte": "Tu avances.",
+          "texte": "Je te suis des yeux.",
           "canal": "affiche",
           "jetons": [],
           "parties": [
@@ -1757,7 +1767,7 @@
               "cles_ui": [
                 "lecture.micro.en_cours"
               ],
-              "texte": "Tu avances."
+              "texte": "Je te suis des yeux."
             }
           ]
         },
@@ -1819,7 +1829,7 @@
         },
         {
           "id": "enc.encouragement_pendant_lecture.18",
-          "texte": "C'est bien, continue.",
+          "texte": "Tu fais du beau travail.",
           "canal": "affiche",
           "jetons": [],
           "parties": [
@@ -1827,13 +1837,13 @@
               "cles_ui": [
                 "lecture.micro.en_cours"
               ],
-              "texte": "C'est bien, continue."
+              "texte": "Tu fais du beau travail."
             }
           ]
         },
         {
           "id": "enc.encouragement_pendant_lecture.19",
-          "texte": "Je t'écoute jusqu'au bout.",
+          "texte": "Je ne bouge pas d'ici.",
           "canal": "affiche",
           "jetons": [],
           "parties": [
@@ -1841,7 +1851,7 @@
               "cles_ui": [
                 "lecture.micro.en_cours"
               ],
-              "texte": "Je t'écoute jusqu'au bout."
+              "texte": "Je ne bouge pas d'ici."
             }
           ]
         },
@@ -2732,7 +2742,7 @@
         },
         {
           "id": "enc.blocage_lecture.08",
-          "texte": "Je n'attrape pas bien ta voix. Tu peux redire, ou on passe à la suite.",
+          "texte": "Je n'attrape pas bien ta voix. On s'arrête un moment, si tu veux.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -2746,7 +2756,7 @@
               "cles_ui": [
                 "lecture.blocage.corps_2"
               ],
-              "texte": "Tu peux redire, ou on passe à la suite."
+              "texte": "On s'arrête un moment, si tu veux."
             }
           ]
         },
@@ -2872,7 +2882,7 @@
         },
         {
           "id": "enc.blocage_lecture.15",
-          "texte": "Le micro et moi, on entend mal. On passe à la suite, si tu veux.",
+          "texte": "Ta voix arrive toute petite. On passe à la suite, si tu veux.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -2880,7 +2890,7 @@
               "cles_ui": [
                 "lecture.blocage.corps"
               ],
-              "texte": "Le micro et moi, on entend mal."
+              "texte": "Ta voix arrive toute petite."
             },
             {
               "cles_ui": [
@@ -3375,7 +3385,7 @@
         },
         {
           "id": "enc.indice_demande_1.06",
-          "texte": "Je te pose une petite question d'abord.",
+          "texte": "J'ai une petite chose à te demander.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3383,7 +3393,7 @@
               "cles_ui": [
                 "maths.indice.1.amorce"
               ],
-              "texte": "Je te pose une petite question d'abord."
+              "texte": "J'ai une petite chose à te demander."
             }
           ]
         },
@@ -3459,7 +3469,7 @@
         },
         {
           "id": "enc.indice_demande_1.12",
-          "texte": "Ma question va t'aider à démarrer.",
+          "texte": "Réfléchis un instant. Ma question arrive.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3467,7 +3477,7 @@
               "cles_ui": [
                 "maths.indice.1.amorce"
               ],
-              "texte": "Ma question va t'aider à démarrer."
+              "texte": "Réfléchis un instant. Ma question arrive."
             }
           ]
         },
@@ -3557,7 +3567,7 @@
         },
         {
           "id": "enc.indice_demande_1.19",
-          "texte": "On cherche ensemble ce que veut cet exercice.",
+          "texte": "Cet exercice demande quoi, à ton avis ?",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3565,7 +3575,7 @@
               "cles_ui": [
                 "maths.indice.1.amorce"
               ],
-              "texte": "On cherche ensemble ce que veut cet exercice."
+              "texte": "Cet exercice demande quoi, à ton avis ?"
             }
           ]
         },
@@ -3700,7 +3710,7 @@
         },
         {
           "id": "enc.indice_demande_2.08",
-          "texte": "Je te propose une façon de compter.",
+          "texte": "Compte-les en les touchant du doigt.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3708,7 +3718,7 @@
               "cles_ui": [
                 "maths.indice.2.amorce"
               ],
-              "texte": "Je te propose une façon de compter."
+              "texte": "Compte-les en les touchant du doigt."
             }
           ]
         },
@@ -3770,7 +3780,7 @@
         },
         {
           "id": "enc.indice_demande_2.13",
-          "texte": "Je te montre un moyen de t'aider.",
+          "texte": "Voilà un moyen tout simple.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3778,7 +3788,7 @@
               "cles_ui": [
                 "maths.indice.2.amorce"
               ],
-              "texte": "Je te montre un moyen de t'aider."
+              "texte": "Voilà un moyen tout simple."
             }
           ]
         },
@@ -3798,7 +3808,7 @@
         },
         {
           "id": "enc.indice_demande_2.15",
-          "texte": "Tu peux barrer les ronds au fur et à mesure.",
+          "texte": "Tu peux barrer les ronds, un par un.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3806,7 +3816,7 @@
               "cles_ui": [
                 "maths.indice.2.amorce"
               ],
-              "texte": "Tu peux barrer les ronds au fur et à mesure."
+              "texte": "Tu peux barrer les ronds, un par un."
             }
           ]
         },
@@ -3940,7 +3950,7 @@
         },
         {
           "id": "enc.indice_demande_3.04",
-          "texte": "Je te donne un exemple qui ressemble.",
+          "texte": "En voici un plus simple, pour commencer.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3948,13 +3958,13 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "Je te donne un exemple qui ressemble."
+              "texte": "En voici un plus simple, pour commencer."
             }
           ]
         },
         {
           "id": "enc.indice_demande_3.05",
-          "texte": "Regarde cet exemple. Il est plus facile.",
+          "texte": "Regarde ce cas tout simple.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -3962,7 +3972,7 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "Regarde cet exemple. Il est plus facile."
+              "texte": "Regarde ce cas tout simple."
             }
           ]
         },
@@ -4010,7 +4020,7 @@
         },
         {
           "id": "enc.indice_demande_3.09",
-          "texte": "On s'entraîne sur un exemple facile.",
+          "texte": "Je te donne un modèle facile à suivre.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4018,7 +4028,7 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "On s'entraîne sur un exemple facile."
+              "texte": "Je te donne un modèle facile à suivre."
             }
           ]
         },
@@ -4066,7 +4076,7 @@
         },
         {
           "id": "enc.indice_demande_3.13",
-          "texte": "On regarde un cas plus simple ensemble.",
+          "texte": "On fait d'abord une version courte.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4074,13 +4084,13 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "On regarde un cas plus simple ensemble."
+              "texte": "On fait d'abord une version courte."
             }
           ]
         },
         {
           "id": "enc.indice_demande_3.14",
-          "texte": "Je te propose un exemple facile à voir.",
+          "texte": "Voilà un cas facile pour comprendre.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4088,7 +4098,7 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "Je te propose un exemple facile à voir."
+              "texte": "Voilà un cas facile pour comprendre."
             }
           ]
         },
@@ -4136,7 +4146,7 @@
         },
         {
           "id": "enc.indice_demande_3.18",
-          "texte": "Je te raconte un exemple qui aide.",
+          "texte": "Voilà de quoi t'entraîner d'abord.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4144,13 +4154,13 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "Je te raconte un exemple qui aide."
+              "texte": "Voilà de quoi t'entraîner d'abord."
             }
           ]
         },
         {
           "id": "enc.indice_demande_3.19",
-          "texte": "Écoute. Je te montre un exercice qui ressemble.",
+          "texte": "Écoute d'abord ce petit exercice.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4158,13 +4168,13 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "Écoute. Je te montre un exercice qui ressemble."
+              "texte": "Écoute d'abord ce petit exercice."
             }
           ]
         },
         {
           "id": "enc.indice_demande_3.20",
-          "texte": "On essaie avec des nombres plus petits.",
+          "texte": "On prend moins d'objets pour commencer.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4172,7 +4182,7 @@
               "cles_ui": [
                 "maths.indice.3.amorce"
               ],
-              "texte": "On essaie avec des nombres plus petits."
+              "texte": "On prend moins d'objets pour commencer."
             }
           ]
         }
@@ -4320,7 +4330,7 @@
         },
         {
           "id": "enc.indice_demande_4.10",
-          "texte": "On le refait ensemble, calmement.",
+          "texte": "On le reprend depuis le début, calmement.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4328,7 +4338,7 @@
               "cles_ui": [
                 "maths.indice.4.amorce"
               ],
-              "texte": "On le refait ensemble, calmement."
+              "texte": "On le reprend depuis le début, calmement."
             }
           ]
         },
@@ -4418,7 +4428,7 @@
         },
         {
           "id": "enc.indice_demande_4.17",
-          "texte": "Je te dis chaque étape. Tu les fais.",
+          "texte": "On prend les étapes dans l'ordre. Ensemble.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4426,13 +4436,13 @@
               "cles_ui": [
                 "maths.indice.4.amorce"
               ],
-              "texte": "Je te dis chaque étape. Tu les fais."
+              "texte": "On prend les étapes dans l'ordre. Ensemble."
             }
           ]
         },
         {
           "id": "enc.indice_demande_4.18",
-          "texte": "On y va ensemble, sans se presser.",
+          "texte": "Rien ne presse. Je déroule tout avec toi.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4440,7 +4450,7 @@
               "cles_ui": [
                 "maths.indice.4.amorce"
               ],
-              "texte": "On y va ensemble, sans se presser."
+              "texte": "Rien ne presse. Je déroule tout avec toi."
             }
           ]
         },
@@ -4460,7 +4470,7 @@
         },
         {
           "id": "enc.indice_demande_4.20",
-          "texte": "On termine ce chemin ensemble. Tu dis la fin.",
+          "texte": "Je dis les étapes. Le dernier mot est à toi.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -4468,7 +4478,7 @@
               "cles_ui": [
                 "maths.indice.4.amorce"
               ],
-              "texte": "On termine ce chemin ensemble. Tu dis la fin."
+              "texte": "Je dis les étapes. Le dernier mot est à toi."
             }
           ]
         }
@@ -5150,7 +5160,7 @@
         },
         {
           "id": "enc.reussite_maths.13",
-          "texte": "Tu as compté jusqu'au bout. Bravo pour ce travail.",
+          "texte": "Tu as compté avec soin. Bravo.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -5158,13 +5168,13 @@
               "cles_ui": [
                 "maths.fini.retour"
               ],
-              "texte": "Tu as compté jusqu'au bout."
+              "texte": "Tu as compté avec soin."
             },
             {
               "cles_ui": [
                 "maths.fini.retour_2"
               ],
-              "texte": "Bravo pour ce travail."
+              "texte": "Bravo."
             }
           ]
         },
@@ -5190,7 +5200,7 @@
         },
         {
           "id": "enc.reussite_maths.15",
-          "texte": "Tu n'as pas abandonné. Bravo pour ton courage.",
+          "texte": "Tu as cherché sans t'arrêter. Bravo pour ton courage.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -5198,7 +5208,7 @@
               "cles_ui": [
                 "maths.fini.retour"
               ],
-              "texte": "Tu n'as pas abandonné."
+              "texte": "Tu as cherché sans t'arrêter."
             },
             {
               "cles_ui": [
@@ -5388,7 +5398,7 @@
         },
         {
           "id": "enc.transition_lecture_vers_maths.04",
-          "texte": "Voilà la lecture terminée. On enchaîne avec les maths.",
+          "texte": "Tu as tout lu. Au tour des maths.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -5396,13 +5406,13 @@
               "cles_ui": [
                 "transition.felicitation.lecture"
               ],
-              "texte": "Voilà la lecture terminée."
+              "texte": "Tu as tout lu."
             },
             {
               "cles_ui": [
                 "transition.annonce.maths"
               ],
-              "texte": "On enchaîne avec les maths."
+              "texte": "Au tour des maths."
             }
           ]
         },
@@ -5508,7 +5518,7 @@
         },
         {
           "id": "enc.transition_lecture_vers_maths.10",
-          "texte": "Tu as terminé la lecture. On finit avec les maths.",
+          "texte": "Tu as lu ton texte en entier. On compte, maintenant.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -5516,13 +5526,13 @@
               "cles_ui": [
                 "transition.felicitation.lecture"
               ],
-              "texte": "Tu as terminé la lecture."
+              "texte": "Tu as lu ton texte en entier."
             },
             {
               "cles_ui": [
                 "transition.annonce.maths"
               ],
-              "texte": "On finit avec les maths."
+              "texte": "On compte, maintenant."
             }
           ]
         },
@@ -5668,7 +5678,7 @@
         },
         {
           "id": "enc.transition_lecture_vers_maths.18",
-          "texte": "La lecture est rangée. On sort les maths.",
+          "texte": "On range le texte. On passe au calcul.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -5676,13 +5686,13 @@
               "cles_ui": [
                 "transition.felicitation.lecture"
               ],
-              "texte": "La lecture est rangée."
+              "texte": "On range le texte."
             },
             {
               "cles_ui": [
                 "transition.annonce.maths"
               ],
-              "texte": "On sort les maths."
+              "texte": "On passe au calcul."
             }
           ]
         },
@@ -5807,7 +5817,7 @@
         },
         {
           "id": "enc.transition_maths_vers_lecture.04",
-          "texte": "Voilà les maths terminées. On enchaîne avec la lecture.",
+          "texte": "Tu as tout calculé. Au tour de la lecture.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -5815,13 +5825,13 @@
               "cles_ui": [
                 "transition.felicitation.maths"
               ],
-              "texte": "Voilà les maths terminées."
+              "texte": "Tu as tout calculé."
             },
             {
               "cles_ui": [
                 "transition.annonce.lecture"
               ],
-              "texte": "On enchaîne avec la lecture."
+              "texte": "Au tour de la lecture."
             }
           ]
         },
@@ -5927,7 +5937,7 @@
         },
         {
           "id": "enc.transition_maths_vers_lecture.10",
-          "texte": "Tu as terminé les maths. On finit avec la lecture.",
+          "texte": "Les calculs sont finis. Le texte arrive.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -5935,13 +5945,13 @@
               "cles_ui": [
                 "transition.felicitation.maths"
               ],
-              "texte": "Tu as terminé les maths."
+              "texte": "Les calculs sont finis."
             },
             {
               "cles_ui": [
                 "transition.annonce.lecture"
               ],
-              "texte": "On finit avec la lecture."
+              "texte": "Le texte arrive."
             }
           ]
         },
@@ -6087,7 +6097,7 @@
         },
         {
           "id": "enc.transition_maths_vers_lecture.18",
-          "texte": "Les maths sont rangées. On sort le texte.",
+          "texte": "On range les calculs. On passe au texte.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -6095,13 +6105,13 @@
               "cles_ui": [
                 "transition.felicitation.maths"
               ],
-              "texte": "Les maths sont rangées."
+              "texte": "On range les calculs."
             },
             {
               "cles_ui": [
                 "transition.annonce.lecture"
               ],
-              "texte": "On sort le texte."
+              "texte": "On passe au texte."
             }
           ]
         },
@@ -6819,7 +6829,7 @@
         },
         {
           "id": "enc.retour_de_pause.18",
-          "texte": "Le calme reste avec nous. On continue.",
+          "texte": "Le tipi est encore calme. On repart.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -6827,7 +6837,7 @@
               "cles_ui": [
                 "pause.retour.corps"
               ],
-              "texte": "Le calme reste avec nous. On continue."
+              "texte": "Le tipi est encore calme. On repart."
             }
           ]
         },
@@ -6866,7 +6876,7 @@
       "libelle": "Fin du travail du soir, juste avant le rituel fixe",
       "ecran": "/enfant/session/*",
       "cles_ui": [
-        "transition.cloture.corps"
+        "session.fin_travail.corps"
       ],
       "req": [
         "PED-11",
@@ -6883,7 +6893,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Tu as bien travaillé. Viens avec moi."
             }
@@ -6897,7 +6907,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Le travail du soir est fini."
             }
@@ -6911,7 +6921,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "C'est terminé. Tu as travaillé ce soir."
             }
@@ -6925,7 +6935,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "On arrête là. Le soir est à toi."
             }
@@ -6939,7 +6949,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Le travail est fini. Tu peux respirer."
             }
@@ -6953,7 +6963,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Voilà la fin du travail. Bravo."
             }
@@ -6967,7 +6977,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "On a fini. Range tes affaires tranquillement."
             }
@@ -6981,7 +6991,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "C'est la fin. Tu as bien cherché ce soir."
             }
@@ -6995,7 +7005,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Le tipi se referme doucement. Bonne soirée."
             }
@@ -7009,7 +7019,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "On s'arrête ici. C'est très bien comme ça."
             }
@@ -7017,15 +7027,15 @@
         },
         {
           "id": "enc.cloture.11",
-          "texte": "Ton travail du soir est terminé. Bravo.",
+          "texte": "Tu as fini ta journée de travail. Bravo.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
-              "texte": "Ton travail du soir est terminé. Bravo."
+              "texte": "Tu as fini ta journée de travail. Bravo."
             }
           ]
         },
@@ -7037,7 +7047,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Voilà. On a fait le chemin jusqu'au bout."
             }
@@ -7051,7 +7061,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Le travail s'arrête pour aujourd'hui. Tu peux souffler."
             }
@@ -7065,7 +7075,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Le travail est rangé. Le soir t'appartient."
             }
@@ -7079,7 +7089,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "On termine ici. Tu as donné des efforts."
             }
@@ -7093,7 +7103,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Fin du travail. Va t'amuser maintenant."
             }
@@ -7107,7 +7117,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Voilà. Plus rien à faire ce soir."
             }
@@ -7115,15 +7125,15 @@
         },
         {
           "id": "enc.cloture.18",
-          "texte": "On s'arrête là. On se retrouve un autre soir.",
+          "texte": "À demain, peut-être. Bonne fin de soirée.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
-              "texte": "On s'arrête là. On se retrouve un autre soir."
+              "texte": "À demain, peut-être. Bonne fin de soirée."
             }
           ]
         },
@@ -7135,7 +7145,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "Le travail se termine ici. Tout va bien."
             }
@@ -7149,7 +7159,7 @@
           "parties": [
             {
               "cles_ui": [
-                "transition.cloture.corps"
+                "session.fin_travail.corps"
               ],
               "texte": "On ferme le cahier. Doucement, sans bruit."
             }
@@ -7494,7 +7504,7 @@
         },
         {
           "id": "enc.pas_de_devoirs.17",
-          "texte": "Aucune leçon à apprendre ce soir. Le soir est à toi.",
+          "texte": "Aucune leçon à apprendre ce soir. Amuse-toi bien.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -7508,7 +7518,7 @@
               "cles_ui": [
                 "enfant.accueil.vide.corps"
               ],
-              "texte": "Le soir est à toi."
+              "texte": "Amuse-toi bien."
             }
           ]
         },
@@ -7691,7 +7701,7 @@
         },
         {
           "id": "enc.photo_illisible.06",
-          "texte": "Je continue à chercher tes devoirs. Tes pierres sont là, va les voir.",
+          "texte": "Il me faut encore un moment. Ton coffre est ouvert.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -7699,19 +7709,19 @@
               "cles_ui": [
                 "enfant.accueil.souci.titre"
               ],
-              "texte": "Je continue à chercher tes devoirs."
+              "texte": "Il me faut encore un moment."
             },
             {
               "cles_ui": [
                 "enfant.accueil.souci.corps"
               ],
-              "texte": "Tes pierres sont là, va les voir."
+              "texte": "Ton coffre est ouvert."
             }
           ]
         },
         {
           "id": "enc.photo_illisible.07",
-          "texte": "Je mets un peu de temps ce soir. Le coffre est ouvert pour toi.",
+          "texte": "Je vérifie encore une chose. Ton coffre t'attend.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -7719,13 +7729,13 @@
               "cles_ui": [
                 "enfant.accueil.souci.titre"
               ],
-              "texte": "Je mets un peu de temps ce soir."
+              "texte": "Je vérifie encore une chose."
             },
             {
               "cles_ui": [
                 "enfant.accueil.souci.corps"
               ],
-              "texte": "Le coffre est ouvert pour toi."
+              "texte": "Ton coffre t'attend."
             }
           ]
         },
@@ -7811,7 +7821,7 @@
         },
         {
           "id": "enc.photo_illisible.12",
-          "texte": "Je n'ai pas encore tout trouvé. Tu peux aller au coffre.",
+          "texte": "Il me manque un petit bout. Tes pierres t'attendent.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -7819,19 +7829,19 @@
               "cles_ui": [
                 "enfant.accueil.souci.titre"
               ],
-              "texte": "Je n'ai pas encore tout trouvé."
+              "texte": "Il me manque un petit bout."
             },
             {
               "cles_ui": [
                 "enfant.accueil.souci.corps"
               ],
-              "texte": "Tu peux aller au coffre."
+              "texte": "Tes pierres t'attendent."
             }
           ]
         },
         {
           "id": "enc.photo_illisible.13",
-          "texte": "Je continue de regarder. Ton coffre t'attend.",
+          "texte": "Je continue de regarder. Tes pierres sont juste là.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -7845,7 +7855,7 @@
               "cles_ui": [
                 "enfant.accueil.souci.corps"
               ],
-              "texte": "Ton coffre t'attend."
+              "texte": "Tes pierres sont juste là."
             }
           ]
         },
@@ -7951,7 +7961,7 @@
         },
         {
           "id": "enc.photo_illisible.19",
-          "texte": "Je regarde tout ça pour toi. Tes pierres t'attendent.",
+          "texte": "Je regarde tout ça pour toi. Tes pierres sont prêtes.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -7965,13 +7975,13 @@
               "cles_ui": [
                 "enfant.accueil.souci.corps"
               ],
-              "texte": "Tes pierres t'attendent."
+              "texte": "Tes pierres sont prêtes."
             }
           ]
         },
         {
           "id": "enc.photo_illisible.20",
-          "texte": "Je cherche encore un petit peu. Ton coffre est grand ouvert.",
+          "texte": "Je regarde une dernière ligne. Le coffre reste grand ouvert.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -7979,13 +7989,13 @@
               "cles_ui": [
                 "enfant.accueil.souci.titre"
               ],
-              "texte": "Je cherche encore un petit peu."
+              "texte": "Je regarde une dernière ligne."
             },
             {
               "cles_ui": [
                 "enfant.accueil.souci.corps"
               ],
-              "texte": "Ton coffre est grand ouvert."
+              "texte": "Le coffre reste grand ouvert."
             }
           ]
         }
@@ -8132,7 +8142,7 @@
         },
         {
           "id": "enc.reprise_session.07",
-          "texte": "Te revoilà. Rien n'a bougé ici.",
+          "texte": "Te revoilà. Je n'ai rien changé.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -8146,7 +8156,7 @@
               "cles_ui": [
                 "enfant.accueil.reprise.corps"
               ],
-              "texte": "Rien n'a bougé ici."
+              "texte": "Je n'ai rien changé."
             }
           ]
         },
@@ -8172,7 +8182,7 @@
         },
         {
           "id": "enc.reprise_session.09",
-          "texte": "Te voilà. Je t'ai gardé la place.",
+          "texte": "Te voilà. Ta place n'a pas bougé.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -8186,7 +8196,7 @@
               "cles_ui": [
                 "enfant.accueil.reprise.corps"
               ],
-              "texte": "Je t'ai gardé la place."
+              "texte": "Ta place n'a pas bougé."
             }
           ]
         },
@@ -8234,7 +8244,7 @@
         },
         {
           "id": "enc.reprise_session.12",
-          "texte": "Bonsoir. Le tipi est resté ouvert.",
+          "texte": "Bonsoir. Le tipi n'a pas fermé.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -8248,13 +8258,13 @@
               "cles_ui": [
                 "enfant.accueil.reprise.corps"
               ],
-              "texte": "Le tipi est resté ouvert."
+              "texte": "Le tipi n'a pas fermé."
             }
           ]
         },
         {
           "id": "enc.reprise_session.13",
-          "texte": "Te voilà. On reprend le cahier là où il était.",
+          "texte": "Te voilà. La page est restée ouverte.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -8268,7 +8278,7 @@
               "cles_ui": [
                 "enfant.accueil.reprise.corps"
               ],
-              "texte": "On reprend le cahier là où il était."
+              "texte": "La page est restée ouverte."
             }
           ]
         },
@@ -8336,7 +8346,7 @@
         },
         {
           "id": "enc.reprise_session.17",
-          "texte": "Te voilà. Tu ne refais pas tout.",
+          "texte": "Te voilà. Inutile de tout recommencer.",
           "canal": "les_deux",
           "jetons": [],
           "parties": [
@@ -8350,7 +8360,7 @@
               "cles_ui": [
                 "enfant.accueil.reprise.corps"
               ],
-              "texte": "Tu ne refais pas tout."
+              "texte": "Inutile de tout recommencer."
             }
           ]
         },
@@ -8396,7 +8406,7 @@
         },
         {
           "id": "enc.reprise_session.20",
-          "texte": "Bonsoir {prenom}. On continue notre chemin, tranquillement.",
+          "texte": "Bonsoir {prenom}. On finit le chemin, doucement.",
           "canal": "les_deux",
           "jetons": [
             "{prenom}"
@@ -8412,7 +8422,7 @@
               "cles_ui": [
                 "enfant.accueil.reprise.corps"
               ],
-              "texte": "On continue notre chemin, tranquillement."
+              "texte": "On finit le chemin, doucement."
             }
           ]
         }

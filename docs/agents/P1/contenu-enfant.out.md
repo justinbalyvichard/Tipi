@@ -1,8 +1,8 @@
 # P1bis — Contenu enfant Tipi
 
-Livrable de l'agent `contenu-enfant`. **Version 3 : version 2 (reprise du
-`VERDICT: FAIL` du 2026-09-20) plus l'arbitrage ARB-06 de l'Orchestrateur.**
-Verdict repris : (`docs/agents/P1/contenu-enfant.review.md`,
+Livrable de l'agent `contenu-enfant`. **Version 4** : reprise du `VERDICT: FAIL`
+du tour 1, arbitrage ARB-06, puis reprise du `VERDICT: FAIL` du tour 2
+(2 [MAJEUR], 4 [MINEUR], 1 renommage). Verdicts repris : (`docs/agents/P1/contenu-enfant.review.md`,
 8 [MAJEUR], 5 [MINEUR], avis `gardien-charte` NON CONFORME sur ses points 1 et 7).
 
 Sources : `TIPI-PROMPT-CURSOR.md` (1.3, 2.2, 3.4, 3.5), le verdict,
@@ -27,7 +27,7 @@ côté.** Chaque ligne indique ce qui a changé et où le vérifier.
 
 | # | Constat | Ce que j'ai changé | Où | Preuve mécanique |
 | --- | --- | --- | --- | --- |
-| 1 | [MAJEUR] `cloture` déclarait `bravo.titre`, ligne invariante du rituel | `situations.cloture.cles_ui` ne contient plus qu'une clé : `transition.cloture.corps`. La banque `cloture` n'alimente **aucune** clé de `/enfant/bravo` | `encouragements.json` | Contrôle 11 : `cles_ui de cloture : ['transition.cloture.corps']` |
+| 1 | [MAJEUR] `cloture` déclarait `bravo.titre`, ligne invariante du rituel | `situations.cloture.cles_ui` ne contient plus qu'une clé : `session.fin_travail.corps`. La banque `cloture` n'alimente **aucune** clé de `/enfant/bravo` | `encouragements.json` | Contrôle 11 : `cles_ui de cloture : ['session.fin_travail.corps']` |
 | 2 | [MAJEUR] 5 clés retirées par la correction du marketing | Toutes les `cles_ui` ont été refaites sur les clés réellement présentes dans le marketing corrigé. Les clés éclatées par ordre ou par matière sont soit utilisées telles quelles (`transition.felicitation.lecture`, `transition.annonce.maths`, et leurs miroirs), soit déclarées fixes (`lecture.intro.titre.premier/.apres`, `maths.intro.titre.premier/.apres`, `enfant.programme.corps.*`) | `encouragements.json` | Contrôle 6 : les 35 clés déclarées existent dans `produit-marketing.out.md`, **aucune absente** |
 | 3 | [MAJEUR] rien ne disait quelle clé une variante remplit | **Chaque variante porte `parties`** : une partie = un texte + la ou les clés qu'il remplit. Le `texte` de la variante est la jointure des parties, dans l'ordre. Les clés que la banque ne fait **pas** varier sont listées et motivées dans `cles_fixes_non_variees` | `encouragements.json` | Contrôle 6 : 680 parties, invariant `texte == jointure` vrai sur 460/460, 0 partie sans clé |
 | 4 | [MAJEUR] `indice_demande` aplatissait l'échelle PED-02 | Éclatée en **4 situations de 20 variantes** : `indice_demande_1` à `_4`, une par niveau, chacune sur sa clé unique. Chaque banque reste dans le registre de son niveau | `encouragements.json` | Contrôle 9 : 20/20 dans le registre pour les 4 niveaux, 0 vocabulaire d'un autre niveau |
@@ -35,7 +35,7 @@ côté.** Chaque ligne indique ce qui a changé et où le vérifier.
 | 6 | [MAJEUR] `blocage` mélangeait panne de micro et difficulté d'exercice | Éclatée en `blocage_maths` (l'exercice résiste) et **`blocage_lecture`** (20 variantes neuves : la panne est du côté du micro et de l'écoute de Pilou, jamais de l'enfant) | `encouragements.json` | Contrôle 8 : 20/20 attribuent la panne au micro ou à Pilou, 0 parle de l'exercice |
 | 7 | [MAJEUR] boutons du rituel inversés, identifiants inexistants | `bravo.bouton_principal` = « Aller jouer », ordre 8 ; `bravo.bouton_secondaire` = « Voir mon coffre », ordre 9. Le champ `role` porte la hiérarchie | `gwenn-scripts.json` | Contrôle 13 : `ordre 8 bravo.bouton_principal Aller jouer` |
 | 8 | [MAJEUR] deux vocabulaires de canal non tranchés | **Tranché** : `tts` / `affiche` / `les_deux`, décision de l'Orchestrateur du 2026-09-20 inscrite dans le fichier (`regles.canal_decision`) avec la table de correspondance. Le marketing s'aligne, et l'a déjà fait : ses tables portent `les_deux` | les deux fichiers | Contrôle 4 : 479/479 canaux valides, 0 entrée sans canal |
-| 9 | [MINEUR] `pas_de_devoirs` répétitive | 6 variantes réécrites en changeant l'angle (cartable fermé, coffre ouvert, leçon, temps libre, repos) | `encouragements.json` | Contrôle 10 : **0 paire au-dessus de 0,50** sur les 23 banques |
+| 9 | [MINEUR] `pas_de_devoirs` répétitive | 6 variantes réécrites en changeant l'angle (cartable fermé, coffre ouvert, leçon, temps libre, repos) | `encouragements.json` | Mesure refaite au tour 3, voir constat 15 : 0 paire signalée dans cette banque sous les trois règles |
 | 10 | [MINEUR] la banque `cloture` empruntait les mots du rituel | `cloture` 13, 16 et 18 réécrites. « Tu peux aller jouer » et « C'est fini » sont réservés au rituel | `encouragements.json` | Contrôle 11 : 0 emprunt |
 | 11 | [MINEUR] un participe accordé au genre | `enc.reprise_session.01` : « On reprend **là où on en était**. » | `encouragements.json` | Contrôle 4 : 0 accord de genre sur 479 entrées |
 | 12 | [MINEUR] la phrase du rapport sur les canaux était fausse | Corrigée en section 1.3, et adossée au comptage réel par situation | ce rapport | Contrôle 12 : `affiche` 25 = 20 banque + 5 boutons |
@@ -98,7 +98,7 @@ rendus controles (les deux matieres) :
 ```
 
 Le contrôle de longueur, les interdits, les emoji et les chiffres sont désormais
-mesurés **sur chaque rendu**, pas sur le texte à jeton : 865 phrases contrôlées
+mesurés **sur chaque rendu**, pas sur le texte à jeton : 864 phrases contrôlées
 pour 479 entrées, parce que les 20 variantes à jeton comptent double.
 
 La variante 01 reprend mot pour mot le texte canonique du marketing
@@ -129,28 +129,83 @@ animation sans texte. C'est écrit dans le fichier lui-même
 (`regles.canal_tts_en_v1`), pas seulement ici, pour qu'un développeur qui
 découvre une énumération à trois valeurs dont une est vide sache que c'est voulu.
 
-## Réponse sur le nom `transition.cloture.corps`
+## Réponse sur le nom de la clé de clôture
 
-**Le nom n'est pas idéal, et je recommande malgré tout de le garder.**
+**Question tranchée depuis, et dans l'autre sens.** J'avais recommandé de garder
+`transition.cloture.corps` pour ne pas désynchroniser deux travaux en cours, tout
+en écrivant que le nom décrivait l'inverse du moment qu'il désigne. Le contrôle
+du tour 2 a qualifié le point en [MINEUR] 19 et l'Orchestrateur a révoqué sa
+décision (ARB-07). **La clé s'appelle maintenant `session.fin_travail.corps`**,
+des deux côtés. Ma réserve initiale était la bonne ; ma recommandation de ne pas
+y toucher ne l'était pas.
 
-Ce qu'on peut lui reprocher : le préfixe `transition.` désigne partout ailleurs
-l'écran qui sépare deux étapes, alors que cette clé porte la phrase de fin du
-**travail**, après la dernière étape. Un développeur pressé pourrait la câbler
-sur l'écran de transition. `session.fin_travail.corps` décrirait mieux le moment.
+---
 
-Pourquoi je ne le change pas : ce nom est celui que le contrôleur a proposé dans
-son verdict, et `produit-marketing` **l'a créé entre-temps**, avec le texte
-canonique « Tu as bien travaillé. Viens avec moi. » que j'ai repris en variante
-01 de `cloture`. Renommer maintenant coûterait une passe à deux livrables pour
-un gain de lisibilité. La réserve reste posée ici : si vous voulez le nom plus
-juste, `session.fin_travail.corps` n'apparaît qu'à deux endroits de mon fichier
-(`situations.cloture.cles_ui` et `statut_cles`), je m'aligne en une ligne.
+# 0 ter. Reprise après verdict du tour 2
+
+Les 2 [MAJEUR], les 4 [MINEUR] et le renommage sont traités. **Aucun constat
+n'est laissé de côté ; la liste « Constats mineurs non repris » est vide.**
+
+| # | Constat | Ce que j'ai changé | Preuve mécanique |
+| --- | --- | --- | --- |
+| 14 | [MAJEUR] « On s'occupe **de les maths** » : préposition contractante à gauche du jeton | `enc.annonce_programme_une_etape.03` devient « **On prépare** {matiere}, tous les deux. » Et surtout, la garantie manquante est ajoutée à `regles.jeton_matiere_regle` : **aucune préposition contractante (`de`, `à`) ne précède immédiatement le jeton**. Le contrôle 14 liste désormais, pour les 20 variantes, le **mot situé à gauche** du jeton et les deux rendus complets | Contrôle 14 : `prepositions contractantes a gauche du jeton : 0`, et les 40 rendus imprimés |
+| 15 | [MAJEUR] 3 chiffres faux sur le recouvrement, 3 paires au-dessus de 0,50, 12 paires pile à 0,50 | **46 paires signalées par ma nouvelle mesure à trois règles, 46 traitées.** 53 variantes réécrites en trois passes, en changeant l'angle et non la tournure. L'indicateur est refait : trois mesures publiées avec leur règle, seuil en **supérieur ou égal** | Contrôle 10 : `paires signalees : 0`, `max A 0,429`, `max B 0,429`, `max C 0,698`, **`paires EXACTEMENT a 0,50 : 0`** |
+| 16 | [MINEUR] 5 clés ni variées ni déclarées fixes | Neuvième groupe ajouté à `cles_fixes_non_variees` : `maths.concret.corps`, `pause.rassurance`, `enfant.attente.pilou`, `lecture.reprise.corps`, `maths.reprise.corps`, motif « Repères constants d'un soir à l'autre » | Contrôle 6 : `9 groupes, 34 cles` |
+| 17 | [MINEUR] « au fur et à mesure » | `enc.indice_demande_2.15` devient « Tu peux barrer les ronds, un par un. » | Recherche de la locution : absente |
+| 18 | [MINEUR] éloge par la négation | `enc.reussite_maths.15` devient « Tu as cherché sans t'arrêter. Bravo pour ton courage. » Je n'ai pas repris « Tu as continué jusqu'au bout », qui recréait une paire avec la variante 03 | Contrôle 10 : aucune paire signalée dans `reussite_maths` |
+| 19 | [MINEUR] + décision de l'Orchestrateur : nom de clé | `session.fin_travail.corps` devient **`session.fin_travail.corps`**, aux deux endroits : `situations.cloture.cles_ui` et `statut_cles`. `produit-marketing` a renommé ses cinq occurrences en parallèle | Contrôle 6 : `cles UI declarees : 35, absentes de produit-marketing.out.md : aucune` |
+
+## Ce que j'ai retenu de la leçon sur l'indicateur
+
+Vous m'écrivez : « quand tu corriges un outil de mesure, re-mesure ce que
+l'ancienne version signalait, pas seulement ce que la nouvelle trouve. » C'est
+exactement ce qui s'est passé : neutraliser `{matiere}` était juste, et cela a
+fait glisser deux doublons réels de « au-dessus de 0,50 » à « exactement 0,50 »,
+donc sous un seuil que j'avais écrit en **strictement supérieur**. Trois
+conséquences, appliquées :
+
+1. **Le seuil est en supérieur ou égal**, et le contrôle publie en plus le
+   nombre de paires tombant *pile* sur la valeur seuil — la statistique qui
+   m'avait échappé. Elle vaut zéro.
+2. **Trois mesures indépendantes, pas une.** Une liste de mots-outils large, une
+   liste minimale où les adverbes restent des mots pleins, et une similarité de
+   séquence. Une paire signalée par **n'importe laquelle** est traitée. C'est ce
+   qui fait passer le compte de 15 paires (votre mesure) à 46 (la mienne) : je
+   préfère un indicateur qui remonte trop.
+3. **La règle est publiée avec le chiffre** : les deux listes de mots-outils,
+   le traitement des jetons, les trois seuils, et la comparaison employée. Le
+   contrôle les imprime avant de donner le résultat, pour que le chiffre soit
+   rejouable sans lire mon code.
+
+Et quand j'ai élargi les radicaux du détecteur de niveau 3 après réécriture, j'ai
+**re-mesuré avec l'ancienne liste** et publié ce qu'elle signalait : 6 variantes,
+vérifiées une par une (section 5.4, point 4).
+
+## Les 53 variantes réécrites
+
+Par banque, membre de paire réécrit : `encouragement_pendant_lecture` 13, 18, 19 ;
+`indice_demande_1` 06, 12, 19 ; `indice_demande_2` 08, 13, 15 ;
+`indice_demande_3` 04, 05, 09, 13, 14, 18, 19, 20 ; `indice_demande_4` 10, 17,
+18, 20 ; `reussite_maths` 13, 15 ; `transition_lecture_vers_maths` 04, 10, 18 ;
+`transition_maths_vers_lecture` 04, 10, 18 ; `photo_illisible` 06, 07, 12, 13,
+19, 20 ; `reprise_session` 07, 09, 12, 13, 17, 20 ; `annonce_programme` 11 ;
+`annonce_programme_une_etape` 02, 03, 16, 20 ; `cloture` 11, 18 ;
+`retour_de_pause` 18 ; `blocage_lecture` 08, 15 ; `pas_de_devoirs` 17 ;
+`accueil` 11.
+
+**Une tournure supprimée sans qu'on me l'ait demandée** : trois variantes de
+l'annonce à une seule étape donnaient « c'est **les maths** ». La forme est
+correcte à l'oral courant, mais pas au sens strict (« ce sont les maths »), et
+« ce sont » serait guindé pour un CE1. Plutôt que de défendre une forme
+discutable devant un enfant qui apprend à lire, je l'ai retirée : les trois
+variantes sont réécrites sans elle.
 
 ---
 
 ## Sommaire
 
 0 bis. Arbitrage ARB-06 et réponses demandées
+0 ter. Reprise après verdict du tour 2
 1. Schéma de `content/encouragements.json`
 2. Décomposition en situations (arbitrage A de l'Orchestrateur)
 3. Schéma de `content/gwenn-scripts.json`
@@ -182,7 +237,7 @@ TypeScript, sans recherche dans un tableau.
   "regles": { ... },
   "correspondance_mission": { "accueil": ["accueil"], ... },
   "cles_fixes_non_variees": [ { "cles": [...], "motif": "..." } ],
-  "statut_cles": { "transition.cloture.corps": "À créer côté marketing..." },
+  "statut_cles": { "session.fin_travail.corps": "À créer côté marketing..." },
   "situations": {
     "accueil": {
       "id": "accueil",
@@ -341,6 +396,7 @@ groupe. Extraits :
 | `maths.demande_resultat.1` à `.4`, `maths.indice.epuise` | Refus de donner le résultat (PED-01) : formulations fixes, contrôlées une fois pour toutes |
 | `bravo.*` | Rituel invariant (PED-12), dans `gwenn-scripts.json` |
 | Tous les libellés de bouton | Un libellé d'action ne varie pas d'un soir à l'autre (DES-06) |
+| `maths.concret.corps`, `pause.rassurance`, `enfant.attente.pilou`, `lecture.reprise.corps`, `maths.reprise.corps` | Repères constants d'un soir à l'autre : une formulation stable vaut mieux qu'une variante (PED-03, PRD-12, PRD-18). Groupe ajouté au tour 3, sur le [MINEUR] 16 |
 
 **Conséquence assumée et écrite** : PED-11 s'applique aux situations où Pilou
 *parle* à l'enfant d'un soir sur l'autre. Une clé structurelle, un libellé
@@ -434,16 +490,19 @@ Comptes **relevés mécaniquement** dans le fichier livré (sortie réelle en 5.
 | 16 | `transition_maths_vers_lecture` | **20** | `transition.felicitation.maths` + `transition.annonce.lecture` | les_deux |
 | 17 | `demande_pause` | **20** | `pause.titre` + `pause.corps` | les_deux |
 | 18 | `retour_de_pause` | **20** | `pause.retour.corps` | les_deux |
-| 19 | `cloture` | **20** | `transition.cloture.corps` | les_deux |
+| 19 | `cloture` | **20** | `session.fin_travail.corps` | les_deux |
 | 20 | `pas_de_devoirs` | **20** | `enfant.accueil.vide.titre` + `.corps` | les_deux |
 | 21 | `photo_illisible` | **20** | `enfant.accueil.souci.titre` + `.corps` | les_deux |
 | 22 | `reprise_session` | **20** | `enfant.accueil.reprise.titre` + `.corps` | les_deux |
 | | **Total** | **460** | 35 clés | |
 
-**Diversité réelle** : les 460 variantes sont 460 textes distincts (479 avec les
-rituels), et **aucune paire de variantes d'une même banque ne dépasse 0,50 de
-recouvrement** (indice de Jaccard sur les mots pleins, la mesure même du
-contrôleur). Le maximum constaté est de 0,50, sur cinq banques.
+**Diversité réelle**, mesurée sous trois règles publiées (section 5.2,
+contrôle 10) : les 460 variantes sont 460 textes distincts (479 avec les
+rituels), **aucune paire d'une même banque n'atteint le seuil de 0,50** sur l'une
+ou l'autre des deux mesures de Jaccard, **aucune n'atteint 0,70** en similarité
+de séquence, et **aucune ne tombe exactement sur 0,50**. Maximums réels :
+0,429 (Jaccard, les deux listes) et 0,698 (séquence). Le seuil est appliqué en
+**supérieur ou égal**, et non en strictement supérieur comme au tour 2.
 
 ---
 
@@ -464,8 +523,8 @@ const e=JSON.parse(fs.readFileSync('content/encouragements.json','utf8'));
 console.log('situations : '+Object.keys(e.situations).length);
 console.log('variantes  : '+Object.values(e.situations).reduce((a,s)=>a+s.variantes.length,0));
 console.log('parties    : '+Object.values(e.situations).reduce((a,s)=>a+s.variantes.reduce((b,v)=>b+v.parties.length,0),0));
+console.log('cle de cloture : '+e.situations.cloture.cles_ui.join(','));
 const g=JSON.parse(fs.readFileSync('content/gwenn-scripts.json','utf8'));
-console.log('rituels    : '+Object.keys(g.rituels).join(', '));
 console.log('lignes fixes : '+Object.values(g.rituels).reduce((a,r)=>a+r.ecrans.reduce((b,x)=>b+x.lignes.length,0),0));
 "
 
@@ -474,23 +533,25 @@ content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, cles rac
 situations : 23
 variantes  : 460
 parties    : 680
-rituels    : onboarding, rituel_fermeture
+cle de cloture : session.fin_travail.corps
 lignes fixes : 19
 ---exit:0---
 ```
 
-## 5.2 Contrôle de charte et de raccordement
+## 5.2 Contrôle de charte, de raccordement et de recouvrement
 
 Le script est conservé hors du dépôt (répertoire de travail de l'agent). Il
 vérifie, sur **toutes** les entrées et **sur chaque rendu de jeton** : comptes
 par situation ; couverture des 16 situations de la mission ; longueur de chaque
-phrase en comptage strict (une élision compte pour deux mots) ; mots et
-fragments interdits ; accords de genre ; emoji, chiffres, prénom en dur ;
-unicité des identifiants, des textes bruts et des textes normalisés ; validité
-et présence du canal ; invariant `texte == jointure des parties` ; **existence
-réelle de chaque clé déclarée dans `produit-marketing.out.md`** ; les contrôles
-dédiés aux constats 4, 5, 6, 9 et 10 ; la hiérarchie des boutons du rituel ; et
-le contrôle 14 de l'arbitrage ARB-06.
+phrase en comptage strict ; mots et fragments interdits ; accords de genre ;
+emoji, chiffres, prénom en dur ; unicité des identifiants, des textes bruts et
+des textes normalisés ; validité et présence du canal ; invariant
+`texte == jointure des parties` ; existence réelle de chaque clé déclarée dans
+`produit-marketing.out.md` ; les contrôles dédiés aux constats 4, 5, 6, 9 et 10
+du tour 1 ; **le recouvrement sous trois règles publiées, au seuil supérieur ou
+égal** ; la hiérarchie des boutons du rituel ; et le contrôle 14, qui imprime le
+**mot situé à gauche du jeton** et les deux rendus de chacune des 20 variantes à
+jeton.
 
 ```
 ======================================================================
@@ -547,7 +608,7 @@ situations de mission couvertes : 16 / 16
 3. LONGUEUR DES PHRASES (limite : 12 mots, comptage strict)
 ======================================================================
 entrees controlees : 479
-phrases controlees : 865
+phrases controlees : 864
 phrase la plus longue : enc.blocage_lecture.05 (10 mots) : Je t'entends mal, et ce n'est pas toi
 depassements : 0
 
@@ -569,7 +630,8 @@ textes normalises : 479, doublons : aucun
 parties controlees : 680
 invariant texte == jointure des parties : OK sur 460/460
 cles UI declarees : 35, absentes de produit-marketing.out.md : aucune
-cles fixes non variees declarees : 8 groupes
+cles fixes non variees declarees : 9 groupes, 34 cles
+cles sous statut particulier : session.fin_travail.corps
 
 ======================================================================
 7. CONSTAT 5 — photo_illisible : aucun support nomme, une sortie partout
@@ -585,6 +647,9 @@ variantes attribuant la panne au micro ou a l'ecoute de Pilou : 20 / 20
 ======================================================================
 9. CONSTAT 4 — les quatre niveaux d'indices ne se melangent pas
 ======================================================================
+re-mesure avec l'ANCIENNE liste de radicaux du niveau 3 : 6 variantes non reconnues
+  05, 09, 13, 14, 19, 20
+  (chacune verifiee a la main : ce sont des annonces d'exemple simplifie)
 indice_demande_1   variantes dans le registre du niveau : 20 / 20
 indice_demande_2   variantes dans le registre du niveau : 20 / 20
 indice_demande_3   variantes dans le registre du niveau : 20 / 20
@@ -592,20 +657,27 @@ indice_demande_4   variantes dans le registre du niveau : 20 / 20
 aucune variante des 80 ne contient de resultat chiffre (controle 4 : 0 chiffre)
 
 ======================================================================
-10. CONSTAT 9 — recouvrement interne des banques (Jaccard, mots pleins)
+10. CONSTAT 9 + [MAJEUR] 15 — recouvrement interne, trois regles publiees
 ======================================================================
-paires au-dessus de 0,50 : 0
-  max 0.50  transition_lecture_vers_maths    ('enc.transition_lecture_vers_maths.05', 'enc.transition_lecture_vers_maths.10')
-  max 0.50  retour_de_pause                  ('enc.retour_de_pause.14', 'enc.retour_de_pause.18')
-  max 0.50  reprise_session                  ('enc.reprise_session.01', 'enc.reprise_session.13')
-  max 0.50  photo_illisible                  ('enc.photo_illisible.01', 'enc.photo_illisible.12')
-  max 0.50  indice_demande_4                 ('enc.indice_demande_4.06', 'enc.indice_demande_4.18')
+Regle publiee avec l'indicateur :
+  mesure A : Jaccard sur les mots pleins, liste de mots-outils LARGE (84 mots)
+  mesure B : Jaccard sur les mots pleins, liste MINIMALE et grammaticale (66 mots)
+             les adverbes (bien, tout, doucement...) y restent des mots pleins
+  mesure C : similarite de sequence difflib sur le texte entier
+  jetons {prenom} et {matiere} neutralises dans A et B, retires dans C
+  seuil de signalement : A >= 0,50  OU  B >= 0,50  OU  C >= 0,70
+  comparaison : superieur OU EGAL au seuil, jamais strictement superieur
+paires signalees (A >= 0,50 ou B >= 0,50 ou C >= 0,70) : 0
+maximum mesure A : 0.429  ('hesitation', 'enc.hesitation.02', 'enc.hesitation.20')
+maximum mesure B : 0.429  ('hesitation', 'enc.hesitation.02', 'enc.hesitation.20')
+maximum mesure C : 0.698  ('retour_de_pause', 'enc.retour_de_pause.01', 'enc.retour_de_pause.20')
+paires EXACTEMENT a 0,50 sous A ou B : 0
 
 ======================================================================
 11. CONSTAT 10 — la banque cloture n'emprunte pas les mots du rituel
 ======================================================================
 emprunts aux phrases du rituel : 0
-cles_ui de cloture : ['transition.cloture.corps']
+cles_ui de cloture : ['session.fin_travail.corps']
 
 ======================================================================
 12. REPARTITION DES CANAUX
@@ -630,6 +702,69 @@ rituel_fermeture invariant : True (PED-12)
 ======================================================================
 14. ARB-06 — annonce a une seule etape : jeton {matiere}, Soir leger indiscernable
 ======================================================================
+mot precedant le jeton, controle sur 20 variantes :
+  prepositions contractantes (de, a, du, des, au, aux) a gauche du jeton : 0
+  les deux rendus de chaque variante, avec le mot qui precede le jeton :
+    01  mot a gauche : fait        
+        On fait la lecture. Et c'est tout.
+        On fait les maths. Et c'est tout.
+    02  mot a gauche : travailles  
+        Ce soir, tu travailles la lecture avec moi.
+        Ce soir, tu travailles les maths avec moi.
+    03  mot a gauche : prépare     
+        On prépare la lecture, tous les deux.
+        On prépare les maths, tous les deux.
+    04  mot a gauche : a           
+        Au programme, il y a la lecture.
+        Au programme, il y a les maths.
+    05  mot a gauche : travaille   
+        On travaille la lecture ensemble.
+        On travaille les maths ensemble.
+    06  mot a gauche : propose     
+        Je te propose la lecture pour ce soir.
+        Je te propose les maths pour ce soir.
+    07  mot a gauche : prend       
+        On prend la lecture, tranquillement.
+        On prend les maths, tranquillement.
+    08  mot a gauche : fait        
+        Aujourd'hui, on fait la lecture.
+        Aujourd'hui, on fait les maths.
+    09  mot a gauche : ouvre       
+        On ouvre la lecture, et on y va.
+        On ouvre les maths, et on y va.
+    10  mot a gauche : pour        
+        On s'installe pour la lecture.
+        On s'installe pour les maths.
+    11  mot a gauche : fais        
+        Tu fais la lecture avec moi.
+        Tu fais les maths avec moi.
+    12  mot a gauche : commence    
+        On commence la lecture quand tu veux.
+        On commence les maths quand tu veux.
+    13  mot a gauche : regarde     
+        Ce soir, on regarde la lecture.
+        Ce soir, on regarde les maths.
+    14  mot a gauche : pour        
+        On y va doucement pour la lecture.
+        On y va doucement pour les maths.
+    15  mot a gauche : sur         
+        Je t'accompagne sur la lecture.
+        Je t'accompagne sur les maths.
+    16  mot a gauche : met         
+        Au programme du soir, on met la lecture.
+        Au programme du soir, on met les maths.
+    17  mot a gauche : fait        
+        On fait la lecture, comme il faut.
+        On fait les maths, comme il faut.
+    18  mot a gauche : sur         
+        Ce soir, on passe du temps sur la lecture.
+        Ce soir, on passe du temps sur les maths.
+    19  mot a gauche : sur         
+        On avance sur la lecture, doucement.
+        On avance sur les maths, doucement.
+    20  mot a gauche : travailler  
+        On va travailler la lecture ce soir.
+        On va travailler les maths ce soir.
 variantes portant le jeton {matiere} : 20 / 20
 jeton en debut de phrase : 0
 vocabulaire de reduction ou de fatigue : 0
@@ -637,8 +772,8 @@ cles remplies : ['enfant.programme.une.corps.lecture', 'enfant.programme.une.cor
 rendus controles (les deux matieres) :
    On fait la lecture. Et c'est tout.
    On fait les maths. Et c'est tout.
-   Ce soir, c'est la lecture, tranquillement.
-   Ce soir, c'est les maths, tranquillement.
+   Ce soir, tu travailles la lecture avec moi.
+   Ce soir, tu travailles les maths avec moi.
 
 ======================================================================
 RESULTAT : AUCUN PROBLEME
@@ -676,11 +811,7 @@ phrases canoniques du marketing absentes : 0
 occurrences de Gwenn : 0
 ```
 
-**Les 20 phrases canoniques testées sont présentes**, chacune en variante 01 de
-sa situation : la banque étend le texte validé par le marketing, elle ne le
-remplace pas.
-
-## 5.4 Deux points d'honnêteté sur les contrôles
+## 5.4 Quatre points d'honnêteté sur les contrôles
 
 1. **Mon détecteur d'accord de genre a produit deux faux positifs** au premier
    passage : « Ton tipi est prêt. » (accord sur *tipi*) et « Je ne suis pas
@@ -695,7 +826,20 @@ remplace pas.
    mesure gonflée a fait remonter, **j'ai quand même réécrit les cinq qui
    restaient trop proches une fois le jeton retiré** ; une seule était un pur
    artefact de mesure.
-3. **Mon détecteur de niveau d'indice était incomplet** : il refusait « Voilà
+3. **Mon indicateur de recouvrement était trop permissif, et le contrôle du
+   tour 2 l'a démontré.** Seuil en « strictement supérieur », une seule liste de
+   mots-outils, pas de mesure de séquence : trois doublons réels passaient, et
+   douze paires s'arrêtaient pile sur la valeur seuil. Refait en trois mesures
+   publiées, seuil en supérieur ou égal, plus le compte des paires exactement au
+   seuil (section 0 ter). Résultat après réécriture : 0 paire signalée, 0 paire
+   à 0,50, maximum 0,429 en Jaccard et 0,698 en similarité de séquence.
+4. **J'ai élargi les radicaux du détecteur de niveau 3** après avoir réécrit six
+   variantes qui ne disaient plus « exemple » mais « cas simple », « version
+   courte », « modèle ». Conformément à la leçon du tour 2, le contrôle
+   **re-mesure avec l'ancienne liste** et publie ce qu'elle signalait : 6
+   variantes, que j'ai vérifiées une par une — ce sont bien des annonces
+   d'exemple simplifié, niveau 3 de PED-02.
+5. **Mon détecteur de niveau d'indice était incomplet** : il refusait « Voilà
    comment on peut s'y prendre. » (niveau 2) faute des radicaux « comment »,
    « moyen », « prendre », « demand », « chaque pas ». J'ai complété la liste des
    radicaux attendus. Les quatre textes concernés étaient bien dans le registre
@@ -770,7 +914,7 @@ variante, ordre stable, aucune condition liée à la performance de la soirée.
 
 L'arbitrage reste celui de la version 1, validé par le contrôleur : la banque
 `cloture` est dite **à la fin de la dernière étape**, sur une clé distincte
-(`transition.cloture.corps`), et le rituel de `/enfant/bravo` ne varie jamais.
+(`session.fin_travail.corps`), et le rituel de `/enfant/bravo` ne varie jamais.
 Aucune des 20 variantes n'emprunte les mots du rituel (contrôle 11 : 0 emprunt).
 
 ---
@@ -832,14 +976,13 @@ contrôleur note qu'une escalade ESC-001 est déjà ouverte par l'Orchestrateur.
 
 # 10. Ce qui reste ouvert
 
-1. **`transition.cloture.corps` existe désormais** : `produit-marketing` l'a
+1. **`session.fin_travail.corps` existe désormais** : `produit-marketing` l'a
    créée le 2026-09-20. Les 35 clés déclarées par la banque existent toutes.
    J'ai repris son texte canonique (« Tu as bien travaillé. Viens avec moi. »)
    en variante 01 de `cloture`, comme pour les 22 autres banques.
-2. **Nom de la clé de clôture** : je recommande de garder
-   `transition.cloture.corps` pour ne pas désynchroniser le travail en cours,
-   tout en signalant que `session.fin_travail.corps` décrirait mieux le moment
-   (section 0 bis). Si `produit-marketing` tranche pour l'autre nom, je m'aligne.
+2. **Nom de la clé de clôture** : réglé. Renommée en
+   `session.fin_travail.corps` des deux côtés, sur le [MINEUR] 19 et la
+   révocation ARB-07 de l'Orchestrateur. Plus rien d'ouvert ici.
 3. **Renommage de `gwenn-scripts.json`** en `pilou-scripts.json` : candidat
    `BACKLOG-V2.md`, hors périmètre.
 4. **Cache TTS (TEC-09b)** : les 479 entrées sont des phrases récurrentes, donc
