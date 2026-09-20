@@ -342,7 +342,7 @@
       "variantes": [
         {
           "id": "enc.avant_lecture.01",
-          "texte": "On commence par la lecture. Je lis d'abord.",
+          "texte": "C'est le moment de la lecture. Je lis d'abord.",
           "canal": "les_deux",
           "jetons": []
         },
@@ -1028,13 +1028,13 @@
       "variantes": [
         {
           "id": "enc.avant_maths.01",
-          "texte": "Maintenant, les maths. On regarde d'abord les objets.",
+          "texte": "C'est le moment des maths. On regarde les objets.",
           "canal": "les_deux",
           "jetons": []
         },
         {
           "id": "enc.avant_maths.02",
-          "texte": "On passe aux maths. Tout doucement.",
+          "texte": "Les maths, c'est maintenant. Tout doucement.",
           "canal": "les_deux",
           "jetons": []
         },

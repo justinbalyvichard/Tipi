@@ -135,10 +135,40 @@ réponses ci-dessus.
 
 ---
 
+## ESC-001 — Le fichier `content/gwenn-scripts.json` porte un nom incohérent
+
+Ouverte le : 2026-09-20 · Par : Orchestrateur, sur remontée de `produit-marketing` · Porte : G1 · Statut : **en attente**
+
+**Rien n'en dépend.** `contenu-enfant` avance avec le nom actuel, et le
+renommage éventuel coûte une commande. Je remonte parce qu'un agent ne peut pas
+corriger le prompt maître de sa propre autorité.
+
+Le constat en trois lignes. La mascotte s'appelle **Pilou** partout dans le
+prompt maître. Mais la section 5.1 impose à `contenu-enfant` de produire
+`content/gwenn-scripts.json`, et la règle `30-copy-enfant.mdc` cible
+`src/components/gwenn/**`. « Gwenn » semble être un reste d'une version
+antérieure où la mascotte portait un autre nom — un nom breton, alors que la
+section 1.3 pose explicitement que ni le nom, ni l'animal, ni l'univers visuel
+ne font référence à la Bretagne.
+
+| Option | Conséquence |
+| --- | --- |
+| Garder `gwenn-scripts.json` | Le dépôt garde un nom de fichier et un dossier de composants qui ne correspondent à rien dans le produit. Coût nul, confusion permanente pour tout agent qui arrive après. |
+| Renommer en `pilou-scripts.json` et `src/components/pilou/**` | Cohérence totale. Impose de corriger le prompt maître en section 5.1 et la règle `30-copy-enfant.mdc`, donc de modifier la source de vérité en cours de route. |
+
+> **Question fermée** : accepte-t-on de renommer `content/gwenn-scripts.json` en
+> `content/pilou-scripts.json` et `src/components/gwenn/**` en
+> `src/components/pilou/**`, en corrigeant le prompt maître en conséquence —
+> oui ou non ?
+
+**Réponse humaine** : _(en attente)_
+
+---
+
 ## Escalades de désaccord producteur/contrôleur
 
 Au troisième `FAIL` sur une même porte, l'Orchestrateur ouvre ici une entrée :
 porte concernée, désaccord en trois lignes, options avec leurs conséquences,
 question fermée.
 
-*(aucune pour l'instant)*
+*(aucune pour l'instant — G1 en est à l'aller-retour 2 sur 3)*
