@@ -1,0 +1,2259 @@
+{
+  "schema": "tipi.encouragements.v1",
+  "version": "1.0.0",
+  "personnage": "Pilou",
+  "jeton_prenom": "{prenom}",
+  "canaux": [
+    "tts",
+    "affiche",
+    "les_deux"
+  ],
+  "regles": {
+    "selection": "Tirage aléatoire sans répétition immédiate dans la liste variantes de la situation.",
+    "longueur": "Une idée par phrase, 12 mots maximum par phrase.",
+    "interdits": [
+      "c'est faux",
+      "erreur",
+      "tu t'es trompé",
+      "essaie de faire mieux",
+      "comparaison à un autre enfant",
+      "ironie",
+      "prénom du parent",
+      "promesse de récompense réelle",
+      "chrono",
+      "décompte",
+      "score chiffré",
+      "compteur d'erreurs",
+      "emoji"
+    ],
+    "canal": {
+      "tts": "Lue par Pilou, non affichée.",
+      "affiche": "Affichée seulement, Pilou ne parle pas à ce moment.",
+      "les_deux": "Lue et affichée, mot pour mot identique (PED-10)."
+    },
+    "jeton_prenom_regle": "Le prénom de l'enfant n'est jamais écrit en dur : il passe par le jeton {prenom} (PRD-02)."
+  },
+  "situations": {
+    "accueil": {
+      "id": "accueil",
+      "libelle": "Accueil du soir, Pilou salue l'enfant",
+      "ecran": "/enfant",
+      "cles_ui": [
+        "enfant.accueil.titre",
+        "enfant.accueil.corps"
+      ],
+      "req": [
+        "PED-11",
+        "PED-05",
+        "PED-10"
+      ],
+      "note": "Jouée à l'ouverture de l'écran enfant, avant l'annonce du programme.",
+      "variantes": [
+        {
+          "id": "enc.accueil.01",
+          "texte": "Bonsoir {prenom}. Je suis contente de te voir.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.accueil.02",
+          "texte": "Te voilà. Entre, on est bien ici.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.03",
+          "texte": "Salut {prenom}. Ton tipi est allumé.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.accueil.04",
+          "texte": "Bonsoir. J'ai gardé ta place au chaud.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.05",
+          "texte": "Te revoilà. Assieds-toi, on est tranquilles.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.06",
+          "texte": "Bonsoir {prenom}. Le tipi t'attendait.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.accueil.07",
+          "texte": "Coucou. Je suis là, comme tous les soirs.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.08",
+          "texte": "Bonsoir. On va faire ça tous les deux.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.09",
+          "texte": "Te voilà, {prenom}. On y va doucement.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.accueil.10",
+          "texte": "Bonsoir. Pose ton cartable, respire un coup.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.11",
+          "texte": "Salut. Je suis contente que tu sois là.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.12",
+          "texte": "Bonsoir {prenom}. Ici, on prend son temps.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.accueil.13",
+          "texte": "Te voilà. Le soir, on travaille tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.14",
+          "texte": "Coucou {prenom}. Tu es là, c'est bien.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.accueil.15",
+          "texte": "Bonsoir. Je t'ai gardé un coin du tipi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.16",
+          "texte": "Te revoilà. On commence quand tu veux.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.17",
+          "texte": "Bonsoir {prenom}. On fait un petit moment ensemble.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.accueil.18",
+          "texte": "Salut. Installe-toi. Je reste près de toi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.19",
+          "texte": "Bonsoir. Je reste avec toi ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.accueil.20",
+          "texte": "Te voilà, {prenom}. Ce moment est à nous deux.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        }
+      ]
+    },
+    "annonce_programme": {
+      "id": "annonce_programme",
+      "libelle": "Annonce du programme en pictos",
+      "ecran": "/enfant/programme",
+      "cles_ui": [
+        "enfant.programme.titre",
+        "enfant.programme.corps"
+      ],
+      "req": [
+        "PRD-07",
+        "PED-06",
+        "PED-10",
+        "PED-11"
+      ],
+      "note": "Accompagne les pictos. Le nombre d'étapes reste porté par les clés UI, jamais par la banque.",
+      "variantes": [
+        {
+          "id": "enc.annonce_programme.01",
+          "texte": "Regarde. Voilà notre programme de ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.02",
+          "texte": "Je te montre ce qu'on fait ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.03",
+          "texte": "Voilà le plan. On le fait dans l'ordre.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.04",
+          "texte": "On suit les images, l'une après l'autre.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.05",
+          "texte": "Voilà les images de ce soir. On les suit.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.06",
+          "texte": "Tu sais déjà tout. Il n'y a pas de surprise.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.07",
+          "texte": "Voilà le programme. Il est court, comme toujours.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.08",
+          "texte": "On fait ça, et après c'est fini.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.09",
+          "texte": "Regarde les images. Elles disent ce qu'on fait.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.10",
+          "texte": "Je t'explique avant. Comme ça, tu es tranquille.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.11",
+          "texte": "Voilà notre chemin de ce soir. On le suit.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.12",
+          "texte": "C'est tout pour ce soir. Rien de plus.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.13",
+          "texte": "Je t'annonce le programme. C'est simple.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.14",
+          "texte": "On avance pas à pas. Voilà le premier pas.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.15",
+          "texte": "Regarde. On sait déjà où on va.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.16",
+          "texte": "Voilà ce qui nous attend. Ce n'est pas long.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.17",
+          "texte": "Le programme tient sur ces images. C'est tout.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.18",
+          "texte": "Je te montre la route. Après, on part.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.19",
+          "texte": "On regarde ensemble, puis on commence doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.annonce_programme.20",
+          "texte": "Voilà le travail du soir. On s'y met ensemble.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "avant_lecture": {
+      "id": "avant_lecture",
+      "libelle": "Entrée dans l'étape lecture",
+      "ecran": "/enfant/session/lecture",
+      "cles_ui": [
+        "lecture.intro.titre",
+        "lecture.intro.corps"
+      ],
+      "req": [
+        "PRD-08",
+        "PED-10",
+        "PED-11"
+      ],
+      "note": "Dite avant que Pilou lise le texte modèle.",
+      "variantes": [
+        {
+          "id": "enc.avant_lecture.01",
+          "texte": "On commence par la lecture. Je lis d'abord.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.02",
+          "texte": "Je lis le texte une fois. Tu écoutes.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.03",
+          "texte": "Installe-toi bien. On va lire ensemble.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.04",
+          "texte": "Voilà le texte. Je te le lis d'abord.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.05",
+          "texte": "Écoute ma voix. Après, ce sera ton tour.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.06",
+          "texte": "On lit tranquillement. Rien ne presse.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.07",
+          "texte": "Je commence, tu suis avec les yeux.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.08",
+          "texte": "Regarde les mots pendant que je lis.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.09",
+          "texte": "On prend le texte du début. Tout doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.10",
+          "texte": "Je te montre comment ça sonne. Puis tu essaies.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.11",
+          "texte": "La lecture, c'est maintenant. On y va calmement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.12",
+          "texte": "Mets-toi bien. Ça aide pour lire à voix haute.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.13",
+          "texte": "On ouvre le texte. Je lis en premier.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.14",
+          "texte": "Tu vas lire à voix haute. Je t'écoute après.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.15",
+          "texte": "D'abord je lis. Ensuite tu lis. C'est simple.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.16",
+          "texte": "Prends une grande respiration. On commence la lecture.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.17",
+          "texte": "Le texte est court. On y va ensemble.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.18",
+          "texte": "Je lis lentement, pour que tu entendes bien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.19",
+          "texte": "On lit à deux. Chacun son tour.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_lecture.20",
+          "texte": "Voilà l'histoire du soir. Je commence.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "encouragement_lecture": {
+      "id": "encouragement_lecture",
+      "libelle": "Encouragement pendant et juste après la lecture à voix haute",
+      "ecran": "/enfant/session/lecture",
+      "cles_ui": [
+        "lecture.micro.en_cours",
+        "lecture.retour.effort"
+      ],
+      "req": [
+        "PED-05",
+        "PED-11",
+        "PED-07"
+      ],
+      "note": "Les entrées 01 à 10 sont affichées pendant que le micro est ouvert : Pilou se tait pour ne pas couvrir la voix de l'enfant. Les entrées 11 à 20 sont dites et affichées entre deux passages, micro fermé.",
+      "variantes": [
+        {
+          "id": "enc.encouragement_lecture.01",
+          "texte": "Je t'écoute.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.02",
+          "texte": "Continue, tu lis bien.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.03",
+          "texte": "Prends ton temps.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.04",
+          "texte": "Ça avance.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.05",
+          "texte": "Je suis là.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.06",
+          "texte": "Tu peux respirer entre les mots.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.07",
+          "texte": "Doucement, c'est très bien.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.08",
+          "texte": "Continue comme ça.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.09",
+          "texte": "Ta voix porte bien.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.10",
+          "texte": "On y est presque.",
+          "canal": "affiche",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.11",
+          "texte": "Tu lis jusqu'au bout. Bravo pour ton courage.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.12",
+          "texte": "Tu t'accroches aux mots. C'est du travail.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.13",
+          "texte": "J'entends que tu cherches. Continue tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.14",
+          "texte": "Tu avances ligne après ligne. C'est bien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.15",
+          "texte": "Tu prends ton temps. C'est exactement ça.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.16",
+          "texte": "Lire à voix haute demande des efforts. Tu le fais.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.17",
+          "texte": "Tu as recommencé la phrase. C'est une bonne idée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.18",
+          "texte": "Ta voix se pose. On continue tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.19",
+          "texte": "Tu regardes bien les mots. Ça aide beaucoup.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.encouragement_lecture.20",
+          "texte": "Tu continues même quand c'est long. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "hesitation": {
+      "id": "hesitation",
+      "libelle": "Hésitation détectée sur un mot",
+      "ecran": "/enfant/session/lecture",
+      "cles_ui": [
+        "lecture.hesitation.corps"
+      ],
+      "req": [
+        "PED-04",
+        "PED-09",
+        "PED-11"
+      ],
+      "note": "Pilou propose, elle n'impose jamais. Aucune correction mot à mot n'est affichée.",
+      "variantes": [
+        {
+          "id": "enc.hesitation.01",
+          "texte": "On regarde ce mot ensemble ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.02",
+          "texte": "Ce mot est long. Tu veux l'essayer encore ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.03",
+          "texte": "On le coupe en morceaux, si tu veux.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.04",
+          "texte": "Je peux le dire une fois. Tu veux ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.05",
+          "texte": "Ce mot se cache un peu. On le cherche ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.06",
+          "texte": "Tu veux redire ce mot tranquillement ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.07",
+          "texte": "Regarde le début du mot. Juste le début.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.08",
+          "texte": "On souffle, puis on reprend ce mot.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.09",
+          "texte": "Ce mot est difficile. C'est normal.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.10",
+          "texte": "Tu veux qu'on le lise en même temps ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.11",
+          "texte": "Mets ton doigt sous le mot. Ça aide.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.12",
+          "texte": "On peut passer, et le revoir après.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.13",
+          "texte": "Prends ton temps sur ce mot. Je t'attends.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.14",
+          "texte": "Tu veux réessayer, ou tu préfères continuer ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.15",
+          "texte": "Ce mot a beaucoup de lettres. On regarde.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.16",
+          "texte": "On le dit doucement, syllabe par syllabe.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.17",
+          "texte": "Je le répète, et tu le dis après moi ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.18",
+          "texte": "Tu l'as presque. On recommence ce mot ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.19",
+          "texte": "On le regarde de plus près, tous les deux.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.hesitation.20",
+          "texte": "Ce mot demande un effort. Tu veux essayer ?",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "reussite_etape": {
+      "id": "reussite_etape",
+      "libelle": "Fin d'une étape, éloge centré sur l'effort",
+      "ecran": "/enfant/session/*",
+      "cles_ui": [
+        "lecture.retour.effort",
+        "maths.fini.retour"
+      ],
+      "req": [
+        "PED-05",
+        "PED-07",
+        "PED-11"
+      ],
+      "note": "Aucun chiffre, aucune note, aucune validation binaire. L'éloge porte sur l'effort.",
+      "variantes": [
+        {
+          "id": "enc.reussite_etape.01",
+          "texte": "C'est fait. Tu as terminé cette étape.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.02",
+          "texte": "Voilà, c'est fini pour cette partie. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.03",
+          "texte": "Tu as tenu jusqu'au bout. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.04",
+          "texte": "Bravo. Tu as travaillé sérieusement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.05",
+          "texte": "Cette étape est terminée. Tu peux souffler.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.06",
+          "texte": "Tu as fait ce qu'il fallait. C'est bien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.07",
+          "texte": "Voilà une chose de faite. Tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.08",
+          "texte": "Tu as bien cherché. Ça compte beaucoup.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.09",
+          "texte": "C'est terminé. Tu as tenu bon.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.10",
+          "texte": "Bravo pour tes efforts sur cette étape.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.11",
+          "texte": "Tu as avancé à ton rythme. C'est parfait.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.12",
+          "texte": "Cette partie est finie. Tu as bien travaillé.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.13",
+          "texte": "Tu as essayé, encore et encore. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.14",
+          "texte": "Voilà. Le travail de cette étape est fini.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.15",
+          "texte": "Tu as gardé ta concentration. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.16",
+          "texte": "C'est fait. Tu as donné ce qu'il fallait.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.17",
+          "texte": "Tu as terminé. Ça demandait du courage.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.18",
+          "texte": "Bravo. Tu as fait le chemin en entier.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.19",
+          "texte": "Cette étape est derrière nous. Tu l'as faite.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reussite_etape.20",
+          "texte": "Tu as travaillé jusqu'à la fin. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "transition_etapes": {
+      "id": "transition_etapes",
+      "libelle": "Transition douce entre deux étapes",
+      "ecran": "/enfant/session/*",
+      "cles_ui": [
+        "transition.felicitation",
+        "transition.annonce"
+      ],
+      "req": [
+        "PRD-10",
+        "PED-11",
+        "PED-10"
+      ],
+      "note": "Les entrées 01 à 05 sont dites pendant la micro-animation, sans texte à l'écran. Les entrées 06 à 20 sont dites et affichées.",
+      "variantes": [
+        {
+          "id": "enc.transition_etapes.01",
+          "texte": "On souffle, puis on continue.",
+          "canal": "tts",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.02",
+          "texte": "Petite pause, et on repart.",
+          "canal": "tts",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.03",
+          "texte": "Une chose de faite. On passe à l'autre.",
+          "canal": "tts",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.04",
+          "texte": "Je range ça, et on avance.",
+          "canal": "tts",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.05",
+          "texte": "Voilà. On change de travail.",
+          "canal": "tts",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.06",
+          "texte": "C'est fait. Maintenant, on passe à la suite.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.07",
+          "texte": "Cette partie est finie. On continue avec la suivante.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.08",
+          "texte": "On tourne la page. La suite arrive.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.09",
+          "texte": "Tu as fini cette partie. On passe à l'autre.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.10",
+          "texte": "On quitte ce travail. Le prochain arrive.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.11",
+          "texte": "Respire un coup. On repart doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.12",
+          "texte": "On finit avec la dernière chose. Une seule.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.13",
+          "texte": "On continue tranquillement. Rien ne presse.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.14",
+          "texte": "Étire tes bras. Puis on continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.15",
+          "texte": "On change de travail. Ça repose la tête.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.16",
+          "texte": "Bravo pour cette partie. On passe à l'autre.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.17",
+          "texte": "On avance ensemble. La suite est courte.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.18",
+          "texte": "Tu peux boire un peu. Ensuite, on continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.19",
+          "texte": "On laisse ça de côté. On regarde la suite.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.transition_etapes.20",
+          "texte": "Voilà l'autre chose du programme. On y va.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "avant_maths": {
+      "id": "avant_maths",
+      "libelle": "Entrée dans l'étape maths",
+      "ecran": "/enfant/session/maths",
+      "cles_ui": [
+        "maths.intro.titre",
+        "maths.intro.corps",
+        "maths.concret.corps"
+      ],
+      "req": [
+        "PRD-09",
+        "PED-01",
+        "PED-03",
+        "PED-11"
+      ],
+      "note": "Concret avant abstrait. Aucune entrée ne laisse croire que Pilou donnera le résultat.",
+      "variantes": [
+        {
+          "id": "enc.avant_maths.01",
+          "texte": "Maintenant, les maths. On regarde d'abord les objets.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.02",
+          "texte": "On passe aux maths. Tout doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.03",
+          "texte": "Voilà les maths. On commence par regarder.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.04",
+          "texte": "Les maths arrivent. On prend son temps.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.05",
+          "texte": "On compte des ronds avant de calculer.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.06",
+          "texte": "Je te montre des objets. Après, le calcul.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.07",
+          "texte": "En maths, on peut compter sur ses doigts.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.08",
+          "texte": "On regarde bien, puis on réfléchit.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.09",
+          "texte": "En maths, on cherche, et c'est normal.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.10",
+          "texte": "Voilà l'exercice. On le lit ensemble.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.11",
+          "texte": "On commence par comprendre. Le calcul vient après.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.12",
+          "texte": "Prends une respiration. On entre dans les maths.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.13",
+          "texte": "Je ne donne pas les réponses. Je t'aide à chercher.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.14",
+          "texte": "On a le droit de dessiner pour compter.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.15",
+          "texte": "Les maths se font lentement. Ça aide beaucoup.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.16",
+          "texte": "Regarde l'exercice. Dis-moi ce que tu vois.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.17",
+          "texte": "On cherche ensemble. Et c'est toi qui trouves.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.18",
+          "texte": "Voilà des ronds à compter. Prends ton temps.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.19",
+          "texte": "On installe les maths. Rien ne presse ici.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.avant_maths.20",
+          "texte": "Tu peux compter à voix haute, si tu veux.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "indice_demande": {
+      "id": "indice_demande",
+      "libelle": "L'enfant demande un indice",
+      "ecran": "/enfant/session/maths",
+      "cles_ui": [
+        "maths.indice.1.amorce",
+        "maths.indice.2.amorce",
+        "maths.indice.3.amorce",
+        "maths.indice.4.amorce"
+      ],
+      "req": [
+        "PED-01",
+        "PED-02",
+        "PED-11"
+      ],
+      "note": "Amorce d'habillage. Le contenu de l'indice est pré-généré à l'analyse (TEC-07). Aucune amorce ne dit le rang de l'indice, aucune ne contient de résultat.",
+      "variantes": [
+        {
+          "id": "enc.indice_demande.01",
+          "texte": "Je te donne un coup de pouce. Écoute.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.02",
+          "texte": "Voilà un indice. La réponse reste à toi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.03",
+          "texte": "Je t'aide un peu. Je ne dis pas le résultat.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.04",
+          "texte": "Un indice arrive. Tu continues à chercher.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.05",
+          "texte": "Je te pose une question, pour t'aider.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.06",
+          "texte": "Écoute bien. Ça va t'ouvrir une idée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.07",
+          "texte": "Je te montre un chemin. Tu le suis.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.08",
+          "texte": "Voilà une piste. À toi de la prendre.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.09",
+          "texte": "Je t'explique une façon de faire.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.10",
+          "texte": "Tu peux demander un indice, c'est permis.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.11",
+          "texte": "Voilà de quoi réfléchir. Prends ton temps.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.12",
+          "texte": "Je t'aide à démarrer. Après, tu avances.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.13",
+          "texte": "Un petit coup de main, et tu repars.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.14",
+          "texte": "Je te donne une idée. Le reste t'appartient.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.15",
+          "texte": "Écoute cet indice. Puis reprends ton calcul.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.16",
+          "texte": "Demander de l'aide, c'est une bonne idée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.17",
+          "texte": "Je t'aide autrement. On change de méthode.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.18",
+          "texte": "Voilà un exemple plus facile. Regarde-le bien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.19",
+          "texte": "On refait le chemin ensemble, tout doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.indice_demande.20",
+          "texte": "Je t'accompagne. Mais c'est toi qui trouves.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "blocage": {
+      "id": "blocage",
+      "libelle": "Blocage détecté, Pilou propose une sortie",
+      "ecran": "/enfant/session/*",
+      "cles_ui": [
+        "maths.blocage.corps",
+        "lecture.blocage.corps"
+      ],
+      "req": [
+        "PED-08",
+        "PED-04",
+        "PED-11",
+        "ETH-04"
+      ],
+      "note": "Après trois sollicitations sans réponse exploitable. Pilou propose, ne relance plus, et passer à la suite ne coûte jamais rien.",
+      "variantes": [
+        {
+          "id": "enc.blocage.01",
+          "texte": "Celui-là est difficile. C'est normal.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.02",
+          "texte": "On souffle un peu, ou on passe à la suite ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.03",
+          "texte": "Cet exercice résiste. Ça arrive souvent.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.04",
+          "texte": "Tu veux une pause ? Elle ne coûte rien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.05",
+          "texte": "On peut laisser celui-là de côté.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.06",
+          "texte": "Je vois que c'est dur. On change ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.07",
+          "texte": "Ce n'est pas grave. On peut continuer autrement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.08",
+          "texte": "Tu as le droit de t'arrêter un moment.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.09",
+          "texte": "On respire. Puis tu choisis la suite.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.10",
+          "texte": "Cet exercice est costaud. On y revient plus tard ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.11",
+          "texte": "Tu veux passer à autre chose ? C'est possible.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.12",
+          "texte": "On ne reste pas là-dessus. On avance.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.13",
+          "texte": "Ça bloque un peu. Ce n'est pas grave.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.14",
+          "texte": "Tu as beaucoup cherché. Tu peux souffler.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.15",
+          "texte": "Je te propose une pause, tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.16",
+          "texte": "On laisse cet exercice dormir un peu.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.17",
+          "texte": "Tu décides : une pause, ou la suite ?",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.18",
+          "texte": "Certains exercices demandent du temps. C'est tout.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.19",
+          "texte": "On arrête celui-là. Tu as bien essayé.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.blocage.20",
+          "texte": "Je reste avec toi. On choisit ensemble.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "demande_pause": {
+      "id": "demande_pause",
+      "libelle": "L'enfant demande la pause",
+      "ecran": "/enfant/pause",
+      "cles_ui": [
+        "pause.titre",
+        "pause.corps",
+        "pause.rassurance"
+      ],
+      "req": [
+        "PRD-12",
+        "PED-07",
+        "ETH-01",
+        "PED-11"
+      ],
+      "note": "Aucune durée, aucun décompte, aucun nombre de cycles. Le retour est possible tout de suite.",
+      "variantes": [
+        {
+          "id": "enc.demande_pause.01",
+          "texte": "On souffle un peu. Regarde le rond.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.02",
+          "texte": "D'accord, on fait une pause. Viens.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.03",
+          "texte": "La pause est là quand tu veux.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.04",
+          "texte": "On s'arrête un moment. Tout va bien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.05",
+          "texte": "Respire avec le rond. Tout doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.06",
+          "texte": "Bonne idée. Une pause, ça repose la tête.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.07",
+          "texte": "On met le travail de côté un instant.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.08",
+          "texte": "Ferme les yeux si tu veux. Je t'attends.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.09",
+          "texte": "Inspire doucement. Puis souffle doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.10",
+          "texte": "La pause ne coûte rien. Elle est à toi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.11",
+          "texte": "On respire ensemble, toi et moi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.12",
+          "texte": "Prends le temps qu'il te faut.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.13",
+          "texte": "Tu reviens quand tu veux. Rien ne presse.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.14",
+          "texte": "On fait le calme. Juste un moment.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.15",
+          "texte": "Étire tes bras. Ça fait du bien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.16",
+          "texte": "Pose tes mains sur tes genoux. Respire.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.17",
+          "texte": "Le tipi est calme. Reste là un moment.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.18",
+          "texte": "On ne fait rien du tout. C'est permis.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.19",
+          "texte": "Écoute ta respiration. Elle ralentit doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.demande_pause.20",
+          "texte": "Tu as bien fait de demander la pause.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "retour_de_pause": {
+      "id": "retour_de_pause",
+      "libelle": "Retour de pause vers l'étape en cours",
+      "ecran": "/enfant/session/*",
+      "cles_ui": [
+        "pause.retour.corps"
+      ],
+      "req": [
+        "PRD-12",
+        "ETH-02",
+        "PED-11"
+      ],
+      "note": "Aucune mention de la durée de la pause, aucun commentaire sur le fait d'avoir fait une pause.",
+      "variantes": [
+        {
+          "id": "enc.retour_de_pause.01",
+          "texte": "Te revoilà. On y retourne tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.02",
+          "texte": "Bonjour à nouveau. On reprend doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.03",
+          "texte": "Te voilà. Le travail nous attend, sans presser.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.04",
+          "texte": "On repart. Tu choisis le rythme.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.05",
+          "texte": "Bien. On reprend là où on était.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.06",
+          "texte": "Contente de te revoir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.07",
+          "texte": "On continue tout doucement. Rien n'a bougé.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.08",
+          "texte": "Te revoilà près de moi. On avance.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.09",
+          "texte": "La pause est finie. On reprend calmement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.10",
+          "texte": "Tu as respiré. Maintenant, on continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.11",
+          "texte": "On reprend le fil. Doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.12",
+          "texte": "Tout est resté en place. On y retourne.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.13",
+          "texte": "Prends encore une respiration. Puis on repart.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.14",
+          "texte": "Ta tête est plus calme. On continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.15",
+          "texte": "On remet le travail devant nous. Doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.16",
+          "texte": "Je t'attendais tranquillement. On continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.17",
+          "texte": "On repart ensemble. Sans se presser.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.18",
+          "texte": "Le calme reste avec nous. On continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.19",
+          "texte": "On reprend. Tu fais comme tu peux.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.retour_de_pause.20",
+          "texte": "Voilà. On reprend le travail, tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "cloture": {
+      "id": "cloture",
+      "libelle": "Fin du travail du soir, juste avant le rituel fixe",
+      "ecran": "/enfant/session/*",
+      "cles_ui": [
+        "transition.felicitation",
+        "bravo.titre"
+      ],
+      "req": [
+        "PED-11",
+        "PED-12",
+        "PRD-11"
+      ],
+      "note": "Cette banque est dite à la fin de la dernière étape. Elle précède le rituel de fermeture de gwenn-scripts.json, qui reste identique chaque soir et n'est jamais remplacé par une variante.",
+      "variantes": [
+        {
+          "id": "enc.cloture.01",
+          "texte": "Le travail du soir est fini.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.02",
+          "texte": "Voilà, on a tout fait pour ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.03",
+          "texte": "C'est terminé. Tu as travaillé ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.04",
+          "texte": "On arrête là. Le soir est à toi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.05",
+          "texte": "Le travail est fini. Tu peux respirer.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.06",
+          "texte": "Voilà la fin du travail. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.07",
+          "texte": "On a fini. Range tes affaires tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.08",
+          "texte": "C'est la fin. Tu as bien cherché ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.09",
+          "texte": "Le tipi se referme doucement. Bonne soirée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.10",
+          "texte": "On s'arrête ici. C'est très bien comme ça.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.11",
+          "texte": "Ton travail du soir est terminé. Bravo.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.12",
+          "texte": "Voilà. On a fait le chemin jusqu'au bout.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.13",
+          "texte": "C'est fini pour aujourd'hui. Tu peux souffler.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.14",
+          "texte": "Le travail est rangé. Le soir t'appartient.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.15",
+          "texte": "On termine ici. Tu as donné des efforts.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.16",
+          "texte": "Fin du travail. Tu peux aller jouer.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.17",
+          "texte": "Voilà. Plus rien à faire ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.18",
+          "texte": "C'est fini. On se retrouve un autre soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.19",
+          "texte": "Le travail s'arrête là. Tout va bien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.cloture.20",
+          "texte": "On ferme le cahier. Doucement, sans bruit.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "pas_de_devoirs": {
+      "id": "pas_de_devoirs",
+      "libelle": "Aucun devoir préparé ce soir",
+      "ecran": "/enfant",
+      "cles_ui": [
+        "enfant.accueil.vide.titre",
+        "enfant.accueil.vide.corps"
+      ],
+      "req": [
+        "PRD-16",
+        "ETH-02",
+        "PED-11"
+      ],
+      "note": "Aucun ton de regret, aucune justification, aucune impasse : le coffre reste accessible.",
+      "variantes": [
+        {
+          "id": "enc.pas_de_devoirs.01",
+          "texte": "Ce soir, il n'y a pas de devoirs.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.02",
+          "texte": "Pas de travail ce soir. C'est comme ça.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.03",
+          "texte": "Le cahier est vide ce soir. Bonne soirée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.04",
+          "texte": "Il n'y a rien à faire ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.05",
+          "texte": "Ce soir, on ne travaille pas. Bonne soirée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.06",
+          "texte": "Rien ce soir. Tu peux aller jouer.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.07",
+          "texte": "Pas de devoirs aujourd'hui. On se voit demain.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.08",
+          "texte": "Le tipi est ouvert, mais le travail dort.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.09",
+          "texte": "Ce soir, c'est tranquille. Il n'y a rien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.10",
+          "texte": "Pas de lecture, pas de maths, ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.11",
+          "texte": "Rien à faire ce soir. Ton coffre reste ouvert.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.12",
+          "texte": "Ce soir, tu es libre. Va t'amuser.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.13",
+          "texte": "Il n'y a pas de devoirs. C'est tout simple.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.14",
+          "texte": "Le travail attend un autre jour. Bonne soirée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.15",
+          "texte": "Ce soir, on se dit juste bonsoir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.16",
+          "texte": "Pas de devoirs. Tu peux voir tes pierres.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.17",
+          "texte": "Rien dans le cahier ce soir. Profite de ta soirée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.18",
+          "texte": "Le soir est à toi. Il n'y a rien.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.19",
+          "texte": "Ce soir, le tipi se repose aussi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.pas_de_devoirs.20",
+          "texte": "Aucun devoir ce soir. On se retrouve plus tard.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "photo_illisible": {
+      "id": "photo_illisible",
+      "libelle": "La photo du devoir n'a pas pu être lue",
+      "ecran": "/enfant",
+      "cles_ui": [
+        "enfant.accueil.souci.titre",
+        "enfant.accueil.souci.corps",
+        "enfant.attente.pilou"
+      ],
+      "req": [
+        "PRD-16",
+        "PED-04",
+        "PED-11"
+      ],
+      "note": "Le sujet du souci est toujours Pilou, jamais l'enfant, jamais le parent. Aucun code technique, aucun mot d'échec. La reprise de la photo se traite côté parent.",
+      "variantes": [
+        {
+          "id": "enc.photo_illisible.01",
+          "texte": "Je n'arrive pas à lire la feuille.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.02",
+          "texte": "L'image est un peu floue pour moi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.03",
+          "texte": "Je cherche encore tes devoirs. Patiente un peu.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.04",
+          "texte": "Mes yeux de loutre ne lisent pas bien ce soir.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.05",
+          "texte": "La photo est sombre. Je ne vois pas les mots.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.06",
+          "texte": "Je n'ai pas réussi à lire le cahier.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.07",
+          "texte": "Ce n'est pas clair pour moi. Je recommence.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.08",
+          "texte": "L'écriture se cache. Je la cherche encore.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.09",
+          "texte": "Je n'y arrive pas tout de suite. Ça vient.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.10",
+          "texte": "La feuille est difficile à lire pour moi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.11",
+          "texte": "Je mets un peu de temps. Reste tranquille.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.12",
+          "texte": "Je ne vois pas bien. On va s'arranger.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.13",
+          "texte": "La photo ne me dit pas grand-chose.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.14",
+          "texte": "Je relis la feuille, tout doucement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.15",
+          "texte": "Je regarde encore. Les mots sont petits.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.16",
+          "texte": "Je n'ai pas tout compris sur l'image.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.17",
+          "texte": "Ça prend un moment. Tu peux voir ton coffre.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.18",
+          "texte": "Je ne lis pas encore ce devoir. Patience.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.19",
+          "texte": "L'image reste floue. Je continue à chercher.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.photo_illisible.20",
+          "texte": "Je m'occupe de ça. Ce n'est pas ton souci.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    },
+    "reprise_session": {
+      "id": "reprise_session",
+      "libelle": "Reprise d'une session interrompue",
+      "ecran": "/enfant",
+      "cles_ui": [
+        "enfant.accueil.reprise.titre",
+        "enfant.accueil.reprise.corps",
+        "lecture.reprise.corps",
+        "maths.reprise.corps"
+      ],
+      "req": [
+        "PRD-18",
+        "ETH-02",
+        "PED-11"
+      ],
+      "note": "Aucune mention du temps écoulé, aucune remarque sur l'interruption, aucun retour à zéro.",
+      "variantes": [
+        {
+          "id": "enc.reprise_session.01",
+          "texte": "Te revoilà. On reprend là où on s'était arrêtés.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.02",
+          "texte": "Bonsoir {prenom}. On continue notre travail.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.reprise_session.03",
+          "texte": "On repart d'ici. C'est resté comme avant.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.04",
+          "texte": "Le travail nous attendait. On le reprend.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.05",
+          "texte": "Te voilà. J'ai tout gardé pour toi.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.06",
+          "texte": "On continue. Tes pierres sont bien rangées.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.07",
+          "texte": "Rien n'a bougé. On reprend tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.08",
+          "texte": "Bonsoir. On finit ce qu'on avait commencé.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.09",
+          "texte": "Je t'ai gardé la place. On continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.10",
+          "texte": "On reprend doucement. Pas besoin de tout refaire.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.11",
+          "texte": "Te revoilà. On était juste ici.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.12",
+          "texte": "Le tipi est resté ouvert. On continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.13",
+          "texte": "On reprend le cahier là où il était.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.14",
+          "texte": "Bonsoir {prenom}. On termine ensemble ce soir.",
+          "canal": "les_deux",
+          "jetons": [
+            "{prenom}"
+          ]
+        },
+        {
+          "id": "enc.reprise_session.15",
+          "texte": "Tu reviens, et tout est encore là.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.16",
+          "texte": "On reprend le fil de notre soirée.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.17",
+          "texte": "Tu ne refais pas tout. On continue.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.18",
+          "texte": "Je me souviens de tout. On y retourne.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.19",
+          "texte": "Te voilà. On avance encore un peu.",
+          "canal": "les_deux",
+          "jetons": []
+        },
+        {
+          "id": "enc.reprise_session.20",
+          "texte": "On continue notre chemin, tranquillement.",
+          "canal": "les_deux",
+          "jetons": []
+        }
+      ]
+    }
+  }
+}

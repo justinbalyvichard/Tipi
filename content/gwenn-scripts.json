@@ -1,0 +1,254 @@
+{
+  "schema": "tipi.gwenn-scripts.v1",
+  "version": "1.0.0",
+  "personnage": "Pilou",
+  "note_nom_de_fichier": "Le fichier s'appelle gwenn-scripts.json parce que le prompt maître le nomme ainsi. Le personnage s'appelle Pilou partout dans les textes.",
+  "jeton_prenom": "{prenom}",
+  "canaux": [
+    "tts",
+    "affiche",
+    "les_deux"
+  ],
+  "regles": {
+    "fixite": "Ces répliques n'ont aucune variante. Elles sont jouées telles quelles, dans l'ordre du champ ordre.",
+    "lecture_tts": "Pilou lit, dans l'ordre, toutes les lignes dont le canal vaut tts ou les_deux et dont la condition est remplie.",
+    "condition": "null signifie toujours jouée. Une chaîne nomme l'état applicatif qui déclenche ou remplace la ligne."
+  },
+  "rituels": {
+    "onboarding": {
+      "id": "onboarding",
+      "libelle": "Onboarding en 3 écrans",
+      "route": "/bienvenue",
+      "req": [
+        "PRD-01",
+        "PED-06",
+        "PED-10",
+        "PRD-12",
+        "ETH-04"
+      ],
+      "rejoue": "jamais",
+      "note": "Joué une seule fois à vie. Aucun bouton passer, aucune saisie, aucun numéro d'écran affiché.",
+      "ecrans": [
+        {
+          "id": "bienvenue_1",
+          "ordre": 1,
+          "libelle": "Qui est là",
+          "lignes": [
+            {
+              "id": "bienvenue.1.titre",
+              "ordre": 1,
+              "role": "titre",
+              "texte": "Bonjour, moi c'est Pilou.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bienvenue.1.corps",
+              "ordre": 2,
+              "role": "corps",
+              "texte": "J'habite ici, dans le tipi.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bienvenue.1.bouton",
+              "ordre": 3,
+              "role": "bouton",
+              "texte": "Bonjour Pilou",
+              "canal": "affiche",
+              "condition": null,
+              "jetons": []
+            }
+          ]
+        },
+        {
+          "id": "bienvenue_2",
+          "ordre": 2,
+          "libelle": "Ce qu'on fait ensemble",
+          "lignes": [
+            {
+              "id": "bienvenue.2.titre",
+              "ordre": 1,
+              "role": "titre",
+              "texte": "On fait les devoirs ensemble.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bienvenue.2.corps",
+              "ordre": 2,
+              "role": "corps",
+              "texte": "Deux choses par soir. Pas plus.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bienvenue.2.bouton",
+              "ordre": 3,
+              "role": "bouton",
+              "texte": "D'accord",
+              "canal": "affiche",
+              "condition": null,
+              "jetons": []
+            }
+          ]
+        },
+        {
+          "id": "bienvenue_3",
+          "ordre": 3,
+          "libelle": "La pause et les pierres",
+          "lignes": [
+            {
+              "id": "bienvenue.3.titre",
+              "ordre": 1,
+              "role": "titre",
+              "texte": "Tu peux t'arrêter quand tu veux.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bienvenue.3.corps",
+              "ordre": 2,
+              "role": "corps",
+              "texte": "Appuie sur la pause. Je t'attends.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bienvenue.3.corps_2",
+              "ordre": 3,
+              "role": "corps",
+              "texte": "Tu gagnes des pierres. Elles restent à toi.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bienvenue.3.bouton",
+              "ordre": 4,
+              "role": "bouton",
+              "texte": "On y va",
+              "canal": "affiche",
+              "condition": null,
+              "jetons": []
+            }
+          ]
+        }
+      ]
+    },
+    "rituel_fermeture": {
+      "id": "rituel_fermeture",
+      "libelle": "Rituel de fermeture, identique chaque soir",
+      "route": "/enfant/bravo",
+      "req": [
+        "PED-12",
+        "PRD-11",
+        "PED-05",
+        "PED-07",
+        "ETH-04",
+        "ETH-05"
+      ],
+      "rejoue": "chaque soir, à l'identique",
+      "invariant": true,
+      "note": "Même enchaînement, même ton, même son, quelle que soit la soirée. Aucune variante n'est autorisée ici, y compris si une seule étape a été faite ou si le parent a arrêté la session.",
+      "ecrans": [
+        {
+          "id": "bravo",
+          "ordre": 1,
+          "libelle": "Clôture",
+          "lignes": [
+            {
+              "id": "bravo.titre",
+              "ordre": 1,
+              "role": "titre",
+              "texte": "Bravo {prenom}.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": [
+                "{prenom}"
+              ]
+            },
+            {
+              "id": "bravo.corps",
+              "ordre": 2,
+              "role": "corps",
+              "texte": "Tu as fait tes devoirs ce soir.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bravo.pierres",
+              "ordre": 3,
+              "role": "corps",
+              "texte": "Tu as gagné des pierres.",
+              "canal": "les_deux",
+              "condition": "credit_pierres_ok",
+              "jetons": []
+            },
+            {
+              "id": "bravo.coffre",
+              "ordre": 4,
+              "role": "corps",
+              "texte": "Je les range dans ton coffre.",
+              "canal": "les_deux",
+              "condition": "credit_pierres_ok",
+              "jetons": []
+            },
+            {
+              "id": "bravo.pierres_plus_tard",
+              "ordre": 5,
+              "role": "corps",
+              "texte": "Je range tes pierres un peu plus tard.",
+              "canal": "les_deux",
+              "condition": "credit_pierres_differe",
+              "jetons": []
+            },
+            {
+              "id": "bravo.pierres_plus_tard_2",
+              "ordre": 6,
+              "role": "corps",
+              "texte": "Elles sont à toi. Elles ne se perdent pas.",
+              "canal": "les_deux",
+              "condition": "credit_pierres_differe",
+              "jetons": []
+            },
+            {
+              "id": "bravo.fin",
+              "ordre": 7,
+              "role": "corps",
+              "texte": "C'est fini. Tu peux aller jouer.",
+              "canal": "les_deux",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bravo.bouton",
+              "ordre": 8,
+              "role": "bouton",
+              "texte": "Voir mon coffre",
+              "canal": "affiche",
+              "condition": null,
+              "jetons": []
+            },
+            {
+              "id": "bravo.bouton_2",
+              "ordre": 9,
+              "role": "bouton",
+              "texte": "Aller jouer",
+              "canal": "affiche",
+              "condition": null,
+              "jetons": []
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
