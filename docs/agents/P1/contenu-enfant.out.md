@@ -1,7 +1,8 @@
 # P1bis — Contenu enfant Tipi
 
-Livrable de l'agent `contenu-enfant`. **Version 2, reprise après le
-`VERDICT: FAIL` du 2026-09-20** (`docs/agents/P1/contenu-enfant.review.md`,
+Livrable de l'agent `contenu-enfant`. **Version 3 : version 2 (reprise du
+`VERDICT: FAIL` du 2026-09-20) plus l'arbitrage ARB-06 de l'Orchestrateur.**
+Verdict repris : (`docs/agents/P1/contenu-enfant.review.md`,
 8 [MAJEUR], 5 [MINEUR], avis `gardien-charte` NON CONFORME sur ses points 1 et 7).
 
 Sources : `TIPI-PROMPT-CURSOR.md` (1.3, 2.2, 3.4, 3.5), le verdict,
@@ -10,7 +11,7 @@ Sources : `TIPI-PROMPT-CURSOR.md` (1.3, 2.2, 3.4, 3.5), le verdict,
 
 | Fichier | Rôle | Volume |
 | --- | --- | --- |
-| `content/encouragements.json` | Banque de variantes par situation (PED-11) | 22 situations, 440 variantes, 660 parties |
+| `content/encouragements.json` | Banque de variantes par situation (PED-11) | 23 situations, 460 variantes, 680 parties |
 | `content/gwenn-scripts.json` | Répliques fixes des rituels (PRD-01, PED-12) | 2 rituels, 4 écrans, 19 lignes |
 | `docs/agents/P1/contenu-enfant.out.md` | Le présent rapport | — |
 
@@ -27,16 +28,16 @@ côté.** Chaque ligne indique ce qui a changé et où le vérifier.
 | # | Constat | Ce que j'ai changé | Où | Preuve mécanique |
 | --- | --- | --- | --- | --- |
 | 1 | [MAJEUR] `cloture` déclarait `bravo.titre`, ligne invariante du rituel | `situations.cloture.cles_ui` ne contient plus qu'une clé : `transition.cloture.corps`. La banque `cloture` n'alimente **aucune** clé de `/enfant/bravo` | `encouragements.json` | Contrôle 11 : `cles_ui de cloture : ['transition.cloture.corps']` |
-| 2 | [MAJEUR] 5 clés retirées par la correction du marketing | Toutes les `cles_ui` ont été refaites sur les clés réellement présentes dans le marketing corrigé. Les clés éclatées par ordre ou par matière sont soit utilisées telles quelles (`transition.felicitation.lecture`, `transition.annonce.maths`, et leurs miroirs), soit déclarées fixes (`lecture.intro.titre.premier/.apres`, `maths.intro.titre.premier/.apres`, `enfant.programme.corps.*`) | `encouragements.json` | Contrôle 6 : les 33 clés déclarées existent dans `produit-marketing.out.md`, à la seule exception de `transition.cloture.corps`, à créer |
-| 3 | [MAJEUR] rien ne disait quelle clé une variante remplit | **Chaque variante porte `parties`** : une partie = un texte + la ou les clés qu'il remplit. Le `texte` de la variante est la jointure des parties, dans l'ordre. Les clés que la banque ne fait **pas** varier sont listées et motivées dans `cles_fixes_non_variees` | `encouragements.json` | Contrôle 6 : 660 parties, invariant `texte == jointure` vrai sur 440/440, 0 partie sans clé |
+| 2 | [MAJEUR] 5 clés retirées par la correction du marketing | Toutes les `cles_ui` ont été refaites sur les clés réellement présentes dans le marketing corrigé. Les clés éclatées par ordre ou par matière sont soit utilisées telles quelles (`transition.felicitation.lecture`, `transition.annonce.maths`, et leurs miroirs), soit déclarées fixes (`lecture.intro.titre.premier/.apres`, `maths.intro.titre.premier/.apres`, `enfant.programme.corps.*`) | `encouragements.json` | Contrôle 6 : les 35 clés déclarées existent dans `produit-marketing.out.md`, **aucune absente** |
+| 3 | [MAJEUR] rien ne disait quelle clé une variante remplit | **Chaque variante porte `parties`** : une partie = un texte + la ou les clés qu'il remplit. Le `texte` de la variante est la jointure des parties, dans l'ordre. Les clés que la banque ne fait **pas** varier sont listées et motivées dans `cles_fixes_non_variees` | `encouragements.json` | Contrôle 6 : 680 parties, invariant `texte == jointure` vrai sur 460/460, 0 partie sans clé |
 | 4 | [MAJEUR] `indice_demande` aplatissait l'échelle PED-02 | Éclatée en **4 situations de 20 variantes** : `indice_demande_1` à `_4`, une par niveau, chacune sur sa clé unique. Chaque banque reste dans le registre de son niveau | `encouragements.json` | Contrôle 9 : 20/20 dans le registre pour les 4 niveaux, 0 vocabulaire d'un autre niveau |
 | 5 | [MAJEUR] `photo_illisible` : constats d'échec, sans issue | **Les 20 variantes sont réécrites.** Pilou est toujours en train de chercher ; aucune ne nomme la photo, l'image, la feuille, le cahier ni l'écriture ; chacune ouvre sur le coffre | `encouragements.json` | Contrôle 7 : 0/20 nomment le support, **20/20** offrent une sortie |
 | 6 | [MAJEUR] `blocage` mélangeait panne de micro et difficulté d'exercice | Éclatée en `blocage_maths` (l'exercice résiste) et **`blocage_lecture`** (20 variantes neuves : la panne est du côté du micro et de l'écoute de Pilou, jamais de l'enfant) | `encouragements.json` | Contrôle 8 : 20/20 attribuent la panne au micro ou à Pilou, 0 parle de l'exercice |
 | 7 | [MAJEUR] boutons du rituel inversés, identifiants inexistants | `bravo.bouton_principal` = « Aller jouer », ordre 8 ; `bravo.bouton_secondaire` = « Voir mon coffre », ordre 9. Le champ `role` porte la hiérarchie | `gwenn-scripts.json` | Contrôle 13 : `ordre 8 bravo.bouton_principal Aller jouer` |
-| 8 | [MAJEUR] deux vocabulaires de canal non tranchés | **Tranché** : `tts` / `affiche` / `les_deux`, décision de l'Orchestrateur du 2026-09-20 inscrite dans le fichier (`regles.canal_decision`) avec la table de correspondance. Le marketing s'aligne, et l'a déjà fait : ses tables portent `les_deux` | les deux fichiers | Contrôle 4 : 459/459 canaux valides, 0 entrée sans canal |
-| 9 | [MINEUR] `pas_de_devoirs` répétitive | 6 variantes réécrites en changeant l'angle (cartable fermé, coffre ouvert, leçon, temps libre, repos) | `encouragements.json` | Contrôle 10 : **0 paire au-dessus de 0,50** sur les 22 banques |
+| 8 | [MAJEUR] deux vocabulaires de canal non tranchés | **Tranché** : `tts` / `affiche` / `les_deux`, décision de l'Orchestrateur du 2026-09-20 inscrite dans le fichier (`regles.canal_decision`) avec la table de correspondance. Le marketing s'aligne, et l'a déjà fait : ses tables portent `les_deux` | les deux fichiers | Contrôle 4 : 479/479 canaux valides, 0 entrée sans canal |
+| 9 | [MINEUR] `pas_de_devoirs` répétitive | 6 variantes réécrites en changeant l'angle (cartable fermé, coffre ouvert, leçon, temps libre, repos) | `encouragements.json` | Contrôle 10 : **0 paire au-dessus de 0,50** sur les 23 banques |
 | 10 | [MINEUR] la banque `cloture` empruntait les mots du rituel | `cloture` 13, 16 et 18 réécrites. « Tu peux aller jouer » et « C'est fini » sont réservés au rituel | `encouragements.json` | Contrôle 11 : 0 emprunt |
-| 11 | [MINEUR] un participe accordé au genre | `enc.reprise_session.01` : « On reprend **là où on en était**. » | `encouragements.json` | Contrôle 4 : 0 accord de genre sur 459 entrées |
+| 11 | [MINEUR] un participe accordé au genre | `enc.reprise_session.01` : « On reprend **là où on en était**. » | `encouragements.json` | Contrôle 4 : 0 accord de genre sur 479 entrées |
 | 12 | [MINEUR] la phrase du rapport sur les canaux était fausse | Corrigée en section 1.3, et adossée au comptage réel par situation | ce rapport | Contrôle 12 : `affiche` 25 = 20 banque + 5 boutons |
 | 13 | [MINEUR] 6 tournures au-dessus du registre CE1 | Les 6 sont reformulées au concret : « résiste », « costaud », « dormir », « l'écriture se cache », « le travail dort », « tipi allumé » ont disparu | `encouragements.json` | Recherche des 6 expressions : `absent` pour les 6 |
 
@@ -60,15 +61,103 @@ est corrigée (constat 1).
 
 ---
 
+# 0 bis. Arbitrage ARB-06 et réponses demandées
+
+## Ce que j'ai ajouté
+
+**Banque `annonce_programme_une_etape`, 20 variantes.** Total : 23 situations,
+460 variantes. Les deux autres points de mon refus borné sont conservés comme
+vous les avez tranchés : les libellés de bouton et les titres porteurs d'ordre
+restent fixes.
+
+Elle alimente les deux clés `enfant.programme.une.corps.lecture` et
+`enfant.programme.une.corps.maths` avec **une seule banque de 20 variantes**,
+grâce à un jeton de matière. C'est ce qui permet de tenir votre budget de +20 au
+lieu de +40 sans jamais faire dire à Pilou une matière absente du programme.
+
+| Point | Décision |
+| --- | --- |
+| Jeton | `{matiere}`, déclaré à la racine du fichier (`jeton_matiere`) avec sa table de valeurs : `…une.corps.lecture` vaut « la lecture », `…une.corps.maths` vaut « les maths » |
+| Qui choisit la valeur | **La clé rendue**, jamais une logique de texte. Le code ne devine rien |
+| Contrainte de rédaction | Le jeton n'apparaît jamais en début de phrase (question de majuscule) et n'est jamais sujet d'un verbe (question d'accord singulier/pluriel). Les 20 textes sont justes dans les deux rendus |
+| Soir léger indétectable | Aucune variante ne dit ni ne laisse entendre que la soirée est raccourcie, allégée, réduite, ni qu'elle est liée à la fatigue de l'enfant. Contrôle mécanique sur les mots « seule », « court », « moins », « léger », « réduit », « fatigu », « rapide », « allég », « raccourc », dans les **deux** rendus |
+| Couverture | Configurations C3 à C6 du marketing : matière retirée par le parent, ou Soir léger. Les quatre se jouent avec la même banque |
+
+Preuve, contrôle 14 :
+
+```
+variantes portant le jeton {matiere} : 20 / 20
+jeton en debut de phrase : 0
+vocabulaire de reduction ou de fatigue : 0
+cles remplies : ['enfant.programme.une.corps.lecture', 'enfant.programme.une.corps.maths']
+rendus controles (les deux matieres) :
+   On fait la lecture. Et c'est tout.
+   On fait les maths. Et c'est tout.
+   Ce soir, c'est la lecture, tranquillement.
+   Ce soir, c'est les maths, tranquillement.
+```
+
+Le contrôle de longueur, les interdits, les emoji et les chiffres sont désormais
+mesurés **sur chaque rendu**, pas sur le texte à jeton : 865 phrases contrôlées
+pour 479 entrées, parce que les 20 variantes à jeton comptent double.
+
+La variante 01 reprend mot pour mot le texte canonique du marketing
+(« On fait la lecture. Et c'est tout. »), comme dans les 22 autres banques.
+
+## Réponse sur le canal `tts`
+
+Votre question est la bonne, et la réponse honnête est **la première : `tts` ne
+sert à rien en V1**, et ce n'est pas le symptôme d'une situation qui aurait dû
+l'employer.
+
+Le raisonnement, vérifiable sur les 479 entrées : PED-10 impose que toute
+information importante soit **doublée à l'oral**. Un texte utile à l'action est
+donc toujours dit, et comme il est aussi lisible à l'écran, il est en
+`les_deux`. Pour qu'une entrée soit en `tts`, il faudrait une parole que l'on ne
+veuille **pas** afficher. Je n'ai trouvé aucun moment de la V1 dans ce cas :
+
+- les seuls textes non lus sont les 20 encouragements affichés micro ouvert —
+  Pilou se tait pour ne pas couvrir l'enfant — et les 5 libellés de bouton ;
+- la version 1 de ce livrable plaçait 5 entrées en `tts` sur la transition,
+  pendant la micro-animation. C'était une erreur de ma part : le marketing
+  définit ces clés en `les_deux`, l'écran de transition porte bien du texte, et
+  un enfant qui n'entend pas bien doit pouvoir le lire.
+
+**Je garde donc la valeur dans l'énumération**, comme vous le proposez, pour une
+future réplique purement vocale — typiquement une phrase d'ambiance pendant une
+animation sans texte. C'est écrit dans le fichier lui-même
+(`regles.canal_tts_en_v1`), pas seulement ici, pour qu'un développeur qui
+découvre une énumération à trois valeurs dont une est vide sache que c'est voulu.
+
+## Réponse sur le nom `transition.cloture.corps`
+
+**Le nom n'est pas idéal, et je recommande malgré tout de le garder.**
+
+Ce qu'on peut lui reprocher : le préfixe `transition.` désigne partout ailleurs
+l'écran qui sépare deux étapes, alors que cette clé porte la phrase de fin du
+**travail**, après la dernière étape. Un développeur pressé pourrait la câbler
+sur l'écran de transition. `session.fin_travail.corps` décrirait mieux le moment.
+
+Pourquoi je ne le change pas : ce nom est celui que le contrôleur a proposé dans
+son verdict, et `produit-marketing` **l'a créé entre-temps**, avec le texte
+canonique « Tu as bien travaillé. Viens avec moi. » que j'ai repris en variante
+01 de `cloture`. Renommer maintenant coûterait une passe à deux livrables pour
+un gain de lisibilité. La réserve reste posée ici : si vous voulez le nom plus
+juste, `session.fin_travail.corps` n'apparaît qu'à deux endroits de mon fichier
+(`situations.cloture.cles_ui` et `statut_cles`), je m'aligne en une ligne.
+
+---
+
 ## Sommaire
 
+0 bis. Arbitrage ARB-06 et réponses demandées
 1. Schéma de `content/encouragements.json`
 2. Décomposition en situations (arbitrage A de l'Orchestrateur)
 3. Schéma de `content/gwenn-scripts.json`
 4. Compte exact de variantes par situation
 5. Contrôles mécaniques et sorties réelles
 6. Couverture de PED-04, PED-05, PED-11, PED-12
-7. Le jeton `{prenom}` et le multi-enfants (PRD-02)
+7. Les jetons `{prenom}` et `{matiere}`, et le multi-enfants (PRD-02)
 8. Écart de nommage `gwenn-scripts.json`
 9. Arbitrages tranchés dans ce livrable
 10. Ce qui reste ouvert
@@ -88,6 +177,7 @@ TypeScript, sans recherche dans un tableau.
   "version": "2.0.0",
   "personnage": "Pilou",
   "jeton_prenom": "{prenom}",
+  "jeton_matiere": { "jeton": "{matiere}", "valeurs": { ... }, "emploi": "..." },
   "canaux": ["tts", "affiche", "les_deux"],
   "regles": { ... },
   "correspondance_mission": { "accueil": ["accueil"], ... },
@@ -127,8 +217,9 @@ TypeScript, sans recherche dans un tableau.
 | `regles` | racine | `object` | Règles de rédaction, de sélection et de raccordement |
 | `correspondance_mission` | racine | `Record<string, string[]>` | Les 16 situations de la mission vers les situations livrées |
 | `cles_fixes_non_variees` | racine | `{cles, motif}[]` | Les clés d'écran que la banque ne fait **pas** varier, avec le motif |
-| `statut_cles` | racine | `Record<string,string>` | Clés déclarées qui restent à créer côté marketing |
-| `situations` | racine | `Record<SituationId, Situation>` | Les 22 situations |
+| `statut_cles` | racine | `Record<string,string>` | Statut des clés qui ont demandé une création côté marketing |
+| `situations` | racine | `Record<SituationId, Situation>` | Les 23 situations |
+| `jeton_matiere` | racine | `object` | Le jeton `{matiere}`, sa table de valeurs par clé et son emploi |
 | `cles_ui` | situation | `string[]` | Toutes les clés remplies par la situation, dans l'ordre des parties |
 | `note` | situation | `string` | Condition d'emploi, opposable en revue |
 | `id` | variante | `string` | **Identifiant stable** `enc.<situation>.<nn>` |
@@ -141,7 +232,7 @@ TypeScript, sans recherche dans un tableau.
 
 | Valeur | Sens | Emploi réel |
 | --- | --- | --- |
-| `tts` | Lue par Pilou, non affichée | **Aucune entrée aujourd'hui.** La valeur reste déclarée pour un futur moment parlé sans texte à l'écran |
+| `tts` | Lue par Pilou, non affichée | **Aucune entrée aujourd'hui, et c'est voulu.** Décision et motif en section 0 bis, inscrits dans le fichier sous `regles.canal_tts_en_v1` |
 | `affiche` | Affichée seulement, Pilou se tait | 25 entrées |
 | `les_deux` | Dite **et** affichée, mot pour mot | 434 entrées |
 
@@ -209,7 +300,7 @@ variantes.** Aucune situation n'est regroupée pour tenir le compte de 20.
 | Mission (16 situations demandées) | Situations livrées | Variantes |
 | --- | --- | --- |
 | accueil | `accueil` | 20 |
-| annonce du programme | `annonce_programme` | 20 |
+| annonce du programme | `annonce_programme`, `annonce_programme_une_etape` | 40 |
 | avant lecture | `avant_lecture` | 20 |
 | encouragement en cours de lecture | `encouragement_pendant_lecture`, `retour_apres_lecture` | 40 |
 | hésitation sur un mot | `hesitation` | 20 |
@@ -245,7 +336,7 @@ groupe. Extraits :
 | Clés | Motif |
 | --- | --- |
 | `enfant.programme.corps.lecture_maths`, `.maths_lecture` | Portent l'ordre des deux étapes. Une phrase tirée au sort risquerait d'annoncer un ordre faux |
-| `enfant.programme.une.corps.lecture`, `.maths` | Mode basse énergie : un seul message, texte fixe |
+| `enfant.programme.une.titre` | Titre de repérage de la soirée à une étape. Depuis ARB-06, c'est le **corps** qui varie, pas le titre |
 | `lecture.intro.titre.premier/.apres`, `maths.intro.titre.premier/.apres` | Portent la position de l'étape. La banque remplit le corps, pas le titre |
 | `maths.demande_resultat.1` à `.4`, `maths.indice.epuise` | Refus de donner le résultat (PED-01) : formulations fixes, contrôlées une fois pour toutes |
 | `bravo.*` | Rituel invariant (PED-12), dans `gwenn-scripts.json` |
@@ -255,8 +346,9 @@ groupe. Extraits :
 *parle* à l'enfant d'un soir sur l'autre. Une clé structurelle, un libellé
 d'action ou un message d'état technique ne sont pas des situations : les faire
 varier n'apporte rien à l'enfant et multiplierait les chemins à contrôler.
-Si l'Orchestrateur juge que le mode basse énergie mérite sa propre banque, c'est
-+40 variantes et une ligne de décision ; je ne l'ai pas prise seul.
+Le mode basse énergie faisait exception à cette règle dans la version 2 : il est
+désormais couvert par la banque `annonce_programme_une_etape` (ARB-06, section
+0 bis), pour +20 variantes et non +40, grâce au jeton `{matiere}`.
 
 ---
 
@@ -325,6 +417,7 @@ Comptes **relevés mécaniquement** dans le fichier livré (sortie réelle en 5.
 | --- | --- | --- | --- | --- |
 | 1 | `accueil` | **20** | `enfant.accueil.titre` + `.corps` | les_deux |
 | 2 | `annonce_programme` | **20** | `enfant.programme.titre` | les_deux |
+| 2 bis | `annonce_programme_une_etape` | **20** | `enfant.programme.une.corps.lecture` + `.maths` (jeton `{matiere}`) | les_deux |
 | 3 | `avant_lecture` | **20** | `lecture.intro.corps` | les_deux |
 | 4 | `encouragement_pendant_lecture` | **20** | `lecture.micro.en_cours` | affiche |
 | 5 | `retour_apres_lecture` | **20** | `lecture.retour.effort` + `.effort_2` | les_deux |
@@ -341,13 +434,13 @@ Comptes **relevés mécaniquement** dans le fichier livré (sortie réelle en 5.
 | 16 | `transition_maths_vers_lecture` | **20** | `transition.felicitation.maths` + `transition.annonce.lecture` | les_deux |
 | 17 | `demande_pause` | **20** | `pause.titre` + `pause.corps` | les_deux |
 | 18 | `retour_de_pause` | **20** | `pause.retour.corps` | les_deux |
-| 19 | `cloture` | **20** | `transition.cloture.corps` (à créer) | les_deux |
+| 19 | `cloture` | **20** | `transition.cloture.corps` | les_deux |
 | 20 | `pas_de_devoirs` | **20** | `enfant.accueil.vide.titre` + `.corps` | les_deux |
 | 21 | `photo_illisible` | **20** | `enfant.accueil.souci.titre` + `.corps` | les_deux |
 | 22 | `reprise_session` | **20** | `enfant.accueil.reprise.titre` + `.corps` | les_deux |
-| | **Total** | **440** | 33 clés | |
+| | **Total** | **460** | 35 clés | |
 
-**Diversité réelle** : les 440 variantes sont 440 textes distincts (459 avec les
+**Diversité réelle** : les 460 variantes sont 460 textes distincts (479 avec les
 rituels), et **aucune paire de variantes d'une même banque ne dépasse 0,50 de
 recouvrement** (indice de Jaccard sur les mots pleins, la mesure même du
 contrôleur). Le maximum constaté est de 0,50, sur cinq banques.
@@ -376,11 +469,11 @@ console.log('rituels    : '+Object.keys(g.rituels).join(', '));
 console.log('lignes fixes : '+Object.values(g.rituels).reduce((a,r)=>a+r.ecrans.reduce((b,x)=>b+x.lignes.length,0),0));
 "
 
-content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, cles racine=10 -> schema,version,personnage,jeton_prenom,canaux,regles,correspondance_mission,cles_fixes_non_variees,statut_cles,situations
+content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, cles racine=11 -> schema,version,personnage,jeton_prenom,jeton_matiere,canaux,regles,correspondance_mission,cles_fixes_non_variees,statut_cles,situations
 content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, cles racine=8 -> schema,version,personnage,note_nom_de_fichier,jeton_prenom,canaux,regles,rituels
-situations : 22
-variantes  : 440
-parties    : 660
+situations : 23
+variantes  : 460
+parties    : 680
 rituels    : onboarding, rituel_fermeture
 lignes fixes : 19
 ---exit:0---
@@ -389,14 +482,15 @@ lignes fixes : 19
 ## 5.2 Contrôle de charte et de raccordement
 
 Le script est conservé hors du dépôt (répertoire de travail de l'agent). Il
-vérifie, sur **toutes** les entrées : comptes par situation ; couverture des 16
-situations de la mission ; longueur de chaque phrase en comptage strict (une
-élision compte pour deux mots) ; mots et fragments interdits ; accords de genre ;
-emoji, chiffres, prénom en dur ; unicité des identifiants, des textes bruts et
-des textes normalisés ; validité et présence du canal ; invariant
-`texte == jointure des parties` ; **existence réelle de chaque clé déclarée dans
-`produit-marketing.out.md`** ; les quatre contrôles dédiés aux constats 4, 5, 6,
-9 et 10 ; hiérarchie des boutons du rituel.
+vérifie, sur **toutes** les entrées et **sur chaque rendu de jeton** : comptes
+par situation ; couverture des 16 situations de la mission ; longueur de chaque
+phrase en comptage strict (une élision compte pour deux mots) ; mots et
+fragments interdits ; accords de genre ; emoji, chiffres, prénom en dur ;
+unicité des identifiants, des textes bruts et des textes normalisés ; validité
+et présence du canal ; invariant `texte == jointure des parties` ; **existence
+réelle de chaque clé déclarée dans `produit-marketing.out.md`** ; les contrôles
+dédiés aux constats 4, 5, 6, 9 et 10 ; la hiérarchie des boutons du rituel ; et
+le contrôle 14 de l'arbitrage ARB-06.
 
 ```
 ======================================================================
@@ -404,6 +498,7 @@ des textes normalisés ; validité et présence du canal ; invariant
 ======================================================================
 accueil                           20 variantes   OK
 annonce_programme                 20 variantes   OK
+annonce_programme_une_etape       20 variantes   OK
 avant_lecture                     20 variantes   OK
 encouragement_pendant_lecture     20 variantes   OK
 retour_apres_lecture              20 variantes   OK
@@ -425,13 +520,13 @@ pas_de_devoirs                    20 variantes   OK
 photo_illisible                   20 variantes   OK
 reprise_session                   20 variantes   OK
 ----------------------------------------------------------------------
-situations : 22    total variantes : 440
+situations : 23    total variantes : 460
 
 ======================================================================
 2. COUVERTURE DES 16 SITUATIONS DE LA MISSION
 ======================================================================
 accueil                                -> accueil                                                      OK (min 20)
-annonce du programme                   -> annonce_programme                                            OK (min 20)
+annonce du programme                   -> annonce_programme, annonce_programme_une_etape               OK (min 20)
 avant lecture                          -> avant_lecture                                                OK (min 20)
 encouragement en cours de lecture      -> encouragement_pendant_lecture, retour_apres_lecture          OK (min 20)
 hesitation sur un mot                  -> hesitation                                                   OK (min 20)
@@ -451,8 +546,8 @@ situations de mission couvertes : 16 / 16
 ======================================================================
 3. LONGUEUR DES PHRASES (limite : 12 mots, comptage strict)
 ======================================================================
-entrees controlees : 459
-phrases controlees : 822
+entrees controlees : 479
+phrases controlees : 865
 phrase la plus longue : enc.blocage_lecture.05 (10 mots) : Je t'entends mal, et ce n'est pas toi
 depassements : 0
 
@@ -464,16 +559,16 @@ occurrences trouvees : 0
 ======================================================================
 5. UNICITE DES IDENTIFIANTS ET DES TEXTES
 ======================================================================
-identifiants : 459, doublons : aucun
-textes       : 459, doublons : aucun
-textes normalises : 459, doublons : aucun
+identifiants : 479, doublons : aucun
+textes       : 479, doublons : aucun
+textes normalises : 479, doublons : aucun
 
 ======================================================================
 6. RACCORDEMENT : PARTIES, INVARIANT DE TEXTE, EXISTENCE DES CLES
 ======================================================================
-parties controlees : 660
-invariant texte == jointure des parties : OK sur 440/440
-cles UI declarees : 33, toutes presentes dans produit-marketing.out.md sauf : transition.cloture.corps
+parties controlees : 680
+invariant texte == jointure des parties : OK sur 460/460
+cles UI declarees : 35, absentes de produit-marketing.out.md : aucune
 cles fixes non variees declarees : 8 groupes
 
 ======================================================================
@@ -517,7 +612,7 @@ cles_ui de cloture : ['transition.cloture.corps']
 ======================================================================
 tts           0 entrees
 affiche      25 entrees
-les_deux    434 entrees
+les_deux    454 entrees
   encouragement_pendant_lecture  affiche  20
   onboarding                     affiche  3
   rituel_fermeture               affiche  2
@@ -533,34 +628,41 @@ onboarding : 3 ecrans (PRD-01 en exige 3)
 rituel_fermeture invariant : True (PED-12)
 
 ======================================================================
+14. ARB-06 — annonce a une seule etape : jeton {matiere}, Soir leger indiscernable
+======================================================================
+variantes portant le jeton {matiere} : 20 / 20
+jeton en debut de phrase : 0
+vocabulaire de reduction ou de fatigue : 0
+cles remplies : ['enfant.programme.une.corps.lecture', 'enfant.programme.une.corps.maths']
+rendus controles (les deux matieres) :
+   On fait la lecture. Et c'est tout.
+   On fait les maths. Et c'est tout.
+   Ce soir, c'est la lecture, tranquillement.
+   Ce soir, c'est les maths, tranquillement.
+
+======================================================================
 RESULTAT : AUCUN PROBLEME
 ======================================================================
 ```
 
 `exit: 0`.
 
-## 5.3 Jeton `{prenom}`, phrases canoniques, absence de « Gwenn »
+## 5.3 Jetons, phrases canoniques, absence de « Gwenn »
 
 ```
-entrees avec {prenom} : 14
-Counter({'accueil': 8, 'reprise_session': 5, 'rituel_fermeture': 1})
-
+entrees avec {prenom} : 14 {'accueil': 8, 'reprise_session': 5, 'rituel_fermeture': 1}
+entrees avec {matiere} : 20 {'annonce_programme_une_etape': 20}
 PRESENTE  'Bonsoir {prenom}. Je suis contente de te voir.'  ['enc.accueil.01']
+PRESENTE  "On fait {matiere}. Et c'est tout."  ['enc.annonce_programme_une_etape.01']
 PRESENTE  "Je lis d'abord. Tu écoutes."  ['enc.avant_lecture.01']
 PRESENTE  "On regarde d'abord les objets."  ['enc.avant_maths.01']
 PRESENTE  'On regarde ce mot ensemble ?'  ['enc.hesitation.01']
 PRESENTE  "Celui-là est difficile. C'est normal."  ['enc.blocage_maths.01']
-PRESENTE  'On souffle un peu, ou on passe à la suite ?'  ['enc.blocage_maths.01']
 PRESENTE  "Le micro n'entend pas bien ce soir."  ['enc.blocage_lecture.01']
-PRESENTE  'On fait une pause, ou on continue ?'  ['enc.blocage_lecture.01', 'enc.blocage_maths.03']
 PRESENTE  "Bravo. Tu as lu jusqu'au bout."  ['enc.retour_apres_lecture.01']
-PRESENTE  'Tu as bien cherché tes mots.'  ['enc.retour_apres_lecture.01']
 PRESENTE  'Bravo. Tu as bien cherché.'  ['enc.reussite_maths.01']
-PRESENTE  'Tu as trouvé ta façon de faire.'  ['enc.reussite_maths.01']
 PRESENTE  "C'est fait. Tu as terminé la lecture."  ['enc.transition_lecture_vers_maths.01']
-PRESENTE  'Maintenant, on passe aux maths.'  ['enc.transition_lecture_vers_maths.01']
 PRESENTE  "C'est fait. Tu as terminé les maths."  ['enc.transition_maths_vers_lecture.01']
-PRESENTE  'Maintenant, on passe à la lecture.'  ['enc.transition_maths_vers_lecture.01']
 PRESENTE  "Je te pose une question, pour t'aider."  ['enc.indice_demande_1.01']
 PRESENTE  'On peut faire autrement. Écoute.'  ['enc.indice_demande_2.01']
 PRESENTE  'Je te montre un exemple plus facile.'  ['enc.indice_demande_3.01']
@@ -574,8 +676,9 @@ phrases canoniques du marketing absentes : 0
 occurrences de Gwenn : 0
 ```
 
-**Les 25 phrases canoniques du marketing sont présentes**, chacune en variante
-01 de sa situation : la banque étend le texte validé, elle ne le remplace pas.
+**Les 20 phrases canoniques testées sont présentes**, chacune en variante 01 de
+sa situation : la banque étend le texte validé par le marketing, elle ne le
+remplace pas.
 
 ## 5.4 Deux points d'honnêteté sur les contrôles
 
@@ -585,7 +688,14 @@ occurrences de Gwenn : 0
    qui portent réellement sur l'enfant (« tu es prêt », « tout seul », « on
    s'était arrêtés »…). **Aucun texte n'a été modifié pour faire passer un
    contrôle** ; les deux phrases sont correctes pour un enfant de tout genre.
-2. **Mon détecteur de niveau d'indice était incomplet** : il refusait « Voilà
+2. **Mon indice de recouvrement comptait le jeton `{matiere}` comme un mot
+   plein.** Les 20 variantes de l'annonce à une seule étape le portant toutes, la
+   mesure était gonflée pour cette seule banque. Je neutralise désormais
+   `{matiere}` comme `{prenom}` l'était déjà. Cela dit, sur les six paires que la
+   mesure gonflée a fait remonter, **j'ai quand même réécrit les cinq qui
+   restaient trop proches une fois le jeton retiré** ; une seule était un pur
+   artefact de mesure.
+3. **Mon détecteur de niveau d'indice était incomplet** : il refusait « Voilà
    comment on peut s'y prendre. » (niveau 2) faute des radicaux « comment »,
    « moyen », « prendre », « demand », « chaque pas ». J'ai complété la liste des
    radicaux attendus. Les quatre textes concernés étaient bien dans le registre
@@ -598,7 +708,7 @@ occurrences de Gwenn : 0
 
 ## 6.1 PED-04 — Jamais « c'est faux » ni équivalent
 
-La notion de réponse fausse n'existe nulle part : 459 entrées, 0 occurrence de
+La notion de réponse fausse n'existe nulle part : 479 entrées, 0 occurrence de
 « faux », « erreur », « trompé », « incorrect » et de leurs formes (contrôle 4).
 
 | Moment | Situation | Ce que Pilou dit à la place |
@@ -629,7 +739,7 @@ Aucune variante ne relie une pierre à une bonne réponse.
 
 ## 6.3 PED-11 — Au moins 20 variantes par situation, dans un fichier de contenu
 
-22 situations, 20 variantes chacune, 440 au total, hors du code. Les 16
+23 situations, 20 variantes chacune, 460 au total, hors du code. Les 16
 situations nommées par la mission sont couvertes, et la table de correspondance
 est **dans le fichier**. Les six situations que PED-11 nomme explicitement :
 
@@ -665,9 +775,9 @@ Aucune des 20 variantes n'emprunte les mots du rituel (contrôle 11 : 0 emprunt)
 
 ---
 
-# 7. Le jeton `{prenom}` et le multi-enfants (PRD-02)
+# 7. Les jetons `{prenom}` et `{matiere}`, et le multi-enfants (PRD-02)
 
-Le prénom n'est écrit en dur nulle part : 0 occurrence de « Evan » sur 459
+Le prénom n'est écrit en dur nulle part : 0 occurrence de « Evan » sur 479
 entrées. 14 entrées portent `{prenom}` : 8 dans `accueil`, 5 dans
 `reprise_session`, 1 dans le rituel de fermeture.
 
@@ -680,6 +790,13 @@ enfant. Mise en œuvre attendue :
   calculée sur le texte substitué ;
 - aucun de ces textes n'est envoyé à un modèle d'IA (SEC-04).
 
+**Le jeton `{matiere}`** obéit à la même logique, pour une autre raison : le
+texte ne doit dépendre ni de la matière conservée par le parent, ni de l'ordre
+choisi. Il est déclaré à la racine sous `jeton_matiere`, avec sa table de
+valeurs par clé, et il n'est employé que dans `annonce_programme_une_etape`.
+Contrainte de rédaction vérifiée mécaniquement : jamais en début de phrase,
+jamais sujet d'un verbe.
+
 Même raison pour les accords : **aucune variante ne contient d'adjectif ou de
 participe accordé au genre de l'enfant** (contrôle 4, 0 occurrence). Les textes
 restent justes pour un deuxième enfant, quel que soit son genre.
@@ -690,7 +807,7 @@ restent justes pour un deuxième enfant, quel que soit son genre.
 
 Le nom de fichier imposé par le prompt maître est conservé. Le personnage
 s'appelle **Pilou** dans tous les textes : 0 occurrence de « Gwenn » dans les
-459 entrées (contrôle 5.3). Le fichier porte un champ `note_nom_de_fichier` qui
+479 entrées (contrôle 5.3). Le fichier porte un champ `note_nom_de_fichier` qui
 écrit l'écart noir sur blanc. Le renommage en `pilou-scripts.json` touche le
 prompt maître et une règle permanente : il reste hors de mon périmètre, et le
 contrôleur note qu'une escalade ESC-001 est déjà ouverte par l'Orchestrateur.
@@ -709,26 +826,29 @@ contrôleur note qu'une escalade ESC-001 est déjà ouverte par l'Orchestrateur.
 | 6 | Raccordement aux écrans | `parties` dans chaque variante, plus `cles_fixes_non_variees` pour ce que la banque ne varie pas. La décision est dans le livrable, pas renvoyée au développement |
 | 7 | Chiffres | Aucun chiffre, y compris en toutes lettres pour un rang d'indice |
 | 8 | Longueur | 12 mots maximum, tenu à 10 au pire, en comptage strict |
-| 9 | Volume | 440 variantes assumées. Aucune situation regroupée pour tenir le compte de 20 |
+| 9 | Volume | 460 variantes assumées, dont les 20 de l'annonce à une seule étape (ARB-06). Aucune situation regroupée pour tenir le compte de 20 |
 
 ---
 
 # 10. Ce qui reste ouvert
 
-1. **`transition.cloture.corps` est à créer côté marketing.** C'est la clé
-   d'écran que la banque `cloture` alimente. Elle est déclarée dans
-   `statut_cles` et c'est la seule clé du livrable qui n'existe pas encore.
-2. **Mode basse énergie** : `enfant.programme.une.corps.lecture` et `.maths`
-   restent des textes fixes. Leur donner une banque coûte +40 variantes ; la
-   décision revient à l'Orchestrateur (section 2.2).
+1. **`transition.cloture.corps` existe désormais** : `produit-marketing` l'a
+   créée le 2026-09-20. Les 35 clés déclarées par la banque existent toutes.
+   J'ai repris son texte canonique (« Tu as bien travaillé. Viens avec moi. »)
+   en variante 01 de `cloture`, comme pour les 22 autres banques.
+2. **Nom de la clé de clôture** : je recommande de garder
+   `transition.cloture.corps` pour ne pas désynchroniser le travail en cours,
+   tout en signalant que `session.fin_travail.corps` décrirait mieux le moment
+   (section 0 bis). Si `produit-marketing` tranche pour l'autre nom, je m'aligne.
 3. **Renommage de `gwenn-scripts.json`** en `pilou-scripts.json` : candidat
    `BACKLOG-V2.md`, hors périmètre.
-4. **Cache TTS (TEC-09b)** : les 459 entrées sont des phrases récurrentes, donc
-   toutes cachables. Les 14 entrées portant `{prenom}` doivent être cachées
-   après substitution, une entrée de cache par prénom.
+4. **Cache TTS (TEC-09b)** : les 479 entrées sont des phrases récurrentes, donc
+   toutes cachables. Les 14 entrées portant `{prenom}` et les 20 portant
+   `{matiere}` doivent être cachées **après** substitution : une entrée de cache
+   par prénom, et deux par variante d'annonce à une seule étape.
 5. **Visa `gardien-charte`** : obligatoire avant de considérer ce contenu comme
    livré. Cet agent est producteur, il ne s'auto-valide pas.
-6. **Lecture à voix haute** : les 440 variantes sont écrites pour l'oreille,
+6. **Lecture à voix haute** : les 460 variantes sont écrites pour l'oreille,
    pas encore entendues avec la voix Chirp3-HD retenue (point humain 5 de la
    section 8 du prompt maître).
 

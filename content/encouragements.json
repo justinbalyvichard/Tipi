@@ -3,6 +3,14 @@
   "version": "2.0.0",
   "personnage": "Pilou",
   "jeton_prenom": "{prenom}",
+  "jeton_matiere": {
+    "jeton": "{matiere}",
+    "valeurs": {
+      "enfant.programme.une.corps.lecture": "la lecture",
+      "enfant.programme.une.corps.maths": "les maths"
+    },
+    "emploi": "Une seule situation, annonce_programme_une_etape. La valeur est choisie par la clé rendue, jamais par une logique de texte."
+  },
   "canaux": [
     "tts",
     "affiche",
@@ -169,7 +177,7 @@
     }
   ],
   "statut_cles": {
-    "transition.cloture.corps": "À créer côté marketing. Clé demandée par le contrôle du 2026-09-20 pour que la banque cloture n'alimente aucune clé de l'écran /enfant/bravo (PED-12)."
+    "transition.cloture.corps": "Créée côté marketing le 2026-09-20 (texte canonique : « Tu as bien travaillé. Viens avec moi. »). Elle existe pour que la banque cloture n'alimente aucune clé de l'écran /enfant/bravo (PED-12). Les 35 clés déclarées par ce fichier existent donc toutes."
   },
   "situations": {
     "accueil": {
@@ -938,7 +946,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.02",
-          "texte": "Ce soir, c'est {matiere}.",
+          "texte": "Ce soir, c'est {matiere}, tranquillement.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -949,7 +957,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "Ce soir, c'est {matiere}."
+              "texte": "Ce soir, c'est {matiere}, tranquillement."
             }
           ]
         },
@@ -1040,7 +1048,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.08",
-          "texte": "Ce soir, on fait {matiere}.",
+          "texte": "Aujourd'hui, on fait {matiere}.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -1051,7 +1059,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "Ce soir, on fait {matiere}."
+              "texte": "Aujourd'hui, on fait {matiere}."
             }
           ]
         },
@@ -1074,7 +1082,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.10",
-          "texte": "Il y a {matiere} ce soir.",
+          "texte": "On s'installe pour {matiere}.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -1085,7 +1093,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "Il y a {matiere} ce soir."
+              "texte": "On s'installe pour {matiere}."
             }
           ]
         },
@@ -1142,7 +1150,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.14",
-          "texte": "On y va pour {matiere}.",
+          "texte": "On y va doucement pour {matiere}.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -1153,7 +1161,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "On y va pour {matiere}."
+              "texte": "On y va doucement pour {matiere}."
             }
           ]
         },
@@ -1244,7 +1252,7 @@
         },
         {
           "id": "enc.annonce_programme_une_etape.20",
-          "texte": "Voilà notre travail du soir : {matiere}.",
+          "texte": "Notre travail du soir, c'est {matiere}.",
           "canal": "les_deux",
           "jetons": [
             "{matiere}"
@@ -1255,7 +1263,7 @@
                 "enfant.programme.une.corps.lecture",
                 "enfant.programme.une.corps.maths"
               ],
-              "texte": "Voilà notre travail du soir : {matiere}."
+              "texte": "Notre travail du soir, c'est {matiere}."
             }
           ]
         }
@@ -6869,6 +6877,20 @@
       "variantes": [
         {
           "id": "enc.cloture.01",
+          "texte": "Tu as bien travaillé. Viens avec moi.",
+          "canal": "les_deux",
+          "jetons": [],
+          "parties": [
+            {
+              "cles_ui": [
+                "transition.cloture.corps"
+              ],
+              "texte": "Tu as bien travaillé. Viens avec moi."
+            }
+          ]
+        },
+        {
+          "id": "enc.cloture.02",
           "texte": "Le travail du soir est fini.",
           "canal": "les_deux",
           "jetons": [],
@@ -6878,20 +6900,6 @@
                 "transition.cloture.corps"
               ],
               "texte": "Le travail du soir est fini."
-            }
-          ]
-        },
-        {
-          "id": "enc.cloture.02",
-          "texte": "Voilà, on a tout fait pour ce soir.",
-          "canal": "les_deux",
-          "jetons": [],
-          "parties": [
-            {
-              "cles_ui": [
-                "transition.cloture.corps"
-              ],
-              "texte": "Voilà, on a tout fait pour ce soir."
             }
           ]
         },
