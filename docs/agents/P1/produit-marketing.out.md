@@ -471,8 +471,6 @@ interpolation de nom de matière dans une phrase générique** : « D'abord la
 | Annonce de transition | l'étape suivante est les maths | `transition.annonce.maths` |
 | Annonce de transition | l'étape suivante est la lecture | `transition.annonce.lecture` |
 | Passage vers la clôture | aucune étape ne suit, quelle que soit la configuration C1 à C6 | `session.fin_travail.corps` |
-| Étape vide, suite existante | une autre étape suit | `lecture.vide.corps_2.suite` ou `maths.vide.corps_2.suite` |
-| Étape vide, pas de suite | c'était la dernière étape | `lecture.vide.corps_2.fin` ou `maths.vide.corps_2.fin` |
 
 **Règle de contrôle opposable** : pour chacune des six configurations C1 à C6, un
 contrôleur doit pouvoir dérouler la soirée et constater que Pilou ne nomme jamais
@@ -822,17 +820,11 @@ le titre de l'étape, puis code parent. Aucun bouton visible pour l'enfant.
 | `session.sortie_parent.bouton` | « Saisir le code » | affiche |
 | `session.sortie_parent.annuler` | « Revenir à la session » | affiche |
 
-**État vide** : une étape lecture sans contenu exploitable ne démarre pas. Le
-moteur passe directement à l'étape suivante et Pilou dit :
-
-| Clé | Texte | Mode |
-| --- | --- | --- |
-| `lecture.vide.corps` | « Ce soir, il n'y a pas de lecture. » | les_deux |
-| `lecture.vide.corps_2.suite` | « On passe aux maths. » | les_deux |
-| `lecture.vide.corps_2.fin` | « On a fini. Viens voir. » | les_deux |
-
-`lecture.vide.corps_2.suite` n'est joué que si une étape maths suit réellement.
-Sinon, `lecture.vide.corps_2.fin` mène directement à `/enfant/bravo`.
+**État vide** : **sans objet, et sans texte.** ARB-08 pose qu'une étape sans
+exercice exploitable n'est jamais créée : l'analyse l'écarte et la soirée en
+compte une de moins. L'enfant n'entre donc jamais dans une étape lecture vide.
+Les clés `lecture.vide.*` sont retirées (ARB-12) : un texte sans déclencheur
+finit toujours par être recâblé sur un écran.
 
 **État d'erreur — micro refusé ou indisponible** :
 
@@ -1021,17 +1013,13 @@ ci-dessus qui se joue, et elle seule.
 
 **Sortie anticipée parent** : identique à 7.5 (PRD-13).
 
-**État vide** — pas de maths ce soir :
+**État vide** : **sans objet, et sans texte.** Même règle qu'en 7.5 : ARB-08
+interdit la création d'une étape vide, donc une étape maths sans exercice
+n'existe pas. Les clés `maths.vide.*` sont retirées (ARB-12).
 
-| Clé | Texte | Mode |
-| --- | --- | --- |
-| `maths.vide.corps` | « Ce soir, il n'y a pas de maths. » | les_deux |
-| `maths.vide.corps_2.suite` | « On passe à la lecture. » | les_deux |
-| `maths.vide.corps_2.fin` | « On a fini. Viens voir. » | les_deux |
-
-`maths.vide.corps_2.suite` n'est joué que si une étape lecture suit réellement
-(configuration C2). Sinon, `maths.vide.corps_2.fin` mène directement à
-`/enfant/bravo`.
+Le cas « pas de maths ce soir » reste couvert : la soirée compte une seule étape
+et emprunte `enfant.programme.une.corps.*`, puis passe directement à la clôture
+par `session.fin_travail.corps`.
 
 **État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :
 
