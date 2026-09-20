@@ -117,9 +117,13 @@
       {
         "segment": "cosmetiques.vide",
         "condition": "aucun cosmétique n'est disponible"
+      },
+      {
+        "segment": "indispo",
+        "condition": "le résumé n'est pas encore calculé"
       }
     ],
-    "exclusif_avec": "Clés qui décrivent le même emplacement d'écran et ne peuvent pas s'afficher ensemble. Une clé sœur peut vivre dans un autre fichier de content/ : enfant.programme.titre est porté par la banque encouragements.json.",
+    "exclusif_avec": "Clés qui décrivent le même emplacement d'écran et ne peuvent pas s'afficher ensemble : variantes d'un même texte, et familles de boutons d'un même emplacement. Réciproque par construction À L'INTÉRIEUR des deux fichiers ui-*. Quand une sœur est portée par un autre fichier de content/ — enfant.programme.titre et enfant.programme.une.corps.* sont portés par encouragements.json — le lien est unidirectionnel, et ces fichiers ne portent pas le champ. Le mécanisme primaire de désambiguïsation reste condition.",
     "jetons": "Substitués au rendu. {prenom} vient de child.prenom (PRD-02), jamais écrit en dur. {n} et {date} sont des valeurs de session.",
     "canal": "Repris tel quel du livrable marketing. Toute information utile à l'action est en les_deux : elle est doublée à l'oral (PED-10).",
     "charge": "Une idée par phrase, 12 mots maximum par phrase, vocabulaire de CE1, comme toute parole adressée à l'enfant."
@@ -134,7 +138,11 @@
       "jetons": [],
       "condition": null,
       "condition_source": null,
-      "exclusif_avec": []
+      "exclusif_avec": [
+        "enfant.accueil.reprise.bouton",
+        "enfant.accueil.vide.bouton",
+        "enfant.accueil.souci.bouton"
+      ]
     },
     "enfant.accueil.reprise.bouton": {
       "id": "enfant.accueil.reprise.bouton",
@@ -145,7 +153,11 @@
       "jetons": [],
       "condition": "Variante de reprise (l'app a été fermée en cours de soirée, PRD-18)",
       "condition_source": "intertitre",
-      "exclusif_avec": []
+      "exclusif_avec": [
+        "enfant.accueil.bouton",
+        "enfant.accueil.vide.bouton",
+        "enfant.accueil.souci.bouton"
+      ]
     },
     "enfant.accueil.vide.bouton": {
       "id": "enfant.accueil.vide.bouton",
@@ -156,7 +168,11 @@
       "jetons": [],
       "condition": "État vide — aucun devoir préparé ce soir (PRD-16)",
       "condition_source": "intertitre",
-      "exclusif_avec": []
+      "exclusif_avec": [
+        "enfant.accueil.bouton",
+        "enfant.accueil.reprise.bouton",
+        "enfant.accueil.souci.bouton"
+      ]
     },
     "enfant.accueil.souci.bouton": {
       "id": "enfant.accueil.souci.bouton",
@@ -167,7 +183,11 @@
       "jetons": [],
       "condition": "État d'erreur — les devoirs n'ont pas pu être chargés",
       "condition_source": "intertitre",
-      "exclusif_avec": []
+      "exclusif_avec": [
+        "enfant.accueil.bouton",
+        "enfant.accueil.reprise.bouton",
+        "enfant.accueil.vide.bouton"
+      ]
     },
     "enfant.attente.pilou": {
       "id": "enfant.attente.pilou",
@@ -176,8 +196,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "Attente IA supérieure à 400 ms (TEC-12)",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "enfant.programme.carte.lecture": {
@@ -212,7 +232,9 @@
       "condition": "la lecture est programmée avant les maths",
       "condition_source": "definie_ici",
       "exclusif_avec": [
-        "enfant.programme.corps.maths_lecture"
+        "enfant.programme.corps.maths_lecture",
+        "enfant.programme.une.corps.lecture",
+        "enfant.programme.une.corps.maths"
       ]
     },
     "enfant.programme.corps.maths_lecture": {
@@ -225,7 +247,9 @@
       "condition": "les maths sont programmées avant la lecture",
       "condition_source": "definie_ici",
       "exclusif_avec": [
-        "enfant.programme.corps.lecture_maths"
+        "enfant.programme.corps.lecture_maths",
+        "enfant.programme.une.corps.lecture",
+        "enfant.programme.une.corps.maths"
       ]
     },
     "enfant.programme.bouton": {
@@ -237,7 +261,9 @@
       "jetons": [],
       "condition": null,
       "condition_source": null,
-      "exclusif_avec": []
+      "exclusif_avec": [
+        "enfant.programme.une.bouton"
+      ]
     },
     "enfant.programme.une.titre": {
       "id": "enfant.programme.une.titre",
@@ -261,7 +287,9 @@
       "jetons": [],
       "condition": "Variante à une seule étape (une seule matière reconnue, matière retirée par le parent, ou mode basse énergie, PRD-04)",
       "condition_source": "intertitre",
-      "exclusif_avec": []
+      "exclusif_avec": [
+        "enfant.programme.bouton"
+      ]
     },
     "enfant.programme.souci.titre": {
       "id": "enfant.programme.souci.titre",
@@ -839,8 +867,8 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "les quatre indices ont été donnés (PED-02)",
+      "condition_source": "definie_ici",
       "exclusif_avec": []
     },
     "maths.demande_resultat.1": {
@@ -1214,7 +1242,7 @@
       "canal": "les_deux",
       "role": "indetermine",
       "jetons": [],
-      "condition": "la saisie est bloquée après cinq essais (SEC-02)",
+      "condition": "le cosmétique est débloqué",
       "condition_source": "segment_de_cle",
       "exclusif_avec": [
         "coffre.cosmetiques.verrouille"

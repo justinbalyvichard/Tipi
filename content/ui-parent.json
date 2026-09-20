@@ -11,6 +11,7 @@
     "{date}": "Date de la seance. Seule donnee numerique du resume parent (PRD-06).",
     "{duree}": "Duree estimee, cote parent uniquement. Jamais montree a l'enfant.",
     "{liste}": "Liste construite par l'application, par exemple les mots a revoir.",
+    "{matieres}": "Liste des matieres du soir, dans l'ordre programme par le parent. Remplace l'ordre fige que le marketing a corrige le 2026-09-20.",
     "{matiere}": "« la lecture » ou « les maths », selon l'etape concernee.",
     "{n}": "Nombre de pierres. Inventaire, jamais un score (PED-07, ETH-04).",
     "{prenom}": "Prenom de l'enfant, lu depuis child.prenom. Jamais ecrit en dur (PRD-02).",
@@ -122,9 +123,13 @@
       {
         "segment": "cosmetiques.vide",
         "condition": "aucun cosmétique n'est disponible"
+      },
+      {
+        "segment": "indispo",
+        "condition": "le résumé n'est pas encore calculé"
       }
     ],
-    "exclusif_avec": "Clés qui décrivent le même emplacement d'écran et ne peuvent pas s'afficher ensemble. Une clé sœur peut vivre dans un autre fichier de content/ : enfant.programme.titre est porté par la banque encouragements.json.",
+    "exclusif_avec": "Clés qui décrivent le même emplacement d'écran et ne peuvent pas s'afficher ensemble : variantes d'un même texte, et familles de boutons d'un même emplacement. Réciproque par construction À L'INTÉRIEUR des deux fichiers ui-*. Quand une sœur est portée par un autre fichier de content/ — enfant.programme.titre et enfant.programme.une.corps.* sont portés par encouragements.json — le lien est unidirectionnel, et ces fichiers ne portent pas le champ. Le mécanisme primaire de désambiguïsation reste condition.",
     "jetons": "Substitués au rendu. {prenom} vient de child.prenom (PRD-02), jamais écrit en dur. {n} et {date} sont des valeurs de session.",
     "canal": "Toujours affiche. Pilou ne parle jamais au parent : PED-10 ne concerne que l'enfant, et le parent lit en deux minutes.",
     "ton": "Adulte, factuel, court. Jamais de chiffre de performance de l'enfant (PRD-06), jamais de reproche (ETH-02)."
@@ -489,10 +494,13 @@
     "parent.apercu.resume": {
       "id": "parent.apercu.resume",
       "ecran": "/parent/programme",
-      "texte": "2 étapes ce soir : lecture, maths. Environ 12 minutes.",
+      "texte": "2 étapes ce soir : {matieres}. Environ {duree} min.",
       "canal": "affiche",
       "role": "indetermine",
-      "jetons": [],
+      "jetons": [
+        "{duree}",
+        "{matieres}"
+      ],
       "condition": "deux étapes sont programmées",
       "condition_source": "definie_ici",
       "exclusif_avec": [
@@ -502,10 +510,13 @@
     "parent.apercu.resume_une": {
       "id": "parent.apercu.resume_une",
       "ecran": "/parent/programme",
-      "texte": "1 étape ce soir : lecture. Environ 6 minutes.",
+      "texte": "1 étape ce soir : {matiere}. Environ {duree} min.",
       "canal": "affiche",
       "role": "indetermine",
-      "jetons": [],
+      "jetons": [
+        "{duree}",
+        "{matiere}"
+      ],
       "condition": "une seule étape est programmée",
       "condition_source": "definie_ici",
       "exclusif_avec": [
@@ -664,7 +675,7 @@
     "parent.apercu.regroupe": {
       "id": "parent.apercu.regroupe",
       "ecran": "/parent/programme",
-      "texte": "Tout a été regroupé en 2 étapes. Le reste attendra demain.",
+      "texte": "Le programme a été regroupé pour ce soir. Le reste attendra demain.",
       "canal": "affiche",
       "role": "indetermine",
       "jetons": [],
@@ -937,8 +948,8 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "le résumé n'est pas encore calculé",
+      "condition_source": "segment_de_cle",
       "exclusif_avec": []
     },
     "parent.resume.indispo.corps": {
@@ -948,8 +959,8 @@
       "canal": "affiche",
       "role": "corps",
       "jetons": [],
-      "condition": null,
-      "condition_source": null,
+      "condition": "le résumé n'est pas encore calculé",
+      "condition_source": "segment_de_cle",
       "exclusif_avec": []
     },
     "parent.resume.audio_absent": {
