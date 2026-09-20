@@ -10,7 +10,7 @@
 //   unique partiel) et vivent dans supabase/policies.sql, partie B. Les voici
 //   toutes, parce que ce fichier-ci est celui que lira `dev-feature` :
 //     1. CHECK  gem_ledger.delta > 0                          (ETH-04)
-//     2. CHECK  gem_ledger.delta <= 1                          (barème 3.7)
+//     2. CHECK  gem_ledger.delta BETWEEN 1 AND 2               (barème, ARB-13)
 //     3. CHECK  child.gem_balance >= 0                         (SEC-06)
 //     4. CHECK  settings_access.tentatives_echouees >= 0       (SEC-02)
 //     5. CHECK  reward_threshold.gems_requis > 0               (PRD-14)
@@ -71,16 +71,24 @@ enum StatutTentative {
   bloquee
 }
 
-/// Motif d'un crédit de pierres. Barème : +1 par étape terminée, +1 quand
-/// TOUTES les étapes programmées du soir sont terminées.
+/// Motif d'un crédit de pierres.
+///
+/// BARÈME (ARB-13) : **une soirée complète vaut toujours 3 pierres, quel que
+/// soit le nombre d'étapes programmées.**
+///   +1 par étape terminée ;
+///   + (3 − nombre d'étapes programmées) lorsque TOUTES le sont.
+/// Soit 1 + 1 + 1 pour deux étapes, et 1 + 2 pour une seule.
 ///
 /// ÉCART ASSUMÉ ET TRACÉ : la section 3.7 du prompt maître écrit « +1 bonus si
-/// les 2 étapes du soir sont terminées ». **ARB-08** (docs/agents/GATES.md)
-/// remplace ce « 2 » en dur par « toutes les étapes programmées », parce
-/// qu'une étape vide n'est plus jamais programmée : sans ce changement, un
-/// découpage incomplet de l'IA coûterait deux pierres à un enfant qui n'en est
-/// pas responsable. Conséquence : une soirée à une seule étape rapporte
-/// 2 pierres, comme une soirée complète.
+/// les 2 étapes du soir sont terminées ». **ARB-08 puis ARB-13**
+/// (docs/agents/GATES.md) forfaitisent la soirée, parce que la pierre
+/// récompense le fait de venir et de finir, jamais le volume de travail
+/// (PED-05), et parce qu'un écart d'une seule pierre rendait le Soir léger
+/// détectable dans un coffre chiffré, contre ARB-06.
+///
+/// Le bonus vaut donc 1 ou 2 — jamais 0, jamais négatif : PED-06 plafonne les
+/// étapes à deux, et une soirée sans aucune étape programmée ne crédite rien.
+/// La borne 1..2 est un CHECK Postgres (`gem_ledger_delta_borne`).
 ///
 /// Aucune autre valeur n'existe : jamais de pierre par bonne réponse (PED-05).
 /// Sert aussi de clé d'idempotence avec sessionId (@@unique ci-dessous).

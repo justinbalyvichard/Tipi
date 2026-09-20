@@ -1,8 +1,10 @@
 # P2 — Architecture technique de Tipi
 
-Livrable de l'agent `architecte`. Porte G2. **Version 2**, reprise du
-`VERDICT: FAIL` du tour 1 (`docs/agents/P2/architecture.review.md` : 7 [MAJEUR],
-12 [MINEUR], 0 [BLOQUANT]) et des cinq arbitrages rendus par l'Orchestrateur.
+Livrable de l'agent `architecte`. Porte G2. **Version 3**, reprise du
+`VERDICT: FAIL` du tour 2 (3 [MAJEUR], 3 [MINEUR], 0 [BLOQUANT]) et de
+l'arbitrage **ARB-13**. La version 2 avait fermé les 19 constats du tour 1,
+tous vérifiés dans les fichiers par le contrôleur ; les trois [MAJEUR] du tour 2
+sont nés du tour 2 lui-même, sur le barème réécrit et la transition T12.
 
 Sources lues en entier avant de concevoir : `TIPI-PROMPT-CURSOR.md` (2.3, 2.4,
 3.1 à 3.8, 4.3), `docs/agents/P1/produit-marketing.out.md`,
@@ -77,12 +79,46 @@ ARB-12 tranche les deux points que j'avais laissés ouverts à la fin du tour 2.
 | Point | Décision de l'Orchestrateur | Ce que j'ai fait |
 | --- | --- | --- |
 | **ARB-12.1 — les six clés `lecture.vide.*` / `maths.vide.*`** | Retirées, **à condition** qu'aucun des cinq états limites n'y perde sa couverture. « Je préfère une clé en trop à un état limite sans écran » | **Vérification menée état par état, section 10.3.** Les cinq états gardent chacun une couverture propre : aucune des six clés n'est porteuse. **Les six partent.** J'y ajoute deux points d'exécution que la vérification a fait apparaître : le retrait touche aussi `content/encouragements.json` (deux entrées de `cles_fixes_non_variees`), et une **condition** du résumé parent doit être élargie — sans ajouter le moindre texte |
-| **ARB-12.2 — le barème** | La ligne de `TRACEABILITY.md` doit citer ARB-08 et expliquer l'écart en une phrase. Idem partout où le livrable touche au barème | **Formulation canonique unique, écrite en 9.5**, reprise dans les **quatre** endroits qui énoncent le barème : section 9.5, commentaire de `RaisonGem` dans `prisma/schema.prisma`, commentaire du `CHECK gem_ledger_delta_max_un` dans `supabase/policies.sql`, et **trois lignes de traçabilité prêtes à coller en 16.2** (ETH-04, TEC-11, SEC-06) |
+| **ARB-12.2 — le barème** | La ligne de `TRACEABILITY.md` doit citer ARB-08 et expliquer l'écart en une phrase. Idem partout où le livrable touche au barème | Formulation canonique unique en 9.5, reprise partout. **Dépassé au tour 3** : le contenu de la formulation change avec ARB-13, le compte d'endroits passe de quatre à six (constat 22), et la contrainte citée est renommée `gem_ledger_delta_borne`. Voir 0.5 et 9.5 |
 
 Rien d'autre n'a bougé : aucun chiffre, aucune route, aucune table, aucune
 variable. Les mesures du tour 2 restent valides telles quelles, et
 `prisma validate` est rejoué en 17.1 parce que le commentaire de `RaisonGem` a
 changé.
+
+## 0.5 Reprise après verdict du tour 2
+
+Six constats, numérotés 20 à 25 à la suite du tour 1. **Les six sont traités.**
+
+| # | Constat | Ce que j'ai changé | Où le vérifier |
+| --- | --- | --- | --- |
+| **20** | [MAJEUR] Le bonus n'avait qu'un créditeur, T5. Un enfant qui termine tout mais perd le dernier appui perdait une pierre, définitivement | **Une fonction unique, `crediterBonusSiSoireeComplete()`, appelée par les trois transitions terminales T5, T10 et T12**, chacune dans sa propre transaction. L'unique `(session_id, raison)` rend l'appel idempotent : la sûreté ne repose pas sur la discipline d'appel | 9.2 (T5, T10, T12), 9.4 point 3, 9.5 « Le bonus a trois créditeurs » |
+| **21** | [MAJEUR] « 2 pierres, comme une soirée à deux étapes » est faux : 1+1+1 = 3. Le Soir léger restait détectable à une pierre près, contre ARB-06 | **ARB-13 appliqué** : forfait de 3 pierres par soirée complète, bonus de `3 − nombre d'étapes`. La phrase fausse et « y compris dans son coffre » sont supprimées, remplacées par un **tableau de calcul des quatre cas**. Le conflit ARB-06 / ARB-08 n'est plus un point ouvert : ARB-13 le tranche | 9.5, tableau de calcul |
+| **22** | [MAJEUR] Deux endroits du barème non cités, dont la fiche de `tests-unitaires` qui préréglait l'instrument sur la règle révoquée | « Quatre endroits » devient **la liste réelle des six**, avec pour chacun s'il relève de moi ou non. Les deux hors périmètre sont nommés ; je ne les modifie pas | 9.5 « Les six endroits », 16.2 |
+| **23** | [MINEUR] « vérifiée par V8 » : V8 ne contrôle que le catalogue | Réécrit : V8 vérifie **la destination** ; la séparation se prouve **à la source** (tri structurel) et par un **test d'intégration dont le porteur est nommé** — `securite-rgpd` en P7, sur les 14 clés de 17.3, attendu 404 | 6, fin |
+| **24** | [MINEUR] 300 ms pour trois allers-retours, contre 400 ms pour une transaction | « Lancer la session » descend à **250 ms**, le chemin TTS privé monte à **400 ms** avec sa composition poste par poste, et ce qui évite l'habillage est nommé pour ce que c'est : **le préchargement à l'entrée de l'écran**, pas la vitesse | 12.1 |
+| **25** | [MINEUR] La consigne de retrait des six clés oubliait le livrable marketing, source de l'extraction | Le tableau passe à **trois fichiers**, avec les trois emplacements du marketing et **ce qu'il advient des textes eux-mêmes** | 10.3, point d'exécution 1 |
+
+**Ce que le tour 2 avait acquis n'a pas bougé** : aucun chiffre du corpus TTS,
+aucune route, aucune table, aucune variable d'environnement. Les seules
+modifications de schéma sont celles qu'ARB-13 impose (borne du delta) et les
+commentaires de barème.
+
+**ARB-13 et son effet sur les contraintes.** Le barème forfaitaire rend le bonus
+égal à 2 sur une soirée à une seule étape. La contrainte du tour 2,
+`gem_ledger_delta_max_un CHECK (delta <= 1)`, **aurait donc rejeté en base le
+bonus qu'ARB-13 rend obligatoire** — l'Orchestrateur demandait de le vérifier,
+et c'était bien le cas. Elle est remplacée par
+`gem_ledger_delta_borne CHECK (delta BETWEEN 1 AND 2)`, avec un `DROP … IF
+EXISTS` de l'ancienne pour les bases qui l'auraient déjà reçue, la liste de la
+vérification V4 mise à jour, et **V5 étendue** : elle prouve désormais qu'un
+delta de `-1` **et** qu'un delta de `3` sont tous deux refusés par la base.
+
+**Deux points ouverts du tour 2 se referment sans que j'aie à les porter** : le
+glob de `30-copy-enfant.mdc` a reçu `src/app/bienvenue/**` — l'onboarding est un
+écran enfant, joué une seule fois à vie, donc le seul qu'on ne reverra jamais
+pour le corriger : c'était la bonne prise. Et ARB-12 est désormais inscrit dans
+`GATES.md`.
 
 ---
 
@@ -368,7 +404,7 @@ Array<{ evenementId: string, evenement: Evenement,
 | **unique** `settings_access(family_id)` | schema.prisma | un seul code par foyer |
 | `calibration_log(created_at)`, unique `(homework_id)` | schema.prisma | consultation depuis Réglages |
 | **CHECK** `gem_ledger.delta > 0` | policies.sql B | **ETH-04 au niveau du schéma**, pas seulement du code |
-| **CHECK** `gem_ledger.delta <= 1` | policies.sql B | le barème de 3.7 ne connaît que +1 |
+| **CHECK** `gem_ledger.delta BETWEEN 1 AND 2` (`gem_ledger_delta_borne`) | policies.sql B | Borne du barème **ARB-13** : +1 par étape, bonus de `3 − nombre d'étapes` donc 1 ou 2. La borne haute était `<= 1` au tour 2, ce qui aurait rejeté en base le bonus d'un Soir léger |
 | **CHECK** `child.gem_balance >= 0` | policies.sql B | SEC-06 |
 | **CHECK** `settings_access.tentatives_echouees >= 0` | policies.sql B | SEC-02 |
 | **CHECK** `reward_threshold.gems_requis > 0` | policies.sql B | PRD-14 |
@@ -611,8 +647,25 @@ prénom ne part pas seulement dans un payload de texte : il est aussi
 **prononcé** par Pilou dans 14 clips audio. Le tour 1 les déposait dans un
 bucket public dont le chemin est calculable depuis le dépôt : c'était un oracle
 de confirmation du prénom. Ces 14 clips vivent désormais dans le bucket privé
-`tts-prive` et ne sont servis que par URL signée (section 12.2). La règle est
-écrite dans `supabase/policies.sql` et vérifiée par V8.
+`tts-prive` et ne sont servis que par URL signée (section 12.2).
+
+**Ce que V8 prouve, et ce qu'elle ne prouve pas** (constat 23 du tour 2). La
+**destination** est vérifiée par V8 : le bucket `tts-prive` existe et n'est pas
+public. La **séparation**, elle, ne peut pas l'être par une requête de
+catalogue, puisque le chemin public est `tts-cache/<voixId>/<sha256>` : le
+hachage est opaque, rien dans le chemin ne dit si le texte portait un jeton. La
+séparation se prouve donc à deux autres endroits :
+
+1. **À la source**, par construction : le tri se fait sur la présence d'un jeton
+   dans le texte **avant** tout rendu, par un décideur unique (`POST /api/voix`,
+   8.4), avec des préfixes de bucket disjoints et aucune policy d'écriture pour
+   le client (12.2).
+2. **Par un test d'intégration, dont je nomme ici le porteur** : `securite-rgpd`
+   en P7, au titre de SEC-04. Le test recalcule les clés des **14 clips listés
+   nominativement en 17.3** et vérifie que
+   `GET {NEXT_PUBLIC_TTS_CACHE_URL}/<voixId>/<clé>.mp3` renvoie **404** pour
+   chacun. La liste est déjà publiée ; il ne manquait que l'agent qui la joue.
+   C'est aussi la tentative n°8 de `red-team`, sous une autre forme.
 
 **Le code parent ne traverse jamais aucune de ces frontières** (SEC-08) : il
 n'est connu que de `src/lib/parent/code.ts`, qui ne dépend d'aucun module de
@@ -664,8 +717,9 @@ Aucun `gem_balance = gem_balance + 1` n'existe. Le solde est donc toujours
 exactement la somme du ledger — l'invariant que 3.7 demande de tester, et que
 `scripts/verifier-solde.ts` et la vérification V6 de `policies.sql` rejouent.
 
-**7.4 — La base refuse ce que le code refuserait.** `delta > 0` et `delta <= 1`
-sont des `CHECK` Postgres (ETH-04), `gem_balance >= 0` aussi, et l'unique
+**7.4 — La base refuse ce que le code refuserait.** `delta > 0` et
+`delta BETWEEN 1 AND 2` sont des `CHECK` Postgres (ETH-04 et la borne du barème
+ARB-13), `gem_balance >= 0` aussi, et l'unique
 `(session_id, raison)` rend un double crédit impossible même en cas de double
 appel. **Cette dernière garantie n'était vraie qu'à moitié au tour 1** :
 `session_id` était nullable, et PostgreSQL traite les `NULL` comme distincts
@@ -911,14 +965,14 @@ n'est plus jamais programmée (ARB-08).
 | T2 | `PROGRAMME_VU` | `annonce` | `etapes_prevues` non vide | état de `etapes_prevues[0].matiere` | — | `etat`, `etape_courante = 0`, journal |
 | T3 | `PROGRAMME_VU` | `annonce` | `etapes_prevues` vide (soirée `sansDevoir`) | `termine` | **aucune pierre**, aucun rituel de clôture ; l'enfant voit `enfant.accueil.vide.*` et va au coffre | `etat`, `ended_at`, journal |
 | T4 | `ETAPE_TERMINEE` | `etape_lecture`, `etape_maths` | une étape suit | `transition` | crédit +1 de la matière terminée | `etat`, ledger, `gem_balance`, journal |
-| T5 | `ETAPE_TERMINEE` | `etape_lecture`, `etape_maths` | dernière étape | `cloture` | crédit +1, **puis +1 `bonus_soiree_complete` si toutes les étapes programmées sont terminées** (9.5) | `etat`, ledger ×2, `gem_balance`, journal |
+| T5 | `ETAPE_TERMINEE` | `etape_lecture`, `etape_maths` | dernière étape | `cloture` | crédit +1, **puis `crediterBonusSiSoireeComplete()`** (9.5) | `etat`, ledger ×2, `gem_balance`, journal |
 | T6 | `TRANSITION_VUE` | `transition` | — | état de `etapes_prevues[etape_courante + 1].matiere` | — | `etat`, `etape_courante += 1`, journal |
 | T7 | `PAUSE_DEMANDEE` | `etape_lecture`, `etape_maths` | — | `pause` | **aucune pierre retirée, jamais** (PRD-12, ETH-04) ; fait « pause prise » pour le résumé | `etat`, journal |
 | T8 | `PAUSE_TERMINEE` | `pause` | — | état de `etapes_prevues[etape_courante].matiere` | — | `etat`, journal |
 | T9 | `CLOTURE_VUE` | `cloture` | — | `termine` | génération du résumé (PRD-06), notification locale au parent | `etat`, `resume`, `ended_at`, journal |
-| T10 | `ABANDON_PARENT` | `annonce`, `etape_lecture`, `etape_maths`, `transition`, `pause` | **cookie parent de portée `sortie_session`** (PRD-13) | `abandon_parent` | crédit des étapes déjà terminées et non encore créditées ; résumé « séance arrêtée » | `etat`, `arret_parent = true`, `ended_at`, `resume`, ledger, journal |
+| T10 | `ABANDON_PARENT` | `annonce`, `etape_lecture`, `etape_maths`, `transition`, `pause` | **cookie parent de portée `sortie_session`** (PRD-13) | `abandon_parent` | crédit des étapes déjà terminées et non encore créditées, **puis `crediterBonusSiSoireeComplete()`** — le parent peut arrêter une séance dont l'enfant a déjà tout fini | `etat`, `arret_parent = true`, `ended_at`, `resume`, ledger, journal |
 | T11 | `BLOCAGE` | `etape_lecture`, `etape_maths` | `nb_sollicitations >= BLOCAGE_NB_SOLLICITATIONS` | **inchangé** | fait « blocage » pour le résumé ; l'interface propose pause ou suite (PED-08) | journal, `attempt` |
-| T12 | `CLOTURE_AUTOMATIQUE` | tout état non final | **`session.date` antérieure à la soirée courante** — déclenchée par le serveur, jamais par le client | `termine` | crédit des étapes terminées et non créditées ; résumé « séance arrêtée » ; libère l'unique partiel | `etat`, `ended_at`, `resume`, ledger, journal |
+| T12 | `CLOTURE_AUTOMATIQUE` | tout état non final | **`session.date` antérieure à la soirée courante** — déclenchée par le serveur, jamais par le client | `termine` | crédit des étapes terminées et non créditées, **puis `crediterBonusSiSoireeComplete()`** ; résumé « séance arrêtée » ; libère l'unique partiel | `etat`, `ended_at`, `resume`, ledger, journal |
 
 Toute paire (état, événement) absente de cette table est **invalide** : la route
 renvoie `409 TIPI_TRANSITION_INVALIDE` avec le snapshot courant, sans aucun effet
@@ -974,51 +1028,145 @@ tard. Elles sont à toi. Elles ne se perdent pas. » — et réessaie avec **le 
 **3. Le rattrapage a un porteur nommé, y compris si l'application est fermée.**
 `src/lib/session/cloture-automatique.ts`, appelé par `GET /api/etat` et
 `POST /api/session`, ferme toute session non finale dont la date est passée
-(T12) **et crédite à ce moment-là les étapes terminées non encore créditées**.
-Il les identifie sans ambiguïté : une étape est terminée quand toutes les lignes
-`attempt` de ses exercices portent un statut final, et non créditée quand il
-n'existe pas de ligne `gem_ledger` pour `(session_id, raison)`. Le crédit passe
-par le même `crediterEtape()`, avec le même unique : un rattrapage ne peut pas
-créditer deux fois. Aucune route n'accepte pour autant un montant (7.1).
+(T12) **et crédite à ce moment-là tout ce qui était dû : les étapes terminées et
+non créditées, puis le bonus de soirée complète**. Il les identifie sans
+ambiguïté : une étape est terminée quand toutes les lignes `attempt` de ses
+exercices portent un statut final, et non créditée quand il n'existe pas de
+ligne `gem_ledger` pour `(session_id, raison)` ; le bonus est dû quand toutes
+les étapes programmées le sont, et il passe par
+`crediterBonusSiSoireeComplete()` (9.5). Les deux crédits passent par le même
+unique `(session_id, raison)` : un rattrapage ne peut pas créditer deux fois.
+Aucune route n'accepte pour autant un montant (7.1).
 
-Conséquence sur T10 : l'`ABANDON_PARENT` crédite dans sa propre transaction et
-mène à un état final, sans jamais dépendre d'un « prochain appel » qui
-n'existerait pas.
+**Le bonus fait partie du rattrapage, et ce n'était pas le cas au tour 2.** Sans
+cela, l'enfant qui termine tout mais dont l'appareil s'éteint avant le dernier
+appui perdait définitivement une pierre : T12 créditait l'étape et s'arrêtait
+là. Voir 9.5, « Le bonus a trois créditeurs ».
 
-## 9.5 Barème (ARB-08)
+Conséquence sur T10 : l'`ABANDON_PARENT` crédite dans sa propre transaction —
+étapes **et** bonus — et mène à un état final, sans jamais dépendre d'un
+« prochain appel » qui n'existerait pas.
+
+## 9.5 Barème (ARB-13, qui remplace ARB-08 sur ce point)
 
 | Événement créditeur | Delta | Raison |
 | --- | --- | --- |
-| Une étape programmée est terminée | +1 | `etape_lecture_terminee` ou `etape_maths_terminee` |
-| **Toutes** les étapes programmées du soir sont terminées | +1 | `bonus_soiree_complete` |
+| Une étape programmée est terminée | **+1** | `etape_lecture_terminee` ou `etape_maths_terminee` |
+| **Toutes** les étapes programmées du soir sont terminées | **+ (3 − nombre d'étapes programmées)** | `bonus_soiree_complete` |
 
-Le bonus ne porte plus un « 2 » en dur. C'est la conséquence directe de
-l'arbitrage : puisqu'une étape vide n'est jamais programmée, « toutes les étapes
-programmées » est une notion qui ne dépend plus de la qualité du découpage de
-l'IA. Un enfant n'est jamais privé d'une pierre parce que le pipeline a mal
-fonctionné.
+**Le calcul, pour les deux soirées possibles** — c'est lui que le tour 2 avait
+faux, et il est désormais écrit en toutes lettres :
+
+| Soirée | Étapes créditées | Bonus | **Total** |
+| --- | --- | --- | --- |
+| Deux étapes, toutes terminées | 1 + 1 = 2 | 3 − 2 = **1** | **3 pierres** |
+| Une seule étape (Soir léger, ou une seule matière), terminée | 1 | 3 − 1 = **2** | **3 pierres** |
+| Deux étapes, une seule terminée | 1 | aucun | 1 pierre |
+| Aucune étape programmée (`sansDevoir`) | — | aucun | 0 pierre |
 
 **L'écart à la section 3.7, écrit ici dans sa forme canonique.** Tout endroit du
 projet qui énonce le barème reprend cette phrase, mot pour mot :
 
-> **+1 par étape terminée, +1 lorsque *toutes les étapes programmées* du soir
-> sont terminées (ARB-08).** La section 3.7 du prompt maître écrit « +1 bonus si
-> les 2 étapes du soir sont terminées » ; ARB-08 remplace ce « 2 » en dur par
-> « toutes les étapes programmées » parce qu'une étape vide n'est plus jamais
-> programmée, de sorte qu'un découpage incomplet de l'IA ne coûte aucune pierre
-> à un enfant qui n'en est pas responsable.
+> **Une soirée complète vaut toujours 3 pierres, quel que soit le nombre
+> d'étapes programmées : +1 par étape terminée, plus un bonus de
+> `3 − nombre d'étapes programmées` lorsque toutes le sont (ARB-13).** La
+> section 3.7 du prompt maître écrit « +1 bonus si les 2 étapes du soir sont
+> terminées » ; ARB-13 forfaitise la soirée parce que la pierre récompense le
+> fait de venir et de finir, jamais le volume de travail (PED-05) — un enfant ne
+> doit pas recevoir moins parce que son parent l'a ménagé un soir de fatigue.
 
-Conséquence concrète, à ne jamais laisser implicite : **une soirée à une seule
-étape rapporte 2 pierres, comme une soirée à deux étapes.** C'est cohérent avec
-PED-05, ETH-01 et ARB-06, qui veut qu'un Soir léger reste indétectable par
-l'enfant — y compris dans son coffre.
+**Ce que ce forfait règle, et que le tour 2 avait cassé.** ARB-08 avait rapproché
+les deux cas sans les égaliser : 2 pierres contre 3, soit **un écart d'une pierre
+par Soir léger**, parfaitement visible dans un coffre que PRD-14 affiche chiffré.
+Mon livrable du tour 2 affirmait pourtant « comme une soirée à deux étapes », ce
+qui était arithmétiquement faux, et déclarait ARB-06 satisfait au moment même où
+il était violé. ARB-13 égalise réellement : **le Soir léger devient indétectable
+dans le coffre**, ce qu'ARB-06 exige, et ce que je ne pouvais pas trancher seul
+puisque c'est une décision de barème, donc de produit.
 
-Les quatre endroits qui énoncent le barème citent désormais ARB-08 : cette
-section, le commentaire de l'énumération `RaisonGem` dans `prisma/schema.prisma`,
-le commentaire du `CHECK gem_ledger_delta_max_un` dans `supabase/policies.sql`,
-et les lignes de `TRACEABILITY.md` rédigées en 16.2. `src/config/pierres.config.ts`,
-écrit en V1, portera la même phrase en commentaire d'en-tête : c'est la seule
-table de barème du code.
+**Trois propriétés du bonus, à ne pas perdre à l'implémentation :**
+
+1. **Il vaut 1 ou 2, jamais 0 ni négatif.** PED-06 plafonne les étapes à deux,
+   donc `3 − n ∈ {1, 2}` pour `n ∈ {1, 2}`. La borne est un `CHECK` Postgres,
+   `gem_ledger_delta_borne CHECK (delta BETWEEN 1 AND 2)` — renommé au tour 3,
+   puisque l'ancien `gem_ledger_delta_max_un` interdisait précisément le bonus
+   de 2 qu'ARB-13 rend nécessaire.
+2. **Une soirée sans aucune étape programmée ne crédite rien.** Le cas
+   `sansDevoir` (T3) rendrait « toutes les étapes sont terminées » vrai par
+   vacuité, et `3 − 0 = 3` : la garde exige donc **au moins une étape programmée
+   et terminée**. Un enfant qui n'a pas de devoirs n'a pas travaillé, et le
+   rituel de clôture ne se joue pas non plus (10.2).
+3. **Il est crédité par toute transition qui mène à une soirée complète, jamais
+   par une seule.** C'est le défaut du tour 2, et il coûtait une pierre à un
+   enfant : voir ci-dessous.
+
+### Le bonus a trois créditeurs, et un seul point de décision
+
+Le tour 2 ne créditait le bonus qu'en T5. Un enfant qui finissait son dernier
+exercice mais dont la tablette s'éteignait avant le dernier appui voyait T12
+créditer l'étape le lendemain… et **perdre le bonus définitivement**, puisque
+aucune route n'accepte de montant et qu'aucune transition n'est possible depuis
+un état final. C'est exactement la perte qu'ARB-08 avait été rendu pour empêcher,
+déplacée de l'analyse vers le réseau — et PRD-18 existe précisément parce qu'une
+session du soir est interrompue de temps en temps.
+
+Correction : **une seule fonction, appelée par les trois transitions
+terminales.**
+
+```ts
+// src/lib/pierres/service.ts — appelée par T5, T10 et T12, dans LEUR transaction
+async function crediterBonusSiSoireeComplete(tx, session): Promise<number> {
+  const etapes = session.etapesPrevues;               // jamais vide hors sansDevoir
+  if (etapes.length === 0) return 0;                  // propriété 2
+  if (!etapes.every(estTerminee)) return 0;           // toutes terminées ?
+  // L'unique (session_id, 'bonus_soiree_complete') rend l'appel idempotent :
+  // un rejeu, ou deux transitions terminales successives, ne créditent qu'une fois.
+  return crediter(tx, session, 'bonus_soiree_complete', 3 - etapes.length);
+}
+```
+
+| Transition | Pourquoi elle doit pouvoir créditer le bonus |
+| --- | --- |
+| **T5** `ETAPE_TERMINEE`, dernière étape | Le cas nominal : l'enfant va au bout et appuie |
+| **T10** `ABANDON_PARENT` | Le parent peut arrêter une séance dont l'enfant a déjà tout fini — l'arrêt ne doit rien lui retirer (ETH-04) |
+| **T12** `CLOTURE_AUTOMATIQUE` | Le cas du constat 20 : tout est terminé en base, le dernier appui n'est jamais arrivé |
+
+L'idempotence ne repose pas sur la discipline d'appel mais sur l'unique
+`(session_id, raison)` : appeler la fonction trois fois de suite est sans effet
+au-delà du premier crédit, et le `CHECK` de borne refuserait de toute façon un
+delta hors de 1..2.
+
+### Les six endroits qui énoncent le barème
+
+Le tour 2 en annonçait quatre et affirmait la complétude. Le contrôle en a
+trouvé deux de plus, dont un qui préréglait un instrument de mesure. **Voici la
+liste réelle, avec ce qui relève de moi et ce qui n'en relève pas.**
+
+| # | Endroit | Statut |
+| --- | --- | --- |
+| 1 | `architecture.out.md` § 9.5 — la présente section | **À moi.** Formulation canonique ARB-13 |
+| 2 | `prisma/schema.prisma`, commentaire de `RaisonGem` | **À moi.** Mis à jour |
+| 3 | `supabase/policies.sql`, commentaire de `gem_ledger_delta_borne` | **À moi.** Mis à jour, contrainte renommée |
+| 4 | `architecture.out.md` § 16.2 — lignes de `TRACEABILITY.md` | **À moi.** Réécrites |
+| 5 | `.cursor/agents/tests-unitaires.md`, liste de couverture obligatoire | **Pas à moi.** Corrigé par l'Orchestrateur — voir ci-dessous |
+| 6 | `docs/agents/P1/produit-marketing.out.md` ligne 1148 | **Pas à moi.** Traité séparément par l'Orchestrateur |
+
+**Le cinquième endroit était le plus dangereux, et je le dis franchement parce
+que je ne l'avais pas vu.** La fiche de `tests-unitaires` prescrivait « +1 bonus
+pour 2 étapes » dans sa liste de couverture obligatoire. L'agent qui écrit les
+tests ne lit ni `GATES.md` ni la présente section : il lit sa fiche. Il aurait
+donc écrit un test affirmant la règle révoquée — test qui échoue contre une
+implémentation correcte, ou pire, qui passe parce que l'implémentation aura été
+alignée sur lui. Et `controle-tests`, dont le protocole impose de vérifier que
+chaque ligne de cette liste a un test qui la nomme, aurait validé l'alignement.
+C'est très exactement l'instrument de mesure préréglé sur la règle morte que
+`40-protocole-agents.mdc` décrit. J'avais écrit en 16.2 qu'« un écart silencieux
+est un piège pour le dernier agent de la chaîne » : le piège était plus tôt dans
+la chaîne, sur l'agent dont c'est le métier de mesurer.
+
+`src/config/pierres.config.ts`, écrit en V1, portera la formulation canonique en
+commentaire d'en-tête : c'est la seule table de barème du code, et elle devra
+citer ARB-13.
 
 Jamais de pierre par bonne réponse (PED-05). Jamais de delta négatif (ETH-04,
 garanti par `CHECK`).
@@ -1128,18 +1276,30 @@ complète et propre.
 **Deux points d'exécution pour `contenu-enfant`, sous contrôle de
 `controle-produit` (ARB-10). Je ne modifie pas `content/` moi-même.**
 
-1. **Le retrait touche deux fichiers, pas un.** Les six clés n'existent pas
-   encore dans `content/ui-enfant.json`, qui reste à écrire : il suffit de ne pas
-   les y créer. Mais `lecture.vide.corps` et `maths.vide.corps` sont **déjà
-   déclarées** dans `content/encouragements.json`, dans le cinquième groupe de
-   `cles_fixes_non_variees` (« États techniques à message unique »). Ces deux
-   entrées-là doivent en être retirées, sinon le fichier déclarera comme « clé
-   fixe volontairement non variée » une clé qui n'existe plus nulle part — et le
-   contrôle qui vérifie que les clés déclarées existent côté marketing échouera.
-   Les six autres clés du même groupe restent : elles ont toutes un déclencheur
-   (`lecture.pas_entendu.*`, `lecture.micro_absent.corps`,
-   `lecture.sans_voix.corps`, `maths.sans_indice.corps`,
-   `enfant.programme.souci.corps`).
+1. **Le retrait touche TROIS fichiers, pas deux** — le tour 2 en comptait deux
+   et oubliait le plus important (constat 25).
+
+   | Fichier | Ce qu'il faut y faire |
+   | --- | --- |
+   | `content/ui-enfant.json` | Rien à retirer : il reste à écrire. Il suffit de **ne pas y créer** les six clés |
+   | `content/encouragements.json` | Retirer **deux entrées** du cinquième groupe de `cles_fixes_non_variees` (« États techniques à message unique ») : `lecture.vide.corps` et `maths.vide.corps`. Sinon le fichier déclare comme « clé fixe volontairement non variée » une clé qui n'existe plus nulle part, et le contrôle qui vérifie que les clés déclarées existent côté marketing échoue. Les six autres clés du groupe restent : elles ont toutes un déclencheur (`lecture.pas_entendu.*`, `lecture.micro_absent.corps`, `lecture.sans_voix.corps`, `maths.sans_indice.corps`, `enfant.programme.souci.corps`) |
+   | **`docs/agents/P1/produit-marketing.out.md`** | **Trois emplacements**, et c'est celui-ci qui commande : ARB-10 fait extraire `ui-enfant.json` **de ce livrable**. Si les neuf lignes restent, l'extraction recréera mécaniquement les six clés, et produira l'incohérence inverse de celle qu'on veut éviter |
+
+   Les trois emplacements du livrable marketing, relevés par le contrôle :
+   la table des conditions de rendu de 7.0 (deux lignes : « Étape vide, suite
+   existante » et « Étape vide, pas de suite »), le tableau de l'écran lecture
+   en 7.5 (trois clés `lecture.vide.*` avec leur texte), et celui de l'écran
+   maths en 7.6 (trois clés `maths.vide.*`).
+
+   **Ce qu'il advient des textes eux-mêmes** — « Ce soir, il n'y a pas de
+   lecture. », « On passe aux maths. », « On a fini. Viens voir. » et leurs
+   miroirs : ils **disparaissent**, ils ne se recasent nulle part. Ils décrivaient
+   un moment qui n'existe plus. Deux points de vigilance pour la reprise : ne pas
+   les confondre avec `enfant.accueil.vide.*` (« Ce soir, il n'y a pas de
+   devoirs. »), qui reste et couvre une soirée **sans aucune étape** ; et ne pas
+   les recycler dans la transition, `transition.annonce.*` existant déjà pour
+   annoncer l'étape suivante. Le régime d'ARB-05 s'applique : ce livrable est la
+   source de tous les autres, la correction s'y fait plutôt qu'en backlog.
 
 2. **Une condition à élargir, et non une clé à ajouter.** Le livrable marketing
    (7.12) range l'observation « La séance a été arrêtée avant la fin. Les pierres
@@ -1225,13 +1385,13 @@ constante unique, **propriétaire nommé : `src/config/ui.config.ts`** (constat 
 | Aiguillage `/` | 300 ms | 1 requête indexée `session(child_id, etat)` (+ T12 le lendemain d'une soirée abandonnée) | écran de lancement, sans texte |
 | Ajout d'une photo | 2,5 s | compression client ~300 ms + transfert ~1 Mo + écriture Storage | vignette en attente, côté parent |
 | **Analyse complète** | 15 s, abandon à 20 s | OCR 1,5–3 s par photo (jusqu'à 4 en parallèle) + structuration < 50 ms + prompt 1 : 4–10 s + prompts 2 et 3 en parallèle : 3–8 s | `parent.scan.analyse_en_cours` + `analyse_duree`, côté parent uniquement |
-| Lancer la session | 400 ms | création de session, 1 transaction | bouton en attente |
+| Lancer la session | 250 ms | création de session, 1 transaction | bouton en attente |
 | **Transition d'étape** | 150 ms | 1 transaction : verrou, journal, ledger, solde | aucun habillage nécessaire ; « Pilou réfléchit » au-delà de 400 ms |
 | Indice pré-généré | 150 ms | 1 transaction : lecture `exercise.indices` + upsert `attempt` | aucun |
 | Indice de secours (TEC-07) | 3–8 s | 1 appel `AiProvider` | « Pilou réfléchit » |
 | Rapprochement de lecture | 200 ms | `POST …/tentative` : matching serveur + écriture | `lecture.micro.en_cours` reste affiché |
 | **TTS public, cache touché** | 150 ms | `GET` direct sur le bucket public, CDN, sans clé | aucun : Pilou parle tout de suite |
-| **TTS privé, cache touché** | 300 ms | `POST /api/voix` + URL signée + `GET` Storage | aucun : sous le seuil de 400 ms |
+| **TTS privé, cache touché** | 400 ms | `POST /api/voix` (~80 ms) + émission de l'URL signée auprès de Storage (~120 ms) + `GET` de l'objet, ~40 Ko (~150 ms) | **aucun, mais par anticipation et non par rapidité** : voir ci-dessous |
 | **TTS, cache manqué** (public ou privé) | 900 ms | route serveur + synthèse + écriture Storage | « Pilou réfléchit » |
 | STT | local | Web Speech API, dans le navigateur | `lecture.micro.en_cours` (affiché, Pilou se tait) |
 | Coffre | 200 ms | 1 lecture `child` + paliers | aucun |
@@ -1240,10 +1400,35 @@ constante unique, **propriétaire nommé : `src/config/ui.config.ts`** (constat 
 **Ce que le tour 1 promettait à tort** (constat 6) : 150 ms sur la première
 phrase de chaque soirée. Les 8 variantes d'`accueil` sur 20 qui portent le
 prénom, les 5 de `reprise_session` sur 20, et `bravo.titre` qui est joué **chaque
-soir**, sont des clips privés : leur budget est de 300 ms, pas 150. Deux raisons
-pour que cela reste confortable : le clip est en cache (aucune synthèse), et
-`POST /api/voix` prend un **tableau** de demandes, donc l'écran d'accueil paie un
-seul aller-retour pour toutes ses phrases.
+soir**, sont des clips privés : ils empruntent le chemin le plus long.
+
+**Et ce que le tour 2 promettait encore à tort** (constat 24) : 300 ms, annoncés
+« sous le seuil de 400 ms » — donc sans habillage — pour un chemin qui enchaîne
+**trois** allers-retours, alors que le même tableau accordait 400 ms à la
+création de session, qui n'en fait **qu'un**. Le budget le plus lourd était
+annoncé plus bas que le plus léger. Deux corrections, et une conséquence
+assumée :
+
+1. **« Lancer la session » descend à 250 ms** : une transaction Postgres sur des
+   tables vides ne justifiait pas 400 ms. L'ordre des budgets redevient cohérent
+   avec la quantité de travail.
+2. **Le chemin TTS privé monte à 400 ms**, composé poste par poste dans le
+   tableau. À 400 ms il est **au** seuil de TEC-12, pas en dessous : je ne peux
+   donc plus écrire « aucun habillage nécessaire » au motif qu'il serait rapide.
+3. **Ce qui évite « Pilou réfléchit » sur l'accueil n'est pas la vitesse, c'est
+   l'anticipation.** La demande de voix d'un écran est émise **à l'entrée dans
+   l'écran**, en parallèle du rendu, jamais au moment de jouer le son : le hook
+   `useVoix` précharge les clips de l'écran dès son montage. Le temps de route
+   se superpose au temps de rendu au lieu de s'y ajouter. Et `POST /api/voix`
+   prend un **tableau** de demandes, donc l'accueil paie un seul aller-retour
+   pour toutes ses phrases, pas un par phrase.
+
+**Si la mesure réelle de V4 dépasse le budget malgré le préchargement**, la règle
+TEC-12 s'applique sans discussion : « Pilou réfléchit » s'affiche, y compris sur
+l'accueil. Ce serait un défaut d'agrément, pas un défaut de conformité — et
+c'est le genre de chiffre qui ne se règle que sur l'appareil réel, comme les
+seuils de TEC-16. Aucun de ces budgets n'est mesurable en P2, faute de code :
+ce sont des budgets opposables à V4, pas des promesses.
 
 ## 12.2 Cache TTS (TEC-09b), et la séparation public / privé (SEC-04)
 
@@ -1471,7 +1656,7 @@ comment.
 | TEC-09 | `src/lib/speech/provider.ts` (`SpeechProvider`), `providers/web-speech.ts`, `NEXT_PUBLIC_SPEECH_PROVIDER`, contrat `POST /api/voix/transcrire` | Web Speech en V1. **Couverte sous condition** : le repli Google a son interface, sa valeur de configuration et son contrat, et n'est pas implémenté. Ligne de traçabilité en 16.1 |
 | TEC-09b | `src/lib/voice/cache.ts`, buckets `tts-cache` (public) **et `tts-prive`**, `scripts/prewarm-tts.ts` | Clé sha256 déterministe, 474 clips pré-chauffés = 2,10 % du quota une seule fois, ~5 %/mois en usage. **La séparation des deux buckets est ce qui rend le cache compatible avec SEC-04** (12.2) |
 | TEC-10 | `src/lib/session/machine.ts` (fonction pure), `EtatSession` (enum Prisma), table 9.2, `CHECK session_etape_courante_coherente` | 9 états, 12 transitions, toute paire non listée est refusée en 409 |
-| TEC-11 | `src/lib/pierres/service.ts`, `POST /api/session/:id/transition`, `src/lib/session/cloture-automatique.ts` | Seuls chemins d'écriture, section 7, cinq points de démonstration + règles grep de 7.2 |
+| TEC-11 | `src/lib/pierres/service.ts` (`crediterEtape` + `crediterBonusSiSoireeComplete`), `POST /api/session/:id/transition`, `src/lib/session/cloture-automatique.ts` | Seuls chemins d'écriture, section 7, cinq points de démonstration + règles grep de 7.2. Le bonus est crédité par les trois transitions terminales T5, T10 et T12, jamais par une seule (9.5, ARB-13) |
 | TEC-12 | `src/components/pilou/PilouReflechit.tsx`, **seuil unique dans `src/config/ui.config.ts`**, `enfant.attente.pilou` | Budget de latence 12.1 : chaque interaction au-dessus de 400 ms est nommée et habillée |
 | TEC-13 | Décision D1, `src/config/env.ts` vs `env.client.ts`, 3 variables publiques sans secret | Aucun client Supabase, Google ou IA dans le navigateur ; l'unique accès direct est un `GET` sans clé sur un bucket public sans donnée personnelle ; contrôle `grep` sur `.next/static` en section 11 |
 | TEC-14 | `package.json` scripts `typecheck`, `lint`, `test`, `build` ; aucune dépendance native exotique | Décidé ici, exécuté par les verticales |
@@ -1484,7 +1669,7 @@ comment.
 | SEC-03 | `supabase/policies.sql` parties A et D, **y compris `_prisma_migrations`** | RLS activée sur **toutes** les tables du schéma public, aucune policy pour `anon`/`authenticated`, `REVOKE`, et 8 vérifications **exécutables** dont V1 qui balaie `pg_tables` sans liste en dur |
 | SEC-04 | `src/lib/ai/anonymisation.ts`, typage de `AiProvider`, `calibration_log.payload_ia`, **bucket `tts-prive` + vérification V8** | Quatre barrières : le type, le constructeur unique, la garde d'exécution, et **la séparation des clips audio qui prononcent le prénom** (section 6, 12.2) |
 | SEC-05 | `family.retention_audio_jours`, bucket privé `audios`, `POST /api/cron/purge-audios`, `CRON_SECRET`, `/api/reglages/audio` | Purge planifiée et paramétrable, durée bornée par CHECK, `attempt.audio_url` remis à null |
-| SEC-06 | `src/lib/pierres/service.ts` (recalcul `SUM(delta)`), CHECK `delta > 0`, unique `(session_id, raison)` sur colonne **obligatoire**, absence de route de crédit | Section 7 : cinq points, dont l'absence totale de chemin client |
+| SEC-06 | `src/lib/pierres/service.ts` (recalcul `SUM(delta)`), CHECK `gem_ledger_delta_positif` et `gem_ledger_delta_borne`, unique `(session_id, raison)` sur colonne **obligatoire**, absence de route de crédit | Section 7 : cinq points, dont l'absence totale de chemin client |
 | SEC-07 | `GET /api/reglages/donnees/export`, `DELETE /api/reglages/donnees`, sous-page 7.14 | Export en une pièce jointe JSON, suppression en une transaction (rien de partiel), sans `code_hash` |
 | SEC-08 | Cookie parent httpOnly signé **et porté** (`reglages` / `sortie_session`), `src/lib/parent/code.ts` isolé de `src/lib/ai/**`, aucune entrée Réglages sur un écran enfant | Le code n'entre jamais dans un payload d'IA ; la porte de PRD-13 est une surcouche, pas une navigation (8.6) |
 
@@ -1508,45 +1693,58 @@ couverte par l'interface + Web Speech (arbitrage Orchestrateur, G2 tour 1). |
 Une correction de ma part sur cette ligne : elle dit « arbitrage Orchestrateur,
 G2 tour 1 », et cet arbitrage porte désormais un numéro. Lire **ARB-11**.
 
-## 16.2 Lignes à inscrire dans `TRACEABILITY.md` pour le barème (ARB-12, point 2)
+## 16.2 Lignes à inscrire dans `TRACEABILITY.md` pour le barème (ARB-12, puis ARB-13)
 
 Le risque est nommé : `recette-finale` ne lit pas `GATES.md` exigence par
 exigence, elle lit la section 2 du prompt maître et vérifie le code contre elle.
 Elle trouvera « +1 bonus si les 2 étapes du soir sont terminées » en 3.7, verra
-`bonus_soiree_complete`, et conclura à un écart — avec raison, si rien ne le lui
-explique là où elle regarde. **Un écart assumé et tracé n'est pas un écart ; un
-écart silencieux est un piège pour le dernier agent de la chaîne.**
+un bonus de 2 sur un Soir léger, et conclura à un écart — avec raison, si rien
+ne le lui explique là où elle regarde. **Un écart assumé et tracé n'est pas un
+écart ; un écart silencieux est un piège pour le dernier agent de la chaîne.**
 
-Trois lignes portent le barème. Chacune doit citer ARB-08 :
+Trois lignes portent le barème. Chacune doit citer **ARB-13** :
 
 ```
 | ETH-04 | Les pierres ne se perdent jamais et n'expirent jamais |
-prisma/schema.prisma (CHECK gem_ledger.delta > 0 et delta <= 1, via
-supabase/policies.sql partie B), src/lib/pierres/service.ts,
-src/config/pierres.config.ts | tests V6 | COUVERTE. BARÈME MODIFIÉ PAR ARB-08 :
-+1 par étape terminée, +1 quand TOUTES les étapes programmées du soir sont
-terminées. La section 3.7 écrit « les 2 étapes » ; ARB-08 remplace ce « 2 » en
-dur parce qu'une étape vide n'est plus jamais programmée, afin qu'un découpage
-incomplet de l'IA ne coûte aucune pierre à l'enfant. Conséquence assumée : une
-soirée à une seule étape rapporte 2 pierres. |
+prisma/schema.prisma (CHECK gem_ledger_delta_positif et gem_ledger_delta_borne,
+via supabase/policies.sql partie B), src/lib/pierres/service.ts,
+src/config/pierres.config.ts | tests V6 | COUVERTE. BARÈME FORFAITISÉ PAR
+ARB-13 : une soirée complète vaut TOUJOURS 3 pierres, quel que soit le nombre
+d'étapes programmées — +1 par étape terminée, plus un bonus de
+(3 − nombre d'étapes programmées) lorsque toutes le sont. La section 3.7 écrit
+« +1 bonus si les 2 étapes du soir sont terminées » ; ARB-13 forfaitise parce
+que la pierre récompense le fait de venir et de finir, jamais le volume de
+travail (PED-05), et parce qu'un écart d'une pierre rendait le Soir léger
+détectable dans le coffre, contre ARB-06. Le bonus vaut 1 ou 2, jamais 0 ni
+négatif (PED-06 plafonne les étapes à deux), et une soirée sans étape
+programmée ne crédite rien. Il est crédité par les TROIS transitions terminales
+— T5, T10 et T12 — via crediterBonusSiSoireeComplete() : un enfant qui termine
+tout mais perd le dernier appui ne perd pas sa pierre (PRD-18). |
 
-| TEC-11 | Service pierres côté serveur | src/lib/pierres/service.ts,
-src/lib/session/service.ts, src/lib/session/cloture-automatique.ts,
-POST /api/session/:id/transition | tests V6 | COUVERTE. Barème appliqué :
-voir ETH-04 et ARB-08 — le bonus porte sur toutes les étapes programmées, pas
-sur un « 2 » en dur. |
+| TEC-11 | Service pierres côté serveur | src/lib/pierres/service.ts
+(crediterEtape + crediterBonusSiSoireeComplete), src/lib/session/service.ts,
+src/lib/session/cloture-automatique.ts, POST /api/session/:id/transition
+| tests V6 | COUVERTE. Barème appliqué : voir ETH-04 et ARB-13 — forfait de
+3 pierres par soirée complète, bonus crédité par T5, T10 et T12. |
 
 | SEC-06 | Le solde n'est jamais modifiable depuis le client | recalcul
 SUM(gem_ledger.delta) dans src/lib/pierres/service.ts, unique
 (session_id, raison) sur colonne obligatoire, aucune route n'accepte de montant
-| tests V6 | COUVERTE. Barème : voir ETH-04 et ARB-08. |
+| tests V6 | COUVERTE. Barème : voir ETH-04 et ARB-13. |
 ```
 
-Le même paragraphe canonique figure en 9.5, dans le commentaire de l'énumération
+**Une quatrième ligne est nécessaire, et elle n'est pas dans `TRACEABILITY.md`.**
+La liste de couverture obligatoire de `.cursor/agents/tests-unitaires.md` dit
+« Service pierres : +1 par étape, +1 bonus pour 2 étapes ». C'est la règle
+révoquée, et c'est la fiche que lira l'agent qui écrit les tests. L'Orchestrateur
+l'a amendée ; je la cite ici pour que la correspondance entre les six endroits du
+barème (9.5) et les fichiers réels reste vérifiable d'un seul coup d'œil.
+
+La formulation canonique figure en 9.5, dans le commentaire de l'énumération
 `RaisonGem` de `prisma/schema.prisma`, et dans celui du `CHECK
-gem_ledger_delta_max_un` de `supabase/policies.sql`. Quatre endroits, une seule
-formulation, et le numéro d'arbitrage partout : `recette-finale` tombera dessus
-quel que soit le fichier par lequel elle entre.
+gem_ledger_delta_borne` de `supabase/policies.sql`. Avec ces trois lignes, cela
+fait quatre endroits dans mes livrables et six en tout (9.5) : `recette-finale`
+tombera dessus quel que soit le fichier par lequel elle entre.
 
 ---
 
@@ -1556,9 +1754,10 @@ quel que soit le fichier par lequel elle entre.
 
 `$SP` est mon répertoire de travail temporaire, hors du dépôt. Le schéma a été
 modifié au tour 2 (`session_id` obligatoire, `bonus_soiree_complete`, en-tête des
-huit contraintes), puis de nouveau après ARB-12 (le commentaire de `RaisonGem`
-cite désormais ARB-08 et l'écart à la section 3.7). Sortie ci-dessous : celle de
-ma dernière exécution, postérieure à toutes les corrections.
+huit contraintes), après ARB-12 (le commentaire de `RaisonGem` cite l'arbitrage
+et l'écart à 3.7), puis au tour 3 pour ARB-13 (barème forfaitaire, borne du delta
+passée à `BETWEEN 1 AND 2` dans l'en-tête des contraintes). Sortie ci-dessous :
+celle de ma dernière exécution, postérieure à toutes les corrections.
 
 ```
 $ cd /home/user/Tipi && npm install prisma@5.22.0 --prefix $SP --no-audit --no-fund
@@ -1568,7 +1767,7 @@ $ export DATABASE_URL="postgresql://u:p@localhost:5432/postgres" \
          DIRECT_URL="postgresql://u:p@localhost:5432/postgres"
 $ $SP/node_modules/.bin/prisma format --schema prisma/schema.prisma
 Prisma schema loaded from prisma/schema.prisma
-Formatted prisma/schema.prisma in 36ms 🚀
+Formatted prisma/schema.prisma in 33ms 🚀
 
 $ $SP/node_modules/.bin/prisma validate --schema prisma/schema.prisma
 Prisma schema loaded from prisma/schema.prisma
@@ -1587,8 +1786,9 @@ The schema at prisma/schema.prisma is valid 🚀
 ```
 
 Deux précisions d'honnêteté sur ce bloc. La durée affichée par `prisma format`
-varie d'une exécution à l'autre (33 ms au tour 1, 34 puis 36 ms au tour 2) :
-c'est la sortie réelle de ma dernière exécution, pas un chiffre stable. Et le cadre « Update
+varie d'une exécution à l'autre (33 ms au tour 1, 34 puis 36 au tour 2, 33 au
+tour 3) : c'est la sortie réelle de ma dernière exécution, pas un chiffre
+stable, et je la recopie plutôt que de la figer. Et le cadre « Update
 available » est la bannière que le CLI imprime de lui-même ; je la laisse plutôt
 que de la couper, puisque `controle-architecture` la verra en rejouant.
 Le choix de la version 5.22.0 est délibéré : c'est la dernière 5.x stable, et
@@ -1779,35 +1979,87 @@ $ grep -cE '^NEXT_PUBLIC_' .env.example
 `UPLOAD_MAX_PHOTO_OCTETS` et `UPLOAD_MAX_AUDIO_OCTETS`, toutes deux serveur
 (constat 15). Le tableau de la section 11 compte 27 lignes.
 
+## 17.5 ARB-13 : la contrainte accepte-t-elle un bonus de 2 ?
+
+L'Orchestrateur demande de le vérifier, et c'est le point où le tour 2 se serait
+cassé en production. **Ce contrôle ne peut pas être exécuté en P2** : il n'y a
+pas de base, et je ne joue pas une sortie que je n'ai pas obtenue. Voici donc ce
+que j'ai vérifié, et comment.
+
+Arithmétique du bonus, exhaustive — PED-06 plafonne les étapes à deux, il n'y a
+donc que trois cas possibles :
+
+```
+etapes programmees = 0  ->  pas de bonus (garde explicite, 9.5 propriete 2)
+etapes programmees = 1  ->  bonus = 3 - 1 = 2
+etapes programmees = 2  ->  bonus = 3 - 2 = 1
+```
+
+Le delta écrit en base vaut donc **1 ou 2**, et jamais autre chose. La contrainte
+du tour 2 était `CHECK (delta <= 1)` : **elle aurait rejeté le bonus de 2**,
+c'est-à-dire le cas du Soir léger, tous les soirs légers. Texte réellement livré
+aujourd'hui, relu dans le fichier :
+
+```
+$ grep -n "delta_borne\|delta_max_un" supabase/policies.sql
+190:-- La contrainte est renommée en conséquence : `gem_ledger_delta_max_un` ne
+193:ALTER TABLE public.gem_ledger DROP CONSTRAINT IF EXISTS gem_ledger_delta_max_un;
+197:    SELECT 1 FROM pg_constraint WHERE conname = 'gem_ledger_delta_borne'
+200:      ADD CONSTRAINT gem_ledger_delta_borne CHECK (delta BETWEEN 1 AND 2);
+407:  'gem_ledger_delta_positif', 'gem_ledger_delta_borne', 'child_gem_balance_positif',
+```
+
+Trois choses à vérifier par qui appliquera le fichier sur une vraie base, et qui
+sont écrites pour cela :
+
+1. `DROP CONSTRAINT IF EXISTS gem_ledger_delta_max_un` retire l'ancienne borne
+   d'une base qui l'aurait déjà reçue — sans ce `DROP`, les deux `CHECK`
+   coexisteraient et le plus strict gagnerait, silencieusement ;
+2. la liste de la vérification **V4** nomme `gem_ledger_delta_borne`, donc
+   l'application du fichier échoue si la nouvelle contrainte manque ;
+3. la vérification **V5** est étendue : elle tente une insertion à `-1` **et**
+   une à `3`, et exige que la base refuse les deux. Elle prouve donc la borne
+   dans les deux sens, sur une base réelle, au moment de l'application.
+
+C'est le maximum de preuve atteignable sans base, et je le dis comme tel plutôt
+que de fabriquer une sortie `psql`.
+
 ---
 
 # 18. Points que je veux voir tranchés
 
-Les cinq points du tour 1 sont tranchés et appliqués (0.3). Les deux points que
-j'avais laissés ouverts à la fin du tour 2 le sont par ARB-12 (0.4) :
+Les cinq points du tour 1 sont tranchés (0.3), les deux du tour 2 le sont par
+ARB-12 (0.4), et le barème l'est par ARB-13 (0.5). Le glob a reçu
+`src/app/bienvenue/**`. **Il ne reste qu'un seul point, et il ne m'appartient
+pas non plus.**
 
-- **les six clés `lecture.vide.*` / `maths.vide.*`** : la vérification demandée
-  est faite, état limite par état limite, en **section 10.3**. Les cinq états
-  gardent une couverture propre, les six clés partent, et deux points
-  d'exécution sont écrits pour `contenu-enfant` ;
-- **le barème** : formulation canonique en **9.5**, reprise dans les quatre
-  endroits qui l'énoncent, et trois lignes de `TRACEABILITY.md` prêtes à coller
-  en **16.2**.
+**Le prompt maître prescrit encore la règle révoquée à l'agent qui écrira les
+tests.** `TIPI-PROMPT-CURSOR.md` §5.1, ligne 667, contient la copie de la fiche
+de `tests-unitaires`, et cette copie dit toujours :
 
-Il ne reste donc **qu'un seul point ouvert**, et il n'est pas de mon ressort.
+> « Service pierres : +1 par étape, **+1 bonus pour 2 étapes**, jamais de delta
+> négatif, solde toujours égal à la somme du ledger, écriture impossible depuis
+> le client. »
 
-**Le glob de `30-copy-enfant.mdc` reste faux tant que personne ne l'écrit.**
-Le fichier de règles n'est pas un de mes quatre livrables. La valeur complète,
-qui suit la recommandation du contrôleur et supprime `gwenn` au lieu de le
-conserver :
+La fiche opérationnelle, `.cursor/agents/tests-unitaires.md`, a bien été amendée
+par l'Orchestrateur — je l'ai vérifié, l'amendement citant ARB-08 et ARB-13 y
+figure sous la ligne d'origine. **C'est la fiche que l'agent lit, donc le risque
+immédiat est levé.** Je signale le prompt maître pour deux raisons, et je ne
+propose pas de le modifier — aucun agent n'en a le droit, et il est la source du
+référentiel :
 
-```
-globs: ["content/**", "src/components/pilou/**", "src/components/enfant/**",
-        "src/app/enfant/**", "src/lib/ai/prompts/**"]
-```
+1. La section 5 du prompt maître est la **consigne de recréation** de
+   `.cursor/agents/` : quiconque rejoue la PHASE 0 dans un dépôt neuf
+   réécrirait la fiche avec la règle révoquée, et l'amendement serait perdu.
+2. `recette-finale` doit vérifier « pour CHAQUE identifiant REQ-xxx » contre ce
+   fichier. Un écart entre le prompt maître et le dépôt doit être **connu d'elle
+   à l'avance**, sans quoi elle le découvrira comme un défaut.
 
-Tant que cette ligne n'est pas modifiée, **la règle qui interdit le texte enfant
-en dur ne couvre aucun fichier** : `src/components/gwenn/**` n'existera jamais.
-Le nom de fichier `content/gwenn-scripts.json` reste, lui, en attente de
-l'humain (ESC-001) : je n'y touche pas, et la première entrée du glob,
-`content/**`, le couvre quel que soit son nom final.
+**Question fermée : l'écart de barème entre `TIPI-PROMPT-CURSOR.md` (§3.7 et
+§5.1) et le dépôt est-il consigné une fois pour toutes dans `GATES.md` comme
+écart connu au prompt maître, ou faut-il ouvrir une escalade humaine pour
+corriger le cahier des charges lui-même ?** Ma recommandation : le consigner
+dans `GATES.md` sous ARB-13, qui le porte déjà, en y ajoutant explicitement les
+deux lignes du prompt maître concernées. Modifier le cahier des charges en cours
+de projet coûterait plus cher que de tracer l'écart, et ARB-13 le trace déjà
+pour tout le reste de la chaîne.

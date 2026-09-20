@@ -173,17 +173,31 @@ BEGIN
   END IF;
 END $$;
 
--- Barème : +1 par étape terminée, +1 quand toutes les étapes programmées du
--- soir le sont (ARB-08, qui remplace le « 2 étapes » en dur de la section 3.7
--- parce qu'une étape vide n'est plus jamais programmée). Dans les deux cas le
--- crédit unitaire vaut 1 : aucun crédit ne dépasse 1.
+-- Barème (ARB-13, qui remplace ARB-08 sur ce point) : **une soirée complète vaut
+-- toujours 3 pierres, quel que soit le nombre d'étapes programmées.**
+--   +1 par étape terminée ;
+--   + (3 − nombre d'étapes programmées) lorsque TOUTES sont terminées.
+-- La section 3.7 du prompt maître écrit « +1 bonus si les 2 étapes du soir sont
+-- terminées » : ARB-13 forfaitise la soirée parce que la pierre récompense le
+-- fait de venir et de finir, jamais le volume de travail (PED-05), et parce
+-- qu'un écart d'une pierre rendait le Soir léger détectable dans le coffre,
+-- contre ARB-06.
+--
+-- CONSÉQUENCE SUR CETTE CONTRAINTE : le bonus vaut 2 sur une soirée à une seule
+-- étape (3 − 1). La borne haute est donc 2, et non 1 comme au tour 2. PED-06
+-- plafonnant les étapes à deux, le bonus n'est jamais négatif ni nul : il vaut
+-- 1 ou 2. La borne basse reste assurée par gem_ledger_delta_positif (ETH-04).
+-- La contrainte est renommée en conséquence : `gem_ledger_delta_max_un` ne
+-- décrirait plus ce qu'elle fait. Le DROP ci-dessous retire l'ancienne si une
+-- base l'a déjà reçue.
+ALTER TABLE public.gem_ledger DROP CONSTRAINT IF EXISTS gem_ledger_delta_max_un;
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname = 'gem_ledger_delta_max_un'
+    SELECT 1 FROM pg_constraint WHERE conname = 'gem_ledger_delta_borne'
   ) THEN
     ALTER TABLE public.gem_ledger
-      ADD CONSTRAINT gem_ledger_delta_max_un CHECK (delta <= 1);
+      ADD CONSTRAINT gem_ledger_delta_borne CHECK (delta BETWEEN 1 AND 2);
   END IF;
 END $$;
 
@@ -390,7 +404,7 @@ END $$;
 -- V4 — les huit contraintes de la partie B existent réellement.
 DO $$
 DECLARE attendues text[] := ARRAY[
-  'gem_ledger_delta_positif', 'gem_ledger_delta_max_un', 'child_gem_balance_positif',
+  'gem_ledger_delta_positif', 'gem_ledger_delta_borne', 'child_gem_balance_positif',
   'settings_access_tentatives_positif', 'reward_threshold_gems_positif',
   'family_retention_audio_bornee', 'session_etape_courante_coherente'];
   c text; manquantes text := '';
@@ -427,6 +441,14 @@ BEGIN
     RAISE EXCEPTION 'ETH-04 VIOLÉE : un delta négatif a été accepté.';
   EXCEPTION WHEN check_violation THEN
     RAISE NOTICE 'V5 OK — delta négatif refusé par la base.';
+  END;
+  -- Borne haute (ARB-13) : le bonus vaut au plus 2 ; 3 doit être refusé.
+  BEGIN
+    INSERT INTO public.gem_ledger (id, child_id, session_id, delta, raison)
+    VALUES (gen_random_uuid(), un_child, un_session, 3, 'bonus_soiree_complete');
+    RAISE EXCEPTION 'ARB-13 VIOLÉE : un delta de 3 a été accepté.';
+  EXCEPTION WHEN check_violation THEN
+    RAISE NOTICE 'V5 OK — delta de 3 refusé par la base (borne 1..2).';
   END;
   RAISE EXCEPTION 'V5 : annulation volontaire de la transaction de test.';
 END $$;

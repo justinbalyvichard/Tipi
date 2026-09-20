@@ -1,3 +1,24 @@
+> ## AMENDEMENTS — à lire avant toute exécution
+>
+> Ce fichier reste la source de vérité. Son texte d'origine n'est **jamais**
+> modifié. Mais certaines de ses règles ont été révoquées en cours de projet, par
+> des arbitrages motivés et tracés dans `docs/agents/GATES.md`. **En cas de
+> conflit, l'arbitrage gagne sur le texte d'origine.**
+>
+> | Ligne d'origine | Où | Révoquée par | Règle opposable |
+> | --- | --- | --- | --- |
+> | « +1 bonus si les 2 étapes du soir sont terminées » | §3.7 | ARB-08, ARB-13 | `+1` par étape terminée, plus un bonus de `3 − nombre d'étapes programmées` lorsque toutes sont terminées. **Une soirée complète vaut toujours 3 pierres.** |
+> | « +1 bonus pour 2 étapes » | §5.1, fiche `tests-unitaires` | ARB-08, ARB-13 | idem. La fiche `.cursor/agents/tests-unitaires.md` porte l'amendement. |
+> | `globs: ["content/**", "src/components/gwenn/**", …]` | §5.2, règle `30-copy-enfant` | — | Le dossier `gwenn` n'existe pas : la mascotte s'appelle Pilou. Glob corrigé dans `.cursor/rules/30-copy-enfant.mdc` pour couvrir les chemins réels, `src/app/bienvenue/**` compris. |
+> | `content/gwenn-scripts.json` | §5.1, fiche `contenu-enfant` | — | **Non tranché.** Nom conservé en attendant la réponse humaine à ESC-001. |
+>
+> **Rejouer la PHASE 0 telle quelle réécrirait les fiches d'agents sur les règles
+> révoquées.** Si la PHASE 0 est rejouée, appliquer ces amendements dans la
+> foulée. Motif : une fiche d'agent est un instrument de mesure, et un
+> instrument calibré sur une règle morte produit des résultats verts et faux —
+> voir `.cursor/rules/40-protocole-agents.mdc`, section « Corriger un instrument
+> de mesure ».
+
 # TIPI — Prompt maître pour Cursor (développement multi-agents autonome)
 
 > **Mode d'emploi**
