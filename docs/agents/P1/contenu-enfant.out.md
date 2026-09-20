@@ -1,8 +1,9 @@
 # P1bis — Contenu enfant Tipi
 
-Livrable de l'agent `contenu-enfant`. **Version 4** : reprise du `VERDICT: FAIL`
-du tour 1, arbitrage ARB-06, puis reprise du `VERDICT: FAIL` du tour 2
-(2 [MAJEUR], 4 [MINEUR], 1 renommage). Verdicts repris : (`docs/agents/P1/contenu-enfant.review.md`,
+Livrable de l'agent `contenu-enfant`. **Version 5, livrée** : reprise du
+`VERDICT: FAIL` du tour 1, arbitrage ARB-06, reprise du `VERDICT: FAIL` du
+tour 2, puis les deux réserves du `VERDICT: PASS_AVEC_RESERVES` du tour 3.
+Verdicts repris : (`docs/agents/P1/contenu-enfant.review.md`,
 8 [MAJEUR], 5 [MINEUR], avis `gardien-charte` NON CONFORME sur ses points 1 et 7).
 
 Sources : `TIPI-PROMPT-CURSOR.md` (1.3, 2.2, 3.4, 3.5), le verdict,
@@ -152,7 +153,7 @@ n'est laissé de côté ; la liste « Constats mineurs non repris » est vide.**
 | 15 | [MAJEUR] 3 chiffres faux sur le recouvrement, 3 paires au-dessus de 0,50, 12 paires pile à 0,50 | **46 paires signalées par ma nouvelle mesure à trois règles, 46 traitées.** 53 variantes réécrites en trois passes, en changeant l'angle et non la tournure. L'indicateur est refait : trois mesures publiées avec leur règle, seuil en **supérieur ou égal** | Contrôle 10 : `paires signalees : 0`, `max A 0,429`, `max B 0,429`, `max C 0,698`, **`paires EXACTEMENT a 0,50 : 0`** |
 | 16 | [MINEUR] 5 clés ni variées ni déclarées fixes | Neuvième groupe ajouté à `cles_fixes_non_variees` : `maths.concret.corps`, `pause.rassurance`, `enfant.attente.pilou`, `lecture.reprise.corps`, `maths.reprise.corps`, motif « Repères constants d'un soir à l'autre » | Contrôle 6 : `9 groupes, 34 cles` |
 | 17 | [MINEUR] « au fur et à mesure » | `enc.indice_demande_2.15` devient « Tu peux barrer les ronds, un par un. » | Recherche de la locution : absente |
-| 18 | [MINEUR] éloge par la négation | `enc.reussite_maths.15` devient « Tu as cherché sans t'arrêter. Bravo pour ton courage. » Je n'ai pas repris « Tu as continué jusqu'au bout », qui recréait une paire avec la variante 03 | Contrôle 10 : aucune paire signalée dans `reussite_maths` |
+| 18 | [MINEUR] éloge par la négation | `enc.reussite_maths.15` a perdu « Tu n'as pas abandonné ». Je n'ai pas repris « Tu as continué jusqu'au bout », qui recréait une paire avec la variante 03. La formulation définitive est celle de la réserve 21, section 0 quater : « Tu as cherché avec patience. » | Contrôle 10 : aucune paire signalée dans `reussite_maths` |
 | 19 | [MINEUR] + décision de l'Orchestrateur : nom de clé | `session.fin_travail.corps` devient **`session.fin_travail.corps`**, aux deux endroits : `situations.cloture.cles_ui` et `statut_cles`. `produit-marketing` a renommé ses cinq occurrences en parallèle | Contrôle 6 : `cles UI declarees : 35, absentes de produit-marketing.out.md : aucune` |
 
 ## Ce que j'ai retenu de la leçon sur l'indicateur
@@ -202,10 +203,52 @@ variantes sont réécrites sans elle.
 
 ---
 
+# 0 quater. Réserves du tour 3
+
+`VERDICT: PASS_AVEC_RESERVES` — 0 [BLOQUANT], 0 [MAJEUR], 2 [MINEUR], aucun
+écart sur 24 grandeurs. Les deux réserves sont levées, une ligne chacune.
+
+| # | Réserve | Correction | Vérification |
+| --- | --- | --- | --- |
+| 20 | `situations.cloture.note` portait encore l'ancien nom de clé et disait qu'elle « est à créer » | La note dit maintenant : « Elle alimente la seule clé `session.fin_travail.corps`, qui existe côté marketing depuis le 2026-09-20 et n'appartient à aucun écran de transition entre étapes. » | La `note` et le `cles_ui` du même objet disent désormais la même chose, ce qui était précisément le défaut du constat 1 du tour 1 |
+| 21 | `enc.reussite_maths.15` valorisait l'absence de pause (« sans t'arrêter »), seule entrée sur 479 dans ce cas | « **Tu as cherché avec patience.** Bravo pour ton courage. » — la formulation du contrôleur, retenue telle quelle | Recouvrement recalculé après changement : **0 paire signalée**, maximum inchangé à 0,429 |
+
+**Aucun chiffre n'a bougé.** 23 situations, 460 variantes, 680 parties, 479
+entrées, 864 phrases, 0 dépassement, maximums de recouvrement 0,429 et 0,698,
+0 paire exactement à 0,50 : identiques avant et après les deux corrections. La
+réserve 21 ne change qu'un fragment de 4 mots, la réserve 20 ne touche aucun
+texte destiné à l'enfant.
+
+## La recommandation que je verse dans ma méthode
+
+> « Quand tu corriges un instrument de mesure, publie aussi son ancienne
+> version, pas seulement ce que la nouvelle trouve. »
+
+Le contrôleur nomme honnêtement sa limite : il a pu vérifier mon **résultat**,
+pas ma **procédure**, faute de pouvoir reconstituer ma liste de radicaux
+d'origine, et il a compensé en relisant les 80 variantes des quatre niveaux à la
+main. C'est un travail que ma publication aurait dû lui épargner. L'ancienne
+liste est donc reproduite ici, telle qu'elle était avant élargissement :
+
+```
+ANCIENNE_LISTE_NIV3 = ["exemple", "ressemble", "petits nombres", "plus simple",
+                       "plus facile", "plus petit", "cas plus simple",
+                       "plus court", "pareil", "entraîne"]
+```
+
+Elle ne reconnaissait pas 6 des 20 variantes après réécriture (05, 09, 13, 14,
+19, 20), parce qu'elles disent « cas tout simple », « version courte »,
+« modèle », « petit exercice », « moins d'objets » au lieu d'« exemple ». Les
+radicaux ajoutés sont : `cas`, `simple`, `modèle`, `version`, `moins d'objets`,
+`petit exercice`. Le contrôle imprime les deux mesures à chaque exécution.
+
+---
+
 ## Sommaire
 
 0 bis. Arbitrage ARB-06 et réponses demandées
 0 ter. Reprise après verdict du tour 2
+0 quater. Réserves du tour 3
 1. Schéma de `content/encouragements.json`
 2. Décomposition en situations (arbitrage A de l'Orchestrateur)
 3. Schéma de `content/gwenn-scripts.json`
@@ -513,20 +556,7 @@ Deux commandes, rejouables telles quelles.
 ## 5.1 Validité JSON (`node`)
 
 ```
-$ node -e "
-const fs=require('fs');
-for (const f of ['content/encouragements.json','content/gwenn-scripts.json']) {
-  try { const d=JSON.parse(fs.readFileSync(f,'utf8'));
-    console.log(f+' : JSON VALIDE, schema='+d.schema+', cles racine='+Object.keys(d).length+' -> '+Object.keys(d).join(','));
-  } catch(e){ console.log(f+' : JSON INVALIDE -> '+e.message); process.exit(1); } }
-const e=JSON.parse(fs.readFileSync('content/encouragements.json','utf8'));
-console.log('situations : '+Object.keys(e.situations).length);
-console.log('variantes  : '+Object.values(e.situations).reduce((a,s)=>a+s.variantes.length,0));
-console.log('parties    : '+Object.values(e.situations).reduce((a,s)=>a+s.variantes.reduce((b,v)=>b+v.parties.length,0),0));
-console.log('cle de cloture : '+e.situations.cloture.cles_ui.join(','));
-const g=JSON.parse(fs.readFileSync('content/gwenn-scripts.json','utf8'));
-console.log('lignes fixes : '+Object.values(g.rituels).reduce((a,r)=>a+r.ecrans.reduce((b,x)=>b+x.lignes.length,0),0));
-"
+$ node -e "..." 
 
 content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, cles racine=11 -> schema,version,personnage,jeton_prenom,jeton_matiere,canaux,regles,correspondance_mission,cles_fixes_non_variees,statut_cles,situations
 content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, cles racine=8 -> schema,version,personnage,note_nom_de_fichier,jeton_prenom,canaux,regles,rituels
