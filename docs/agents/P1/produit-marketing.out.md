@@ -470,7 +470,7 @@ interpolation de nom de matière dans une phrase générique** : « D'abord la
 | Félicitation de transition | l'étape qui vient de finir est les maths | `transition.felicitation.maths` |
 | Annonce de transition | l'étape suivante est les maths | `transition.annonce.maths` |
 | Annonce de transition | l'étape suivante est la lecture | `transition.annonce.lecture` |
-| Passage vers la clôture | aucune étape ne suit, quelle que soit la configuration C1 à C6 | `transition.cloture.corps` |
+| Passage vers la clôture | aucune étape ne suit, quelle que soit la configuration C1 à C6 | `session.fin_travail.corps` |
 | Étape vide, suite existante | une autre étape suit | `lecture.vide.corps_2.suite` ou `maths.vide.corps_2.suite` |
 | Étape vide, pas de suite | c'était la dernière étape | `lecture.vide.corps_2.fin` ou `maths.vide.corps_2.fin` |
 
@@ -982,11 +982,18 @@ que soit le nombre d'étapes. C'est le moment où Pilou félicite l'enfant du
 travail du soir, juste **avant** d'entrer dans le rituel de fermeture invariant
 de `/enfant/bravo`.
 
+**Pourquoi la famille `session.*` et non `transition.*`** : partout ailleurs,
+`transition.*` signifie « une étape suit ». Ici, aucune étape ne suit — le rituel
+de fermeture n'est pas une étape. Le préfixe `transition.` mentirait sur le sens.
+Cette clé rejoint donc `session.pause.bouton` et `session.sortie_parent.*`, la
+famille des textes qui appartiennent à la session entière et non à un écran
+d'étape particulier.
+
 | Clé | Texte | Mode |
 | --- | --- | --- |
-| `transition.cloture.corps` | « Tu as bien travaillé. Viens avec moi. » | les_deux |
+| `session.fin_travail.corps` | « Tu as bien travaillé. Viens avec moi. » | les_deux |
 
-**Clé variée, à ne jamais câbler en dur** : `transition.cloture.corps` est
+**Clé variée, à ne jamais câbler en dur** : `session.fin_travail.corps` est
 alimentée par les 20 variantes de la situation `cloture` de
 `content/encouragements.json` (PED-11). Le texte ci-dessus est la **variante
 canonique**, qui sert de référence de ton aux dix-neuf autres, pas une chaîne
@@ -1003,7 +1010,7 @@ après.
 | Ordre | Ce qui se joue | Clé | Varié ? |
 | --- | --- | --- | --- |
 | 1 | Retour de la dernière étape | `lecture.retour.effort` ou `maths.fini.retour` | varié |
-| 2 | Passage vers la clôture | `transition.cloture.corps` | varié |
+| 2 | Passage vers la clôture | `session.fin_travail.corps` | varié |
 | 3 à 7 | Rituel de fermeture | `bravo.titre` à `bravo.fin`, puis les deux boutons | **invariant** |
 
 Dans une soirée à deux étapes, l'enchaînement 1-2-3 ne se joue qu'à la fin de la
@@ -1099,7 +1106,7 @@ le texte, le bouton « Je reviens » reste actif. Aucun message technique.
 les mêmes** chaque soir, quelle que soit la soirée. Aucune variation selon la
 performance. Aucune incitation à recommencer pour faire mieux (PRD-11).
 
-**Ce qui précède cet écran** : `transition.cloture.corps`, jouée à la fin de la
+**Ce qui précède cet écran** : `session.fin_travail.corps`, jouée à la fin de la
 dernière étape (voir 7.6, passage vers la clôture). C'est la dernière phrase
 variable de la soirée. **Aucune des cinq phrases ci-dessous n'est variée** :
 elles ne sont alimentées par aucune banque de phrases, sous peine de casser
