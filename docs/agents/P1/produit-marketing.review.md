@@ -1,6 +1,421 @@
 VERDICT: PASS_AVEC_RESERVES
 
-# Contrôle de `docs/agents/P1/produit-marketing.out.md` — tour 2
+# Tour 3 — passe ciblée de fermeture
+
+Contrôleur : `controle-produit` (lecture seule). Producteur : `produit-marketing`.
+Tour 3 sur 3. Passe ciblée demandée par l'Orchestrateur sur quatre points, pas une
+relecture complète : je n'ai donc pas rejoué le contrôle intégral du tour 2, et ce
+verdict s'appuie sur lui pour tout ce qui n'est pas listé ici.
+
+Relevé du tour 3 : **0 [BLOQUANT], 0 [MAJEUR], 2 [MINEUR]** → la règle « un seul
+BLOQUANT ou MAJEUR impose FAIL » ne s'applique pas.
+
+**Les trois [MINEUR] du tour 2 sont fermés, tous les trois.** Les deux réserves
+ci-dessous sont nouvelles, mineures, et **aucune ne justifie un quatrième tour**.
+L'une des deux n'est même pas du ressort du producteur : elle demande un arbitrage
+de l'Orchestrateur au niveau de la phase P1, parce qu'elle oppose deux livrables.
+
+Je ne rends pas `PASS` sec, et je veux être précis sur la raison, puisque tu as
+demandé de la franchise plutôt qu'une porte ouverte par politesse : ce n'est pas
+que le travail soit inachevé, c'est qu'il reste deux points nommés et cités, dont
+un que tu as toi-même repéré. Les inscrire au verdict les rend opposables à G1
+plutôt que de les laisser se perdre. **G1 peut s'ouvrir avec ces deux réserves
+portées au suivi** ; elles n'entament ni les textes enfant, ni la couverture des
+exigences, ni la checklist éthique.
+
+---
+
+## Point 1 — T2-1 : la contradiction est fermée, pas déplacée
+
+Nouveau texte, lignes 95 à 99 :
+
+> **Preuve de la promesse** : deux étapes maximum par soir quel que soit le volume
+> de devoirs (PED-06), une pause toujours accessible et toujours gratuite
+> (PRD-12), et aucun chiffre de performance montré à l'enfant (PED-07) — les seuls
+> nombres qu'il voit sont les trois nombres d'inventaire de pierres du coffre,
+> énumérés en 7.9, qui ne mesurent pas l'enfant et ne baissent jamais.
+
+**Fermée.** La phrase ne se contente pas d'ajouter « de performance » : elle nomme
+la règle de 7.9, en rappelle les deux critères — ne mesure pas l'enfant, ne baisse
+jamais — et renvoie à l'endroit qui fait foi. 1.1 et 7.9 disent maintenant la même
+chose.
+
+**Et elle n'est pas déplacée** : j'ai cherché toute autre affirmation générale sur
+les chiffres dans le document. Il en reste deux, et les deux sont justes parce
+qu'elles sont bornées à un écran : ligne 1009, « Aucun chiffre, aucun nombre de
+cycles affiché » porte sur `/enfant/pause` ; ligne 1065, « **Aucun chiffre n'est
+affiché** sur cet écran » porte sur `/enfant/bravo`. Aucune des deux n'est une
+affirmation valant pour toute l'application. Il ne subsiste aucune formulation
+générale contredisant 7.9 (annexe I).
+
+## Point 2 — T2-2 : la clé existe et le renvoi pointe juste
+
+Clé ajoutée, ligne 1586, dans la sous-page Paliers de 7.14, en deuxième position
+juste sous `reglages.paliers.corps` :
+
+`` | `reglages.paliers.solde` | « Evan a {n} pierres aujourd'hui. » | ``
+
+Renvoi corrigé, lignes 1388 à 1390 :
+
+> Le parent qui veut le solde exact le lit dans `/reglages`, sous-page Paliers, via
+> la clé `reglages.paliers.solde`, hors du résumé du soir.
+
+**Vérifié, les deux moitiés tiennent.** La clé est bien dans la bonne sous-page, et
+le renvoi la nomme explicitement au lieu de pointer une page au hasard. Le
+producteur a choisi d'ajouter la clé plutôt que de couper le renvoi, ce qui était la
+meilleure des deux branches que j'avais laissées : le parent garde un endroit où
+lire le solde, et le résumé du soir reste sans aucun chiffre, donc PRD-06 reste
+couverte à la lettre.
+
+Un mot sur la formulation : « aujourd'hui » est juste. Il dit que le nombre est un
+état du jour et non un cumul de performance, et il évite la lecture comparative d'un
+soir sur l'autre que le reste du produit refuse.
+
+## Point 3 — T2-3 et son extension : l'extension est saine, avec une réserve
+
+`coffre.palier.titre` est devenu « Où tu en es » (ligne 1144, mode `affiche`). Le
+mot « palier » a disparu des trois chaînes enfant. J'ai vérifié mécaniquement en
+ajoutant « palier » à ma liste de termes interdits : **0 occurrence dans les 161
+chaînes enfant** (annexe C). Le mot ne subsiste que dans les noms de clés
+`coffre.palier.*`, qui sont des identifiants techniques jamais lus ni affichés,
+dans la colonne d'explication du tableau des trois nombres, qui est de la
+documentation pour contrôleurs, et dans les écrans parent, où il est à sa place.
+
+**Le raisonnement du producteur est juste, et l'extension est saine.** Mon constat
+ne citait que `coffre.palier.titre` parce que c'était la chaîne que j'avais relevée,
+mais le défaut était le mot, pas la chaîne. Corriger le seul titre cité aurait laissé
+« palier » dans `coffre.palier.atteint`, qui est en `dit_affiche` — donc **prononcée
+à voix haute par Pilou**, ce qui est pire qu'un libellé affiché. Un contrôleur qui
+s'en tient littéralement au constat cité fabrique ce genre de correction à moitié.
+Le producteur a vu plus loin que mon constat, l'a signalé de lui-même et a proposé le
+backlog en cas de refus : c'est exactement la bonne façon d'étendre un périmètre.
+
+Les deux nouvelles chaînes, examinées une par une :
+
+- `coffre.palier.atteint` « Ça y est. Tu y es arrivé. » — **tient la charte.** Deux
+  phrases, 6 mots, une idée chacune, vocabulaire de CE1, aucune ironie. Elle salue
+  un aboutissement obtenu en faisant ses devoirs soir après soir, pas un résultat
+  d'exercice : les pierres sont créditées par étape terminée et jamais par bonne
+  réponse (barème de 3.7, PED-05). Ce n'est donc pas un éloge du résultat au sens
+  de la charte. Une seule remarque de fond, traitée au constat T3-1 : « arrivé »
+  porte un accord au masculin.
+- `coffre.palier.vide` « Il n'y a rien à atteindre pour l'instant. » — **réserve,
+  voir le constat T3-2.** Tu m'as demandé de le dire si je le pensais : je le pense.
+
+## Point 4 — le prénom en dur : c'est un constat, [MINEUR], et il ne vise pas cette clé
+
+Tu as raison de le relever, et ma mesure confirme la divergence — mais elle montre
+aussi qu'elle ne commence pas avec `reglages.paliers.solde`.
+
+Compté par moi (annexes E et F) : dans `produit-marketing.out.md`, **31 lignes**
+portent « Evan » à l'intérieur d'une chaîne livrée, dont environ 25 sont de vraies
+chaînes d'interface — « Bonsoir Evan. », « Bravo Evan. », « La soirée d'Evan »,
+« Profil d'Evan », « Passez le téléphone à Evan. », « Arrêter la session d'Evan »,
+« Il n'est jamais montré à Evan. » — et **0 occurrence du jeton `{prenom}`**. Dans
+`content/`, l'inverse exactement : `encouragements.json` et `gwenn-scripts.json`
+totalisent **25 occurrences de `{prenom}` et 0 « Evan » en dur**.
+
+Nuance de mesure, que je signale pour que le chiffre ne circule pas déformé : tu
+annonces « 339 entrées » employant `{prenom}`. Ce que je mesure, ce sont 25
+occurrences du jeton réparties dans les deux fichiers, pas une par entrée. Le fait
+qui compte n'en est pas changé, et il est même plus net : **`contenu-enfant` ne code
+jamais le prénom en dur, `produit-marketing` le code toujours en dur.** Chaque
+document est cohérent avec lui-même, et les deux sont exactement opposés.
+
+**Qualification : [MINEUR], et le constat ne porte pas sur la clé nouvelle.**
+Voici pourquoi je ne le monte pas en [MAJEUR], puisque tu me demandes de le
+qualifier et qu'un [MAJEUR] déclencherait l'escalade au tour 3 sur 3.
+
+1. **Aucune exigence n'est violée.** PRD-02 interdit de coder en dur *l'âge*, pas le
+   prénom, et le livrable respecte ce point à la lettre. La contrainte multi-enfants
+   de la section 1.2 du prompt maître porte sur le **schéma de données**, qui est
+   traité en 3.7 et relève de P2, pas sur la copie.
+2. **`reglages.paliers.solde` n'est pas une régression.** Elle suit la convention
+   que ce livrable applique depuis le tour 1 dans 25 chaînes, que j'ai contrôlée
+   deux fois sans la relever. La sanctionner sur cette clé serait déplacer les
+   poteaux après coup, et ferait corriger une chaîne sur vingt-cinq.
+3. **Le coût de correction est faible et n'est pas structurel.** Ces textes vivent
+   dans `content/*.json`, jamais en dur dans un composant (règle de 6.1). Passer à
+   `{prenom}` est un remplacement dans des fichiers de contenu plus une
+   interpolation dans le rendu. Ce n'est pas une refonte.
+
+**Mais c'en est bien un, et il t'appartient**, pas au producteur seul : deux sources
+de la même phase donnent deux conventions opposées aux verticales V6, V7 et V8, qui
+liront les deux. Le risque concret n'est pas le prénom, c'est qu'un développeur
+tranche seul, différemment selon la verticale, et qu'on se retrouve avec les deux
+formes dans les mêmes fichiers de contenu.
+
+---
+
+## Constats du tour 3
+
+### T3-1. [MINEUR] — Deux livrables de P1 donnent deux conventions opposées pour le prénom de l'enfant, et une chaîne enfant porte en plus un accord de genre figé
+
+Chaînes concernées dans ce livrable, entre autres, toutes mesurées en annexe E :
+
+- ligne 1586 : `` `reglages.paliers.solde` | « Evan a {n} pierres aujourd'hui. » ``
+- ligne 553 : `` `enfant.accueil.titre` | « Bonsoir Evan. » ``
+- ligne 1040 : `` `bravo.titre` | « Bravo Evan. » ``
+- ligne 1397 : `` `parent.resume.titre` | « La soirée d'Evan » ``
+
+Face à `content/encouragements.json` et `content/gwenn-scripts.json`, qui emploient
+`{prenom}` 25 fois et ne codent jamais le prénom en dur.
+
+**Second volet, même racine** : la chaîne enfant `coffre.palier.atteint` « Ça y est.
+Tu y es arrivé. » (ligne 1146) porte un participe accordé au masculin. Le prénom se
+remplace par un jeton ; un accord de genre figé dans la phrase, non. C'est la seule
+chaîne enfant nouvelle du tour 3 dans ce cas, et c'est le moment de la traiter.
+
+**Correction attendue**, en deux temps et sans urgence :
+
+1. Une ligne de convention en section 6 du livrable, tranchée par l'Orchestrateur
+   pour toute la phase P1 : soit `{prenom}` partout, y compris dans
+   `produit-marketing.out.md`, soit le prénom littéral partout, y compris dans
+   `content/*.json`. Je recommande `{prenom}`, pour trois raisons : c'est la forme
+   qui survit au multi-enfants annoncé en 1.2 du prompt maître, c'est celle du
+   livrable qui contient le plus de chaînes, et le mouvement inverse ferait perdre
+   une information qu'on ne pourrait pas retrouver automatiquement.
+2. Indépendamment de cet arbitrage, rendre `coffre.palier.atteint` insensible au
+   genre : « Ça y est. C'est bon. » ou « Ça y est. Tu l'as fait. ». Les deux font
+   4 mots, restent en CE1 et gardent le ton de la chaîne d'origine.
+
+### T3-2. [MINEUR] — « Il n'y a rien à atteindre pour l'instant. » est une formulation en creux, en tension avec une règle que le livrable pose lui-même
+
+Texte concerné, ligne 1186 :
+
+`` | `coffre.palier.vide` | « Il n'y a rien à atteindre pour l'instant. » | dit_affiche ``
+
+Tu m'as demandé de trancher franchement, alors je tranche : oui, la formulation est
+en creux, et elle l'est un peu plus que celle qu'elle remplace.
+
+Ce n'est **pas** un reproche au sens de la charte : la phrase ne prend pas l'enfant
+pour sujet, elle décrit un état de l'application, et la charte n'est donc pas en
+défaut. C'est pour cela que le constat est mineur et que mon avis `gardien-charte`
+reste conforme.
+
+Mais elle est dite à voix haute par Pilou, et « rien à atteindre » pose d'abord
+l'idée qu'il y aurait normalement quelque chose à atteindre, puis constate qu'il n'y
+a rien. Pour un enfant de six ans et demi, c'est une absence signalée qu'il n'a pas
+demandée et sur laquelle il ne peut rien : le palier dépend entièrement d'une
+décision d'adulte. Or le livrable écrit lui-même, juste sous cette chaîne,
+« **Aucune incitation à demander un palier au parent.** » L'intention est la bonne,
+et la formulation travaille contre elle : la meilleure façon de ne pas inciter
+l'enfant à réclamer un palier est de ne pas lui apprendre qu'il en manque un.
+
+La chaîne suivante, `coffre.palier.vide_2` « Tes pierres s'accumulent. C'est bien. »,
+répare bien le propos. La question est de savoir pourquoi il faut le réparer.
+
+**Correction attendue** : supprimer la première chaîne et ne garder que la seconde,
+l'état vide se réduisant alors à « Tes pierres s'accumulent. C'est bien. » ; ou, si
+une première phrase est jugée nécessaire pour ouvrir l'écran, remplacer par une
+formulation purement positive qui ne nomme aucune absence, par exemple « Tes pierres
+t'attendent ici. » ou « Ici, tu gardes tes pierres. ». Dans les deux cas, plus aucune
+phrase ne dit à l'enfant ce qui n'existe pas.
+
+---
+
+# AVIS gardien-charte — tour 3
+
+Passe restreinte aux trois chaînes enfant modifiées au tour 3, les seules qui
+touchent des textes vus ou entendus par l'enfant. Le reste des textes enfant est
+inchangé depuis le tour 2, où l'avis était déjà conforme.
+
+**1. Ton — effort valorisé, jamais le résultat seul, aucune formulation lisible comme un reproche.**
+Conforme. « Ça y est. Tu y es arrivé. » salue un aboutissement construit soir après
+soir, jamais un résultat d'exercice : les pierres se gagnent par étape terminée et
+jamais par bonne réponse. « Où tu en es » est un repère neutre. « Il n'y a rien à
+atteindre pour l'instant. » ne prend pas l'enfant pour sujet et ne lui reproche rien ;
+c'est un état de l'application. Réserve de formulation consignée au constat T3-2.
+
+**2. Interdits absolus.** Conforme. 0 occurrence sur 161 chaînes, liste élargie à
+« palier » pour ce tour. Aucune comparaison, aucune ironie, aucun équivalent de
+« c'est faux ».
+
+**3. Charge — une idée par phrase, 12 mots maximum, vocabulaire de CE1.**
+Conforme, et **la réserve du tour 2 est levée** : « palier » ne figure plus dans
+aucune chaîne enfant. « Où tu en es » fait 4 mots, « Ça y est. Tu y es arrivé. » deux
+phrases de 3 mots, « Il n'y a rien à atteindre pour l'instant. » 8 mots et une seule
+idée. Le maximum du document reste à 10 mots.
+
+**4. Pression.** Conforme, inchangé. Toujours exactement trois nombres devant
+l'enfant, tous dans `/enfant/coffre`, vérifié ce tour-ci (annexe D). Aucun chrono,
+aucun décompte, aucun compteur.
+
+**5. Récompense.** Conforme, inchangé. L'écran du coffre ne montre toujours aucun
+texte libre saisi par le parent, et `coffre.palier.maison` reste affichée et dite.
+Le changement de libellé ne rouvre rien : « Où tu en es » ne promet pas davantage
+que « Le prochain palier ».
+
+**6. Maths.** Conforme, inchangé, aucune chaîne de 7.6 touchée.
+
+**7. Autonomie.** Conforme, inchangé.
+
+AVIS: CONFORME
+
+Aucun passage fautif à citer. Une réserve, consignée et non bloquante :
+
+- Réserve, ligne 1186 : `` `coffre.palier.vide` | « Il n'y a rien à atteindre pour l'instant. » | dit_affiche ``
+  Reformulation proposée : supprimer la chaîne et laisser
+  `coffre.palier.vide_2` — « Tes pierres s'accumulent. C'est bien. » — ouvrir l'état
+  vide ; ou la remplacer par « Tes pierres t'attendent ici. ».
+
+Pour mémoire, la réserve du tour 2 — le mot « palier » dans une chaîne enfant — est
+**levée**.
+
+---
+
+# Annexes — sorties réelles des commandes du tour 3
+
+Commandes exécutées par `controle-produit` sur la version du jour de
+`/home/user/Tipi/docs/agents/P1/produit-marketing.out.md`. Sorties collées telles
+quelles, aucune reprise des chiffres du producteur, aucune reprise des annexes des
+tours précédents.
+
+## Annexe I — Contrôles mécaniques du tour 3
+
+Liste de termes interdits élargie à « palier » pour ce tour, comme demandé.
+
+```
+=== A. PICTOGRAMMES ===
+EXIT=1 (1 = aucune correspondance)
+
+=== B. CHAINES ENFANT ===
+Chaines enfant extraites : 161
+Phrases enfant de plus de 12 mots : 0
+Longueur maximale observee : 10 mots
+
+=== C. VOCABULAIRE INTERDIT, AVEC 'palier' AJOUTE ===
+Occurrences dans les chaines enfant : 0
+
+=== D. NOMBRES DEVANT L'ENFANT ===
+  L1133  section 7.9   `coffre.solde.valeur`              {n}
+  L1145  section 7.9   `coffre.palier.reste`              Encore {n} pierres.
+  L1197  section 7.9   `coffre.cosmetiques.verrouille`    Il faut {n} pierres pour celui-là.
+Total : 3
+```
+
+Les cinq chiffres annoncés par le producteur — 0, 161, 0, 0 et 3 toutes en 7.9 —
+sont donc exacts, recalculés et non repris. Deuxième tour consécutif sans écart.
+
+Affirmations générales restantes sur les chiffres, pour vérifier que la
+contradiction du tour 2 n'a pas été déplacée :
+
+```
+97:(PRD-12), et aucun chiffre de performance montré à l'enfant (PED-07) — les seuls
+1009:Aucun chiffre, aucun nombre de cycles affiché, aucune barre. Son
+1065:image, avec `son_pierre` une seule fois. **Aucun chiffre n'est affiché** sur cet
+```
+
+La ligne 97 est la correction de T2-1. Les lignes 1009 et 1065 sont bornées
+respectivement à `/enfant/pause` et à `/enfant/bravo` et restent vraies.
+
+## Annexe J — Convention du prénom, les deux livrables de P1
+
+```
+=== E. PRENOM EN DUR DANS CE LIVRABLE ===
+Lignes contenant 'Evan' a l'interieur d'une chaine livree : 31
+  L48    Evan a {n} pierres aujourd'hui.
+  L197   Evan
+  L553   Bonsoir Evan.
+  L558   Bonsoir Evan. Je suis contente de te voir.
+  L564   Te revoilà, Evan.
+  L1040  Bravo Evan.
+  L1264  Ouvrir Tipi à Evan
+  L1344  Passez le téléphone à Evan. Pilou prend le relais.
+  L1397  La soirée d'Evan
+  L1411  Evan a lu le texte en entier, sans s'arrêter longtemps.
+  L1412  Evan a buté sur quelques mots. Ils sont listés ci-dessous, si vous voulez les revoir.
+  L1413  Evan a demandé de l'aide sur les maths. Pilou l'a guidé sans donner les réponses.
+  L1414  Evan a fait les maths seul, sans demander d'indice.
+  L1415  Evan a fait une pause. Il est revenu ensuite.
+  L1418  Le texte en breton a été lu par Evan seul. Pilou ne le corrige pas.
+  L1434  Evan a ouvert Tipi. Il n'y avait rien à faire.
+  L1464  Ce code protège les réglages. Il n'est pas demandé à Evan.
+  L1511  Arrêter la session d'Evan
+  L1532  Profil d'Evan
+  L1542  Profil d'Evan
+  L1546  Profil d'Evan
+  L1586  Evan a {n} pierres aujourd'hui.
+  L1591  Ce texte reste ici. Il n'est pas affiché à Evan.
+  L1637  Le déroulé des séances, pour reprendre là où Evan s'est arrêté.
+  L1639  Le texte des devoirs est analysé par un service d'intelligence artificielle. Le prénom d'Evan et les photos ne lui sont jamais envoyés.
+  L1669  Le code protège les réglages. Il n'est jamais montré à Evan.
+  L1690  Tipi accompagne Evan dans ses devoirs du soir.
+  L1720  La séance d'Evan est terminée.
+  L1723  Evan a ouvert Tipi. Il n'y avait rien à faire.
+  L1729  Evan n'a pas fait ses devoirs ce soir
+  L1732  Evan vous attend
+
+=== F. JETON {prenom} DANS CE LIVRABLE ===
+Occurrences de {prenom} : 0
+```
+
+Sur ces 31 lignes, quatre ne sont pas des chaînes d'interface : la ligne 48
+appartient au tableau de reprise, la ligne 197 à la table des interdits de
+vocabulaire, les lignes 1729 et 1732 à la liste des notifications **interdites**.
+Restent environ 27 chaînes réellement livrées, toutes avec le prénom en dur.
+
+Convention de l'autre livrable de la même phase, mesurée et non reprise :
+
+```
+encouragements.json                             {prenom}: 22    'Evan' en dur: 0
+gwenn-scripts.json                              {prenom}: 3     'Evan' en dur: 0
+```
+
+Les deux fichiers de contenu parsent sans erreur — c'est une observation de passage,
+leur contrôle appartient à la passe P1bis et non à ce verdict.
+
+## Annexe K — Les trois corrections du tour 3, vérifiées sur pièce
+
+```
+=== T2-2 : cle solde dans la sous-page Paliers ===
+1388:la même raison de lecture comparative. Le parent qui veut le solde exact le lit
+1389:dans `/reglages`, sous-page Paliers, via la clé `reglages.paliers.solde`, hors du
+1586:| `reglages.paliers.solde` | « Evan a {n} pierres aujourd'hui. » |
+
+=== T2-3 : les trois chaines palier ===
+1144:| `coffre.palier.titre` | « Où tu en es » | affiche |
+1145:| `coffre.palier.reste` | « Encore {n} pierres. » | dit_affiche |
+1146:| `coffre.palier.atteint` | « Ça y est. Tu y es arrivé. » | dit_affiche |
+1147:| `coffre.palier.maison` | « Je garde tes pierres. Le reste se décide à la maison. » | dit_affiche |
+1186:| `coffre.palier.vide` | « Il n'y a rien à atteindre pour l'instant. » | dit_affiche |
+1187:| `coffre.palier.vide_2` | « Tes pierres s'accumulent. C'est bien. » | dit_affiche |
+```
+
+## Annexe L — Portée et limites de ce tour
+
+Passe **ciblée**, à la demande de l'Orchestrateur. Je n'ai pas relu le livrable en
+entier ce tour-ci et je ne prétends pas l'avoir fait : j'ai lu les passages modifiés,
+leurs sections d'accueil, et rejoué les contrôles mécaniques que ces modifications
+pouvaient déplacer. Tout ce qui a été établi au tour 2 — 14 routes rédigées,
+couverture des 23 exigences, six configurations C1 à C6, checklist 6/6/5/6/7 et 8
+items de ton — n'a pas été recontrôlé ici et reste acquis sur la foi du tour 2.
+
+`content/encouragements.json` et `content/gwenn-scripts.json` restent hors du
+périmètre de ce verdict : ils relèvent de P1bis. Je ne les ai ouverts que pour
+mesurer la convention de prénom, à la demande de l'Orchestrateur.
+
+Aucun fichier du produit n'a été écrit ni modifié. Aucun commit git.
+
+---
+
+# Historique — tour 2
+
+Verdict du tour 2 : **PASS_AVEC_RESERVES**, 0 [BLOQUANT], 0 [MAJEUR], 3 [MINEUR].
+Avis `gardien-charte` du tour 2 : **CONFORME**, avec une réserve sur le mot
+« palier », levée au tour 3.
+
+Sort des trois [MINEUR] du tour 2, tranché au tour 3 :
+
+| # | Constat du tour 2 | Sort au tour 3 |
+| --- | --- | --- |
+| T2-1 | La section 1.1 affirmait « aucun chiffre montré à l'enfant », en contradiction avec 7.9 qui en admet trois | **Fermé.** 1.1 dit « aucun chiffre de performance » et renvoie nommément aux trois nombres d'inventaire de 7.9. Vérifié non déplacé : les deux autres affirmations restantes sont bornées à un écran et restent vraies |
+| T2-2 | Le résumé parent renvoyait vers une sous-page Paliers qui n'affichait pas le solde | **Fermé.** `reglages.paliers.solde` ajoutée dans la bonne sous-page, et le renvoi de 7.12 la nomme. Le producteur a ajouté la clé plutôt que de couper le renvoi |
+| T2-3 | « Le prochain palier » employait un mot hors vocabulaire CE1 | **Fermé, et au-delà.** « Où tu en es », plus retrait du mot de `coffre.palier.atteint` et `coffre.palier.vide`. 0 occurrence de « palier » dans les 161 chaînes enfant. Extension jugée saine : le défaut était le mot, pas la chaîne citée |
+
+Le texte intégral du verdict du tour 2 suit, conservé tel qu'il a été rendu.
+
+## Contrôle de `docs/agents/P1/produit-marketing.out.md` — tour 2, texte d'origine
 
 Contrôleur : `controle-produit` (lecture seule). Producteur : `produit-marketing`.
 Tour 2 sur 3. Le livrable est passé de 1654 à 1904 lignes.
