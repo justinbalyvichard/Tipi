@@ -1,0 +1,38 @@
+---
+description: Règles de rédaction des textes destinés à l'enfant et des prompts IA
+globs: ["content/**", "src/components/gwenn/**", "src/lib/ai/prompts/**"]
+---
+
+# Rédaction pour un CE1
+
+Public : Evan, 6 ans et demi, CE1, fatigué en fin de journée.
+
+## Règles de rédaction
+
+- Une idée par phrase, **12 mots maximum** par phrase.
+- Vocabulaire de CE1, présent de l'indicatif, pas de subordonnées complexes.
+- Toute information importante est doublée à l'oral par Pilou, jamais seulement
+  écrite (PED-10).
+- Toujours valoriser l'effort et l'essai, jamais uniquement le résultat juste
+  (PED-05).
+
+## Interdits de vocabulaire
+
+- « c'est faux », « erreur », « tu t'es trompé », « essaie de faire mieux »
+- toute comparaison à un autre enfant
+- toute ironie, tout second degré
+- le prénom du parent
+- toute promesse de récompense réelle donnée par l'application
+- tout chrono, décompte, score chiffré ou compteur d'erreurs
+- **aucun emoji**
+
+## Obligations
+
+- **Aucun texte destiné à l'utilisateur n'est écrit en dur dans un composant.**
+  Tout passe par les fichiers de contenu (`content/encouragements.json`,
+  `content/gwenn-scripts.json`).
+- Au minimum **20 variantes par situation** dans la banque de phrases (PED-11).
+- **Tout nouveau texte destiné à l'enfant est visé par `gardien-charte` avant
+  d'être considéré comme livré.** Aucune exception.
+- Prompts IA : aucun prompt ne peut conduire Pilou à donner le résultat d'un
+  calcul (PED-01), ni contenir une donnée identifiante de l'enfant (SEC-04).

@@ -1,0 +1,62 @@
+---
+description: Protocole de collaboration entre agents Tipi (version courte)
+alwaysApply: true
+---
+
+# Protocole agents — version courte
+
+## Handoff
+
+Chaque producteur écrit `docs/agents/<PHASE>/<livrable>.out.md`.
+Chaque contrôleur écrit `docs/agents/<PHASE>/<livrable>.review.md`.
+Rien ne se transmet de mémoire : un agent qui a besoin du travail d'un autre
+**lit son fichier**.
+
+## Format de verdict
+
+Ligne 1 : `VERDICT: PASS` ou `PASS_AVEC_RESERVES` ou `FAIL`.
+Puis une liste numérotée, chaque constat préfixé `[BLOQUANT]`, `[MAJEUR]` ou
+`[MINEUR]`, avec citation exacte et correction attendue.
+
+Un seul `[BLOQUANT]` ou `[MAJEUR]` impose `FAIL`. Les `[MINEUR]` n'empêchent pas
+la porte de s'ouvrir mais partent dans `BACKLOG-V2.md`.
+
+## Preuve de travail
+
+Aucune affirmation de fonctionnement n'est recevable sans la **sortie réelle de
+la commande, collée dans le rapport**. Le contrôleur rejoue la commande
+lui-même : s'il ne reproduit pas, le verdict est `FAIL`. Un agent qui invente
+une sortie de commande est une faute grave du système : le contrôleur le
+signale explicitement dans son verdict.
+
+## Boucle et escalade
+
+Trois allers-retours producteur/contrôleur maximum par porte. Au troisième
+`FAIL`, l'Orchestrateur écrit dans `docs/agents/ESCALADE.md` : la porte
+concernée, le désaccord en trois lignes, les options envisagées avec leurs
+conséquences, et **une question fermée** à l'humain. Puis il s'arrête sur cette
+phase et continue les phases indépendantes.
+
+## Portes
+
+`docs/agents/GATES.md` : porte, phase, statut (`ouverte`, `en cours`, `verte`,
+`bloquée`), date, lien vers le verdict. **L'Orchestrateur est seul à le mettre à
+jour.** Une phase ne démarre jamais si sa porte amont n'est pas verte.
+
+## Traçabilité
+
+`docs/agents/TRACEABILITY.md` : une ligne par identifiant `REQ-xxx` — identifiant,
+intitulé court, fichiers d'implémentation, tests qui le couvrent, statut. Mis à
+jour à chaque fin de verticale, vérifié intégralement par `recette-finale`.
+
+## Périmètre
+
+Toute idée hors référentiel va dans `docs/agents/BACKLOG-V2.md` avec une ligne
+de justification. **Aucun agent ne code une idée non tracée, même bonne.**
+
+## Les trois règles absolues
+
+1. Aucun travail n'est considéré comme fait sans contrôle par un autre agent.
+   Le producteur ne valide jamais son propre travail.
+2. Aucune affirmation sans preuve.
+3. Aucun développement hors périmètre.

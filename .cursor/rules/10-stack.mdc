@@ -1,0 +1,33 @@
+---
+description: Stack technique imposée de Tipi et interdits de code
+alwaysApply: true
+---
+
+# Stack Tipi
+
+- **Next.js 14 App Router**, **TypeScript strict**, **Tailwind CSS**, **pnpm**.
+- **Supabase** (Postgres + Storage), projet en région UE.
+- **Prisma** comme ORM.
+- **Zustand** pour l'état de session, **TanStack Query** pour les données serveur.
+- **Vitest** + Testing Library + msw pour les tests unitaires et d'intégration.
+- **Playwright** pour la recette bout en bout.
+- **Zod** pour toute validation d'entrée externe.
+
+Aucune dépendance supplémentaire sans exigence `REQ-xxx` qui la justifie.
+
+## Interdits de code
+
+- `any`
+- `@ts-ignore`
+- `console.log` résiduel
+- secret ou clé d'API atteignable côté client
+- texte utilisateur en dur dans un composant (tout vient de `content/**`)
+- couleur en dur (tout passe par les tokens de thème)
+
+## Convention de commit
+
+```
+type(portée): sujet [agent:nom]
+```
+
+Exemple : `feat(session): machine à états persistée [agent:dev-feature]`

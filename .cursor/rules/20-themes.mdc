@@ -1,0 +1,66 @@
+---
+description: Tokens des deux thèmes Tipi et règles visuelles
+globs: ["src/components/**", "src/app/**", "src/styles/**"]
+---
+
+# Thèmes Tipi
+
+Les deux thèmes sont des **jeux de variables CSS commutables à chaud**, pas deux
+arborescences de composants. Le thème actif est porté par un attribut sur
+`<html>`.
+
+## Thème « Pilou »
+
+| Rôle | Valeur |
+| --- | --- |
+| fond | `#FFF8EE` |
+| surface | `#FFFFFF` |
+| encre | `#2E2A26` |
+| texte secondaire | `#6B6459` |
+| texte discret | `#8A8074` |
+| ligne | `#EDE6D8` |
+| pointillé | `#D8CCB8` |
+| accent bleu | `#6FB8E8` |
+| accent corail | `#FF8B7B` |
+| accent menthe | `#8FE3C0` |
+| accent jaune | `#FFD166` |
+| teinte bleu | `#E8F4FC` |
+| teinte corail | `#FFEFE0` |
+| teinte jaune | `#FFF3D6` |
+| teinte menthe | `#E9F9F0` |
+
+Rayons : carte 18–22 px, écran 32 px, pilule 999 px.
+Ombre portée douce, **jamais de dégradé**.
+
+Typographies : **Baloo 2** (titres) + **Quicksand** (texte).
+
+## Thème « Apple »
+
+| Rôle | Valeur |
+| --- | --- |
+| fond | `#F5F5F7` |
+| surface | `#FFFFFF` |
+| encre | `#1D1D1F` |
+| texte secondaire | `#86868B` |
+| ligne | `#E5E5EA` |
+| chevron | `#C7C7CC` |
+| accent bleu | `#007AFF` |
+| accent orange | `#FF9500` |
+| accent vert | `#34C759` |
+| accent rouge | `#FF3B30` |
+| accent gris | `#8E8E93` |
+| teinte bleu | `#EAF3FF` |
+
+Rayons : liste 14 px, carte 20 px, écran 32 px.
+Listes groupées à séparateurs hairline, badges d'icônes en carrés arrondis 8 px.
+
+Typographie : pile système `-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui`.
+
+## Règles visuelles
+
+- **Jamais de couleur en dur** dans un composant : uniquement les tokens.
+- Cibles tactiles **≥ 56 px** dans tous les écrans enfant.
+- Une seule action principale par écran, toujours en bas d'écran.
+- **Aucun emoji** : icônes SVG au trait uniquement.
+- **Aucun dégradé**, aucun clignotement, aucun effet flash.
+- Contraste WCAG AA vérifié sur chaque couple texte/fond, dans les deux thèmes.
