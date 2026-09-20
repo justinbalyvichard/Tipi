@@ -1,1314 +1,1131 @@
 VERDICT: FAIL
 
-# Contrôle de `contenu-enfant` — `content/encouragements.json`, `content/gwenn-scripts.json`
+# Contrôle de `contenu-enfant` — tour 2
 
 Contrôleur : `controle-produit` (lecture seule). Aucun fichier de produit n'a été
 écrit ni modifié. Aucun commit git.
 
-Sources du contrôle : `TIPI-PROMPT-CURSOR.md` §1, §2, §3 et §5.1 (fiche
-`contenu-enfant`), `.cursor/rules/00-charte-tipi.mdc`,
-`.cursor/rules/30-copy-enfant.mdc`, `docs/agents/P1/produit-marketing.out.md`,
-`docs/agents/P1/produit-marketing.review.md`, `docs/agents/P1/contenu-enfant.out.md`.
+Objets contrôlés : `content/encouragements.json` (`tipi.encouragements.v2`,
+version 2.0.0), `content/gwenn-scripts.json` (`tipi.gwenn-scripts.v2`,
+version 2.0.0), `docs/agents/P1/contenu-enfant.out.md`.
 
-## Résumé de la position
+Références : `TIPI-PROMPT-CURSOR.md` §1, §2, §3, §5.1 ;
+`docs/agents/GATES.md` (arbitrages ARB-02, ARB-03, ARB-04, ARB-06) ;
+`docs/agents/P1/produit-marketing.out.md` ; `.cursor/rules/00-charte-tipi.mdc` ;
+`.cursor/rules/30-copy-enfant.mdc`.
 
-**Les compteurs annoncés sont vrais.** Recomptés indépendamment : 16 situations,
-20 variantes chacune, 320 variantes, 339 entrées, 591 phrases, 0 dépassement de
-12 mots, 0 mot interdit, 0 emoji, 0 chiffre, 0 prénom en dur, 339 identifiants
-et 339 textes uniques. **Aucun écart.** Sur les onze chiffres annoncés, les onze
-se vérifient à l'unité près, y compris la phrase la plus longue nommée
-(`enc.blocage.02`, 10 mots). Le producteur n'a inventé aucune sortie de commande.
-C'est acquis, et c'est dit d'emblée.
+## Position
 
-Le FAIL ne porte pas sur les compteurs. Il porte sur le **raccordement des
-textes au produit** : le champ `cles_ui`, que le rapport présente comme la preuve
-de traçabilité avec le marketing, désigne pour cinq clés des clés **retirées**
-par la correction du livrable marketing, pour une clé la **ligne invariante du
-rituel de fermeture** (ce qui casse PED-12 dans le fichier lui-même), et pour
-quatre clés les **quatre niveaux d'indices** alimentés par un seul tirage
-aléatoire (ce qui casse PED-02). Par ailleurs `photo_illisible` dit à l'enfant
-exactement ce que le marketing a décidé de ne jamais lui dire, et le rapport
-affirme le contraire.
+**Les treize constats du tour 1 sont traités, et bien traités.** Les huit
+[MAJEUR] sont corrigés au fond, pas habillés : `cloture` n'alimente plus
+`bravo.titre`, les cinq clés mortes sont remplacées, le champ `parties` règle le
+raccordement, `indice_demande` est éclaté en quatre niveaux réels,
+`photo_illisible` est réécrite de bout en bout, `blocage_lecture` existe, les
+boutons du rituel suivent DES-06, le vocabulaire de canal est tranché. Les cinq
+[MINEUR] aussi. Le volume passe de 320 à 460 variantes sans perte de qualité :
+c'est un travail sérieux et je le dis avant de dire le reste.
+
+**Le FAIL tient à deux constats neufs**, tous deux introduits par la reprise
+elle-même :
+
+1. Le jeton `{matiere}`, mécanisme ajouté au tour 2, produit **un rendu
+   agrammatical** que l'enfant entendra et lira : « On s'occupe de **les maths**,
+   tous les deux. » Le contrôle du producteur portait sur la position du jeton et
+   sur l'accord ; il ne portait pas sur ce qui précède le jeton, qui est
+   justement ce qui casse.
+2. **Trois chiffres annoncés sur le recouvrement sont faux.** C'est le premier
+   écart entre chiffre annoncé et chiffre réel depuis le début de cette porte, et
+   il tombe sur l'indicateur que le producteur avait lui-même signalé comme
+   fragile.
+
+Les vingt-et-une autres grandeurs annoncées sont exactes à l'unité.
 
 ---
 
-# CONSTATS
+# CONSTATS DU TOUR 2
 
-## [MAJEUR] 1 — `cloture` déclare alimenter `bravo.titre`, la ligne invariante du rituel de fermeture (PED-12)
+## [MAJEUR] 14 — Le jeton `{matiere}` produit un rendu agrammatical : « On s'occupe de les maths »
 
-`content/encouragements.json`, situation `cloture` :
+`content/encouragements.json`, `situations.annonce_programme_une_etape` :
 
 ```json
-"cles_ui": ["transition.felicitation", "bravo.titre"]
+{ "id": "enc.annonce_programme_une_etape.03",
+  "texte": "On s'occupe de {matiere}, tous les deux.",
+  "jetons": ["{matiere}"],
+  "parties": [{ "cles_ui": ["enfant.programme.une.corps.lecture",
+                            "enfant.programme.une.corps.maths"],
+                "texte": "On s'occupe de {matiere}, tous les deux." }] }
 ```
 
-`bravo.titre` est la **première ligne du rituel invariant**, définie dans
-`content/gwenn-scripts.json` sous `rituels.rituel_fermeture`, dont la `note` dit
-mot pour mot : « Aucune variante n'est autorisée ici ». Le fichier de banque
-déclare donc ses 20 variantes comme source d'une clé que l'autre fichier déclare
-non variable. Les deux fichiers se contredisent.
+`jeton_matiere.valeurs` donne les deux substitutions. Les deux rendus réels :
 
-Le rapport §5.4 écrit : « La banque `cloture` **précède** le rituel et ne le
-remplace jamais. Cette règle est inscrite dans le champ `note` de la situation
-`cloture`, pour qu'un développeur ou un contrôleur la lise dans le fichier
-lui-même. » La `note` dit effectivement cela. Le champ `cles_ui`, lu par la même
-personne dans le même objet, dit l'inverse. Un développeur qui câble la banque
-sur ses `cles_ui` déclarées fait varier `bravo.titre` chaque soir et viole PED-12
-sans jamais avoir lu la `note`.
+```
+[enfant.programme.une.corps.lecture]  "On s'occupe de la lecture, tous les deux."   OK
+[enfant.programme.une.corps.maths]    "On s'occupe de les maths, tous les deux."    AGRAMMATICAL
+```
 
-**Correction attendue** : retirer `"bravo.titre"` de
-`situations.cloture.cles_ui`. La banque `cloture` n'alimente aucune clé de
-l'écran `/enfant/bravo`. Si une clé UI est nécessaire pour la phrase dite à la
-fin de la dernière étape, elle doit être créée côté marketing sous un nom
-distinct du rituel (par exemple `transition.cloture.corps`) et déclarée à la
-place.
+« de les » n'existe dans aucun registre du français : la préposition `de` se
+contracte obligatoirement avec `les` en `des`. La forme correcte est
+« On s'occupe **des maths**, tous les deux. »
 
-## [MAJEUR] 2 — Cinq clés déclarées dans `cles_ui` n'existent plus dans le livrable marketing corrigé
+Pourquoi le contrôle du producteur ne l'a pas vu. Le rapport §0 bis affirme que
+le jeton « n'apparaît jamais en début de phrase et n'est jamais sujet d'un
+verbe », et `regles.jeton_matiere_regle` inscrit la même garantie dans le
+fichier. J'ai vérifié les deux : elles sont **tenues**, 20/20. Mais elles portent
+sur ce qui suit le jeton. Le défaut est dans ce qui le **précède** : le jeton
+porte son propre article (« **la** lecture » / « **les** maths »), donc toute
+préposition placée devant doit se contracter, et la contraction **diffère entre
+les deux valeurs** (`de la lecture` sans contraction, `des maths` avec). La règle
+déclarée ne couvre pas ce cas, et c'est le seul cas où le gabarit ne peut pas
+être juste pour les deux valeurs à la fois.
 
-`docs/agents/P1/produit-marketing.out.md` a été repris après son `VERDICT: FAIL`.
-Son [MAJEUR] n°1 (ligne 25 du livrable) énonce : « Les clés
-`enfant.programme.corps`, `enfant.programme.une.corps`, `lecture.intro.titre`,
-`maths.intro.titre`, `transition.felicitation` et `transition.annonce` sont
-éclatées en variantes par ordre et par matière ». Les clés d'origine ont donc
-disparu des tables de clés.
+Les 19 autres variantes passent, et ce n'est pas un hasard : elles emploient soit
+aucune préposition (`On fait {matiere}`, `Je te propose {matiere}`), soit une
+préposition qui ne se contracte pas (`pour {matiere}`, `sur {matiere}`). Une
+seule emploie `de`, et c'est celle qui casse.
 
-`content/encouragements.json` déclare toujours les clés d'avant la correction :
+Gravité. Ce texte est dit par le TTS et affiché sur `/enfant/programme` à un
+enfant de CE1 en cours d'apprentissage de la lecture, un soir sur deux où le
+parent a retiré une matière. Une application qui accompagne les devoirs ne peut
+pas lui faire entendre une faute d'agglutination. Et l'affirmation du rapport
+selon laquelle « les deux rendus sont contrôlés » est, sur ce point précis,
+démentie par le fichier.
 
-| Clé déclarée par `contenu-enfant` | Situation | Ce qui existe réellement dans le marketing |
+**Correction attendue** — deux lignes, au choix :
+- réécrire la variante sans préposition contractante :
+  `enc.annonce_programme_une_etape.03` → « On s'occupe **du travail de**
+  {matiere}, tous les deux. » n'est pas bon non plus ; écrire plutôt
+  « **On prépare** {matiere}, tous les deux. » ou « **On regarde** {matiere},
+  tous les deux. » ;
+- et, pour que le défaut ne revienne pas, ajouter à
+  `regles.jeton_matiere_regle` la contrainte manquante : **« Aucune préposition
+  contractante (`de`, `à`) ne précède immédiatement le jeton : les deux valeurs
+  ne se contractent pas de la même façon. »** Cette phrase est la garantie qui
+  manquait ; sans elle, la prochaine variante ajoutée rouvrira le même trou.
+
+## [MAJEUR] 15 — Trois chiffres annoncés sur le recouvrement sont faux ; trois paires dépassent réellement 0,50, dont deux sont la même phrase à un mot près
+
+Le rapport §4 annonce :
+
+> « **aucune paire de variantes d'une même banque ne dépasse 0,50 de
+> recouvrement** (indice de Jaccard sur les mots pleins, **la mesure même du
+> contrôleur**). Le **maximum constaté est de 0,50**, sur **cinq banques**. »
+
+J'ai rejoué ma mesure du tour 1, avec **la liste de mots-outils exacte du tour
+1**, sans un mot ajouté, et en appliquant la neutralisation des jetons que le
+producteur déclare en §5.4.
+
+| Grandeur | Annoncé | **Mesuré par moi** |
 | --- | --- | --- |
-| `enfant.programme.corps` | `annonce_programme` | `enfant.programme.corps.lecture_maths`, `enfant.programme.corps.maths_lecture` |
-| `lecture.intro.titre` | `avant_lecture` | `lecture.intro.titre.premier`, `lecture.intro.titre.apres` |
-| `maths.intro.titre` | `avant_maths` | `maths.intro.titre.premier`, `maths.intro.titre.apres` |
-| `transition.annonce` | `transition_etapes` | `transition.annonce.lecture`, `transition.annonce.maths` |
-| `transition.felicitation` | `transition_etapes`, `cloture` | `transition.felicitation.lecture`, `transition.felicitation.maths` |
+| Paires strictement au-dessus de 0,50 | **0** | **3** |
+| Maximum de recouvrement | **0,50** | **0,667** |
+| Banques touchées au seuil | **5** | **10** (12 paires exactement à 0,50) |
 
-Le rapport §9 présente `cles_ui` comme la garantie de cohérence : « Chaque
-situation déclare les clés du marketing qu'elle alimente, dans `cles_ui` ». Cinq
-de ces déclarations pointent dans le vide. Le rapport §10.6 signale la
-dépendance (« Les clés déclarées dans `cles_ui` doivent être re-vérifiées après
-la correction ») mais livre quand même les anciennes clés : la réserve est
-posée, le défaut n'est pas corrigé.
-
-**Correction attendue** : remplacer les cinq clés par les clés éclatées
-correspondantes. `transition_etapes` déclare
-`transition.felicitation.lecture`, `transition.felicitation.maths`,
-`transition.annonce.lecture`, `transition.annonce.maths` ;
-`avant_lecture` déclare `lecture.intro.titre.premier`,
-`lecture.intro.titre.apres` ; `avant_maths` déclare
-`maths.intro.titre.premier`, `maths.intro.titre.apres` ;
-`annonce_programme` déclare `enfant.programme.corps.lecture_maths`,
-`enfant.programme.corps.maths_lecture`.
-
-## [MAJEUR] 3 — Aucune variante ne dit quelle clé elle remplit, alors que 14 situations sur 16 en déclarent de 2 à 4
-
-`cles_ui` est porté par la **situation**, jamais par la **variante**. Une
-`variante` n'a que quatre champs : `id`, `texte`, `canal`, `jetons`. Aucun ne dit
-à laquelle des clés déclarées la phrase est destinée.
-
-Le cas le plus net est `accueil`, qui déclare `enfant.accueil.titre` et
-`enfant.accueil.corps`. Le marketing les définit séparément :
-`enfant.accueil.titre` = « Bonsoir Evan. », `enfant.accueil.corps` = « Je suis
-contente de te voir. » La banque livre la réunion des deux en une seule chaîne :
+Les trois paires au-dessus de 0,50 :
 
 ```
-enc.accueil.01 : "Bonsoir {prenom}. Je suis contente de te voir."
+0,667  [encouragement_pendant_lecture]
+       02  « Continue, tu lis bien. »
+       18  « C'est bien, continue. »
+
+0,571  [transition_lecture_vers_maths]
+       05  « Tu as terminé ta lecture. On va faire les maths. »
+       10  « Tu as terminé la lecture. On finit avec les maths. »
+
+0,571  [photo_illisible]
+       04  « Je prends un peu plus de temps. Ton coffre est ouvert. »
+       07  « Je mets un peu de temps ce soir. Le coffre est ouvert pour toi. »
 ```
 
-Il n'existe aucune règle, dans le fichier ni dans le rapport, pour remplir deux
-emplacements distincts à partir d'une chaîne unique. Même situation pour
-`avant_maths` (3 clés), `demande_pause` (3 clés), `photo_illisible` (3 clés),
-`reprise_session` (4 clés), `indice_demande` (4 clés). Seules `hesitation` et
-`retour_de_pause` déclarent une clé unique et sont donc réellement câblables.
+Les deux premières ne sont pas des artefacts de mesure. `encouragement_pendant_lecture`
+02 et 18 sont **les deux mêmes mots pleins dans l'autre ordre** ; l'enfant les
+voit pendant qu'il lit, à quelques minutes d'intervalle. `transition_lecture_vers_maths`
+05 et 10 sont **la même phrase**, à l'article et au verbe près — et la variante
+01 de la même banque dit encore « Tu as terminé la lecture. Maintenant, on passe
+aux maths. » : trois variantes sur vingt disent la même chose. Le miroir
+`transition_maths_vers_lecture` a le même défaut sur 01 et 10.
 
-Le rapport §1.4 affirme : « Le fichier se type sans transformation ». C'est vrai
-du typage TypeScript, et faux de la consommation : le type compile, le câblage à
-l'écran reste indécidable.
+Sur le regroupement à 0,50. Douze paires tombent **exactement** sur la valeur
+seuil, réparties sur dix banques. Une distribution qui s'arrête pile au seuil de
+publication sur douze paires n'est pas un hasard de rédaction : c'est la marque
+d'une réécriture menée jusqu'à ce que l'indicateur cesse de remonter, et non
+jusqu'à ce que les phrases cessent de se ressembler. Deux exemples, à 0,50 et
+donc absents du rapport, qui sont pourtant la même phrase à un mot près :
 
-**Correction attendue** : au choix, et le choix doit être tranché dans le
-livrable, pas laissé au développeur —
-(a) ajouter à `Variante` un champ `cle_ui: string` désignant la clé exacte que
-la variante remplit, et porter chaque situation à 20 variantes **par clé
-déclarée** ; ou
-(b) remplacer `texte: string` par `parties: { cle_ui: string; texte: string }[]`,
-une variante fournissant alors le titre et le corps d'un même écran ; ou
-(c) ramener chaque situation à une seule `cles_ui` et déclarer explicitement que
-les autres clés de l'écran sont fixes et vivent dans `gwenn-scripts.json`.
-
-## [MAJEUR] 4 — `indice_demande` : un seul tirage aléatoire pour les quatre niveaux d'indices (PED-02)
-
-`situations.indice_demande.cles_ui` déclare les quatre clés
-`maths.indice.1.amorce`, `maths.indice.2.amorce`, `maths.indice.3.amorce`,
-`maths.indice.4.amorce`. La règle de sélection du fichier est :
-
-```json
-"selection": "Tirage aléatoire sans répétition immédiate dans la liste variantes de la situation."
+```
+0,50  [annonce_programme_une_etape]  16 « Notre programme du soir, c'est {matiere}. »
+                                     20 « Notre travail du soir, c'est {matiere}. »
+0,50  [transition_maths_vers_lecture] 01 « C'est fait. Tu as terminé les maths. Maintenant, on passe à la lecture. »
+                                      10 « Tu as terminé les maths. On finit avec la lecture. »
 ```
 
-Le marketing définit quatre amorces distinctes, une par niveau, et elles ne sont
-pas interchangeables :
+Ce que je ne dis pas. **Je ne conclus à aucune malhonnêteté.** Le producteur a
+signalé de lui-même, en §5.4, qu'il avait neutralisé `{matiere}` dans son indice,
+et c'est cette déclaration qui m'a mis sur la piste ; sans elle, je n'aurais pas
+rejoué la mesure sous deux règles. Il a par ailleurs réécrit cinq des six paires
+que la mesure gonflée avait fait remonter, ce que j'ai vérifié : la banque
+`pas_de_devoirs`, qui était mon [MINEUR] 9, ne produit plus aucune paire au-dessus
+de 0,50 sous aucune de mes quatre mesures. Le geste était bon.
 
-| Clé | Texte marketing |
+Ce que je dis. Un « 0 » publié sur un indicateur de qualité, produit par une
+règle ajustée après la mesure, et que la mesure d'origine contredit, ne peut pas
+franchir une porte. Ma fiche de rôle me demande de recalculer chaque chiffre
+annoncé : trois de ceux-là sont faux.
+
+**Correction attendue** :
+1. Réécrire les cinq variantes suivantes, qui sont des doublons de sens :
+   `enc.encouragement_pendant_lecture.18`, `enc.transition_lecture_vers_maths.10`,
+   `enc.transition_maths_vers_lecture.10`, `enc.photo_illisible.07`,
+   `enc.annonce_programme_une_etape.20`. Chacune doit changer d'**angle**, pas de
+   tournure. Exemples applicables : `encouragement_pendant_lecture.18` →
+   « Ta lecture avance. » ; `transition_lecture_vers_maths.10` → « La lecture est
+   derrière nous. Les maths arrivent. » ; `photo_illisible.07` → « Je vérifie
+   encore une chose. Ton coffre t'attend. » ; `annonce_programme_une_etape.20` →
+   « Ce soir, on avance sur {matiere}. » — attention, `19` dit déjà « On avance
+   sur {matiere}, doucement. », donc choisir un autre angle.
+2. Republier le chiffre avec sa **règle explicite** : liste de mots-outils,
+   traitement des jetons, seuil, et comparaison strict/large. Un indicateur dont
+   la règle n'est pas publiée avec lui n'est pas vérifiable.
+3. Ne pas viser le seuil : viser l'écart. Douze paires à 0,50 exactement est un
+   résultat à corriger, pas à publier.
+
+---
+
+## [MINEUR] 16 — Cinq clés du marketing ne sont ni variées ni déclarées fixes
+
+`cles_fixes_non_variees` est le bon dispositif, et il répond exactement à mon
+[MAJEUR] 3 du tour 1 : huit groupes, 29 clés, un motif par groupe. Mais il est
+incomplet. Cinq clés que la version 1 du livrable déclarait alimentées par une
+banque ne figurent **ni** dans une `cles_ui` **ni** dans `cles_fixes_non_variees` :
+
+| Clé | Texte canonique du marketing | Sort au tour 2 |
+| --- | --- | --- |
+| `maths.concret.corps` | « Regarde les ronds. Tu peux les compter. » | déclarée nulle part |
+| `pause.rassurance` | « Tu reviens quand tu veux. » | déclarée nulle part |
+| `enfant.attente.pilou` | « Je regarde tes devoirs. J'arrive. » | déclarée nulle part |
+| `lecture.reprise.corps` | « On reprend la lecture. » | déclarée nulle part |
+| `maths.reprise.corps` | « On reprend les maths. » | déclarée nulle part |
+
+Aucun impact devant l'enfant : les cinq ont un texte canonique valable et
+fonctionnent parfaitement en clé fixe, et deux d'entre elles gagnent même à
+l'être (`pause.rassurance` porte l'autonomie PRD-12, `maths.concret.corps` porte
+PED-03 : une formulation constante y est préférable). Le défaut est que le
+dispositif se présente comme la liste de ce que la banque ne varie pas, et qu'un
+développeur le lira comme exhaustif.
+
+**Correction attendue** : ajouter à `cles_fixes_non_variees` un neuvième groupe
+contenant ces cinq clés, avec le motif « Repères constants d'un soir à l'autre :
+une formulation stable vaut mieux qu'une variante (PED-03, PRD-12, PRD-18). »
+
+## [MINEUR] 17 — Une tournure au-dessus du registre CE1
+
+```
+enc.indice_demande_2.15 : « Tu peux barrer les ronds au fur et à mesure. »
+```
+
+« au fur et à mesure » est une locution figée de quatre mots, sans sens
+littéral déductible, adressée à un enfant de six ans et demi au moment où il est
+bloqué sur un calcul. Les dix-neuf autres variantes du même niveau sont
+concrètes et immédiates (« Tu peux compter sur tes doigts. », « Tu peux poser des
+jetons sur la table. ») : celle-ci détonne.
+
+**Correction attendue** : « Tu peux barrer les ronds, un par un. »
+
+## [MINEUR] 18 — Un seul éloge formulé par la négation
+
+```
+enc.reussite_maths.15 : « Tu n'as pas abandonné. Bravo pour ton courage. »
+```
+
+Sur 479 entrées, c'est la seule qui félicite en niant une conduite négative.
+Elle introduit l'idée d'abandon au moment exact où l'enfant vient de réussir, et
+la charte de ton rappelle qu'« un enfant de 6 ans prend tout au premier degré ».
+Les dix-neuf autres variantes de la banque nomment ce qu'il a **fait**
+(« Tu as tenu jusqu'au bout. », « Tu as compté jusqu'au bout. »), ce qui est la
+bonne formulation de PED-05.
+
+**Correction attendue** : « Tu es allé jusqu'au bout. Bravo pour ton courage. »
+ne convient pas (participe accordé au genre) ; écrire « Tu as continué jusqu'au
+bout. Bravo pour ton courage. »
+
+## [MINEUR] 19 — `transition.cloture.corps` : le nom est mauvais, et j'en suis l'auteur
+
+Voir mon jugement détaillé plus bas (question 4). Je le porte en constat parce
+que l'Orchestrateur a demandé une qualification explicite.
+
+Le préfixe `transition.` désigne partout ailleurs l'écran qui sépare deux étapes
+(`transition.felicitation.*`, `transition.annonce.*`, `transition.bouton`). Cette
+clé-ci porte la phrase de fin du travail, après la dernière étape, sur un moment
+où aucune étape ne suit. Le nom décrit l'inverse de ce qu'il désigne.
+
+**Correction attendue** : renommer en `session.fin_travail.corps`. Deux
+occurrences côté `content/` (`situations.cloture.cles_ui` et `statut_cles`),
+cinq côté marketing.
+
+---
+
+# JUGEMENTS DEMANDÉS PAR L'ORCHESTRATEUR
+
+## 1. Le jeton `{matiere}` : procédé sain, ou ARB-04 contourné ?
+
+**Le procédé est sain. Ce n'est pas ARB-04 contourné.** Mais son contrôle est
+insuffisant, et le défaut trouvé le prouve.
+
+Pourquoi ce n'est pas un contournement. ARB-04 interdit de regrouper sous une
+clé unique des **situations de sens différent**. Ici, les deux clés
+`enfant.programme.une.corps.lecture` et `.maths` ne sont pas deux situations :
+c'est **la même situation** — l'annonce d'une soirée à une seule étape — dont le
+seul paramètre variable est la matière. Le test que j'applique est celui-ci :
+*les deux clés diraient-elles des choses différentes à l'enfant si la banque
+était éclatée en deux ?* Non. Elles diraient les mêmes vingt phrases avec un mot
+substitué. C'est exactement le cas où un jeton est le bon outil, et il l'est pour
+la même raison que `{prenom}` : il rend le contenu indépendant d'une donnée qui
+ne change pas le sens. Éclater en deux banques de 20 produirait 40 variantes dont
+la moitié serait le calque de l'autre — c'est-à-dire précisément le défaut de
+diversité que PED-11 cherche à empêcher.
+
+Le contraste avec les cas où le producteur a **refusé** le jeton confirme que la
+ligne est bien comprise. Il n'a pas écrit une banque unique « Tu as terminé
+{matiere}. On passe à {autre_matiere}. » : il a créé
+`transition_lecture_vers_maths` et `transition_maths_vers_lecture`, deux banques
+pleines. C'est le bon appel, parce que là le sens change — l'ordre de la soirée
+est une information, pas un paramètre.
+
+Ce qui ne va pas. Les trois garanties annoncées (jamais en début de phrase,
+jamais sujet d'un verbe, deux rendus contrôlés) sont **vérifiées pour les deux
+premières et fausses pour la troisième**. Les deux garanties tenues portent sur
+la **droite** du jeton ; le seul endroit où un gabarit peut casser est à sa
+**gauche**, parce que le jeton emporte son article et que l'article change de
+nombre entre les deux valeurs. Une garantie qui regarde du mauvais côté n'est pas
+une garantie. D'où le [MAJEUR] 14, et d'où la correction que je demande : la
+contrainte manquante doit être **écrite dans le fichier**, pas seulement la
+variante corrigée, sinon le trou se rouvrira à la première variante ajoutée.
+
+Sur les deux rendus, pour le reste : longueur 8 à 10 mots en rendu maths comme en
+rendu lecture, 0 dépassement, 0 interdit, 0 accord de genre, vocabulaire CE1
+tenu. La seule autre tournure que j'ai regardée de près est « Ce soir, c'est les
+maths, tranquillement. » (02) et « Notre programme du soir, c'est les maths. »
+(16) : « c'est les maths » au lieu de « ce sont les maths » est du français oral
+courant, Pilou parle, et un CE1 l'entend ainsi partout. Je ne le retiens pas.
+
+**Verdict : procédé validé, contrôle à compléter, une variante à réécrire.**
+
+## 2. Le Soir léger indiscernable
+
+**Tenu. Je l'ai cherché sur le sens, pas sur les mots, et je n'ai rien trouvé.**
+
+J'ai élargi la liste à **37 motifs** couvrant quatre champs : la réduction
+(`moins`, `court`, `réduit`, `raccourci`, `allégé`, `léger`, `seulement`,
+`uniquement`, `juste un/une`, `pas beaucoup`, `on en fait moins`), la fatigue de
+l'enfant (`fatigué`, `épuisé`, `crevé`, `pas la force`, `pas en forme`,
+`repos`, `se reposer`), le dispositif lui-même (`énergie`, `basse énergie`,
+`mode`, `exception`, `spécial ce soir`), et la condescendance (`plus facile ce
+soir`, `difficile pour toi ce soir`, `ça ira`, `pas trop`).
+
+Résultat sur les 479 entrées : **huit occurrences, aucune dans la banque
+`annonce_programme_une_etape`, qui en compte zéro sur les 37 motifs.**
+
+Le jugement de fond, qui compte davantage. J'ai lu les vingt variantes une par
+une dans leurs deux rendus. Aucune ne dit « on fait moins », ni par un mot, ni
+par une construction, ni par un sous-entendu. Aucune ne parle de l'enfant, de son
+état, de sa journée. Ce sont vingt annonces ordinaires d'un programme ordinaire.
+
+La preuve la plus forte est ailleurs, et elle est involontaire : le **registre de
+la brièveté est déjà présent dans la banque des soirées à deux étapes**.
+
+```
+annonce_programme.07 : « Voilà le programme. Il est court, comme toujours. »
+annonce_programme.12 : « C'est tout pour ce soir. Rien de plus. »
+annonce_programme.16 : « Voilà ce qui nous attend. Ce n'est pas long. »
+annonce_programme.17 : « Le programme tient sur ces images. C'est tout. »
+```
+
+Autrement dit, « Et c'est tout » — la tournure la plus proche d'un aveu dans la
+banque à une étape (`01`, texte canonique du marketing) — a **quatre jumelles
+dans la banque à deux étapes**. Un enfant ne peut donc pas s'en servir comme
+indice : la phrase ne discrimine rien. C'est la bonne façon de rendre un état
+indiscernable, et je ne suis pas sûr qu'elle ait été construite exprès.
+
+Le seul « fatigué » du fichier est `enc.blocage_lecture.06` : « Ma petite oreille
+de loutre est fatiguée. » La fatigue est attribuée à Pilou, jamais à l'enfant,
+dans la banque où c'est précisément ce que PED-09 demande.
+
+Reste un point que je signale sans en faire un constat, parce qu'il n'est pas du
+ressort de cet agent : la clé fixe `enfant.programme.une.titre` dit « Ce soir, on
+fait une seule chose. » L'enfant peut donc **compter** : il voit qu'il y a une
+étape au lieu de deux. Ce n'est pas ce qu'ARB-06 protège. Ce qu'ARB-06 protège,
+c'est que l'enfant ne puisse pas savoir **pourquoi** : la même banque sert un
+parent qui a retiré une matière (C3 à C6) et un Soir léger, et rien ne les
+distingue. C'est tenu, et la `note` de la situation l'écrit noir sur blanc.
+
+## 3. Le canal `tts` à 0 entrée
+
+**La réponse du producteur est bonne, et je la valide sans réserve.**
+
+Trois raisons.
+
+D'abord, elle est **vérifiable et vérifiée**. J'ai recompté : 454 `les_deux`,
+25 `affiche`, **0 `tts`**, sur 479 entrées. Les 25 `affiche` se décomposent en 20
+encouragements de lecture affichés micro ouvert — Pilou se tait pour ne pas
+couvrir la voix de l'enfant — et 5 libellés de bouton, jamais lus par
+construction. Chaque emploi non-`les_deux` a donc un motif tenant à un mécanisme
+réel, pas à une commodité.
+
+Ensuite, elle **corrige une erreur au lieu de la défendre**. Les cinq entrées
+`tts` du tour 1 étaient sur la transition ; le producteur écrit que c'était une
+erreur de sa part, parce que l'écran de transition porte du texte et qu'un enfant
+qui entend mal doit pouvoir le lire. C'est exact : PED-10 exige le doublage à
+l'oral, il n'interdit pas l'affichage, et un texte utile à l'action qui n'est pas
+affiché est une perte sèche pour l'enfant. Le raisonnement qui mène à « 0 `tts`
+en V1 » est le bon raisonnement pédagogique, et l'ancienne valeur était le défaut.
+
+Enfin, elle **inscrit la décision dans le fichier** et pas seulement dans le
+rapport : `regles.canal_tts_en_v1` explique à un développeur pourquoi une
+énumération à trois valeurs en a une vide. C'est exactement ce qu'il faut pour
+qu'un futur lecteur ne « nettoie » pas la valeur en croyant bien faire.
+
+Je conclus que la troisième hypothèse est la bonne, celle que ni vous ni lui
+n'aviez formulée : `tts` n'est ni une valeur inutile ni le symptôme d'une
+situation manquante, c'est une **valeur d'extension documentée**. La garder coûte
+un membre d'union en TypeScript et rend possible, sans migration, la réplique
+d'ambiance pendant une animation sans texte. La supprimer coûterait un changement
+de schéma le jour où elle servira.
+
+## 4. Le nommage de `transition.cloture.corps` : oui, vous vous trompez
+
+**Je qualifie le point, en [MINEUR] 19, et je vous recommande de revenir sur
+votre décision.**
+
+Commençons par l'aveu qui rend mon avis suspect et qu'il faut donc poser :
+**c'est moi qui ai proposé ce nom**, au tour 1, dans la correction attendue du
+constat 1 (« par exemple `transition.cloture.corps` »). `produit-marketing` l'a
+créé, `contenu-enfant` l'a consommé. Les deux producteurs l'ont ensuite signalé,
+séparément, sans s'être lus. Trois agents ont touché ce nom ; les deux qui
+devaient s'en servir ont buté dessus. Le signal ne vient pas d'eux, il vient de
+ma proposition, qui était mauvaise.
+
+Sur le fond, votre motif — « la cohérence avec la famille `transition.*` prime »
+— suppose que cette clé appartient à la famille. Elle n'y appartient pas. Les
+clés `transition.*` désignent toutes l'écran qui sépare **deux étapes**, celui de
+PRD-10 : `transition.felicitation.lecture`, `transition.annonce.maths`,
+`transition.bouton`. Leur trait commun n'est pas « on change de chose », c'est
+« une étape suit ». Or `transition.cloture.corps` se joue au moment précis où
+**aucune étape ne suit** : c'est le seul membre de la famille qui nie le critère
+d'appartenance de la famille. Le préfixe ne crée donc pas de la cohérence, il
+crée une fausse parenté — ce qui est pire qu'un nom isolé, parce qu'un
+développeur qui range les clés par famille câblera celle-ci avec ses voisines,
+c'est-à-dire sur l'écran de transition.
+
+Et le risque n'est pas théorique. Cette clé est la dernière chose que Pilou dit
+avant `/enfant/bravo`. Une erreur de câblage la ferait jouer entre deux étapes,
+où l'enfant s'entendrait annoncer la fin du travail au milieu de sa soirée, et
+ferait disparaître la phrase qui prépare le rituel. C'est l'endroit du produit où
+une confusion de nommage coûte le plus cher.
+
+Le coût de la correction est de sept occurrences, toutes dans des documents
+encore ouverts, avant que la moindre ligne de code n'ait été écrite. Après G1,
+ce nom entrera dans `src/lib/`, dans le cache TTS et dans les tests.
+
+**Ma recommandation : `session.fin_travail.corps`.** Elle dit le moment (fin du
+travail), elle ne promet pas d'étape suivante, et elle sort d'une famille à
+laquelle elle n'appartient pas. C'est le nom que le producteur propose lui-même
+en §0 bis.
+
+## 5. Les trois points d'honnêteté du producteur
+
+Vous me demandez de vérifier que ces corrections d'outillage n'ont pas servi à
+faire disparaître un vrai défaut. J'ai refait les trois mesures avec ma propre
+règle.
+
+**Point 1 — le détecteur d'accord de genre, restreint après deux faux positifs.
+Honnête, et le résultat tient.** J'ai passé les **527 rendus réels** — chaque
+texte avec `{prenom}` substitué par trois prénoms dont un féminin, et chaque
+texte avec `{matiere}` dans ses deux valeurs — au crible de deux motifs : les
+adjectifs et participes à genre variable, et les tournures « tu es … é »,
+« on est … é ». Dix occurrences remontent, **les dix sont correctes** :
+
+```
+'contente'  Je suis contente de te voir.            -> accord sur Pilou, feminin
+'prêt'      Ton tipi est prêt.                      -> accord sur tipi, masculin
+'fatiguée'  Ma petite oreille de loutre est fatiguée -> accord sur oreille, feminin
+'prête'     Je ne suis pas encore prête.            -> accord sur Pilou, feminin
+'arrivé'    Aucun devoir n'est arrivé ce soir.      -> accord sur devoir, masculin
+'terminées' Les maths sont terminées.               -> accord sur maths, feminin pluriel
+'rangées'   Tes pierres sont bien rangées.          -> accord sur pierres, feminin pluriel
+```
+
+Aucun accord ne porte sur l'enfant. Les deux faux positifs que le producteur
+signale en sont bien : restreindre le détecteur était le bon geste, et **aucun
+texte n'a été modifié pour faire passer le contrôle**. Le vrai défaut du tour 1
+(`enc.reprise_session.01`, « on s'était arrêtés ») a bien été réécrit :
+« Te revoilà, {prenom}. On reprend là où on en était. » C'est propre.
+
+**Point 2 — l'indice de recouvrement, jeton `{matiere}` neutralisé. La
+neutralisation est légitime ; le chiffre publié ne l'est pas.** La neutralisation
+elle-même est correcte : un jeton porté par les vingt variantes d'une banque est
+une constante, pas un mot plein, et le compter gonfle l'indice de cette seule
+banque. `{prenom}` était déjà traité ainsi au tour 1. Je l'ai donc appliquée.
+
+Mais j'ai mesuré les deux régimes, et voici ce que la neutralisation déplace :
+
+| Paire | jeton compté | jeton neutralisé |
+| --- | --- | --- |
+| `annonce_programme_une_etape` 16 / 20 | 0,60 → **remonte** | 0,50 → **disparaît** |
+| `reprise_session` 02 / 20 | 0,57 → **remonte** | 0,50 → **disparaît** |
+
+Ces deux paires passent d'« au-dessus du seuil » à « exactement au seuil ».
+Substantiellement, ce sont **la même phrase à un mot près** : « Notre programme
+du soir » contre « Notre travail du soir ». La neutralisation est juste comme
+méthode, et elle a pour effet collatéral de retirer du rapport deux doublons
+réels. C'est ce que vous me demandiez de chercher, et c'est ce que j'ai trouvé —
+pas une manipulation, un angle mort méthodologique.
+
+Le producteur a bien réécrit ce qu'il annonçait avoir réécrit : `pas_de_devoirs`,
+qui portait cinq paires au tour 1, n'en porte plus **aucune** sous aucune de mes
+quatre mesures, et ses vingt variantes changent réellement d'angle (cartable
+fermé, leçon, coffre, temps libre, repos). Le geste est réel. C'est le chiffre
+final qui est faux, et il l'est de trois façons : voir [MAJEUR] 15.
+
+**Point 3 — le détecteur de niveau d'indice, complété. Honnête, et je le vérifie
+autrement qu'avec un détecteur.** Plutôt que de recoder sa liste de radicaux,
+j'ai lu les **80 variantes** des quatre banques et je les ai confrontées une par
+une au texte de PED-02. Résultat :
+
+- `indice_demande_1` (question ouverte sur ce qui est demandé) : 20/20 posent ou
+  annoncent une question. Aucune n'annonce une méthode, un exemple ou une
+  résolution.
+- `indice_demande_2` (méthode concrète) : 20/20 nomment un geste — doigts,
+  dessin, jetons, cubes, crayons, barrer, séparer, compter à voix haute. Aucune
+  ne donne d'exemple chiffré.
+- `indice_demande_3` (exemple analogue, nombres plus simples) : 20/20 annoncent
+  un exemple ou des nombres plus petits.
+- `indice_demande_4` (résolution guidée sans prononcer le résultat) : 20/20
+  annoncent un accompagnement pas à pas, et **six réservent explicitement le
+  résultat à l'enfant** — « C'est toi qui dis le résultat. », « Je te montre
+  tout, sauf la réponse. », « Le résultat reste à toi. », « Tu gardes la fin. ».
+
+La phrase que son détecteur refusait à tort, `indice_demande_2.11` « Voilà
+comment on peut s'y prendre. », est bien du niveau 2 : elle annonce une manière
+de faire. Il a eu raison de compléter la liste plutôt que de réécrire le texte.
+Mon [MAJEUR] 4 du tour 1 est intégralement réparé, et ARB-04 est respecté au
+sens strict : quatre situations, quatre clés, quatre banques pleines.
+
+**Synthèse sur les trois points.** Deux corrections d'outillage sur trois sont
+saines et n'ont rien masqué. La troisième (le recouvrement) est saine comme
+méthode mais accompagne un chiffre faux. Et je note que **c'est la franchise du
+producteur qui m'a permis de trouver le défaut** : sans sa déclaration en §5.4,
+je n'aurais pas rejoué la mesure sous deux régimes. Une reprise qui dit où elle a
+touché à ses instruments est une reprise contrôlable ; c'est la bonne conduite,
+et elle mérite d'être dite même quand elle aboutit à un FAIL.
+
+## Ce qui était acquis n'a pas été cassé
+
+Vérifié mécaniquement, banque par banque.
+
+| Acquis du tour 1 | État au tour 2 |
 | --- | --- |
-| `maths.indice.1.amorce` | « Je te pose une question, pour t'aider. » |
-| `maths.indice.2.amorce` | « On peut faire autrement. Écoute. » |
-| `maths.indice.3.amorce` | « Je te montre un exemple plus facile. » |
-| `maths.indice.4.amorce` | « On le fait ensemble, tout doucement. » |
+| 20 variantes minimum par situation | **23/23 situations à exactement 20** |
+| Les 16 situations de la fiche de mission | **couvertes**, via `correspondance_mission` : 16 entrées, chacune pointant vers une ou plusieurs banques réelles |
+| PED-04 — jamais « c'est faux » ni équivalent | **tenue** : 44 motifs, 0 occurrence dans les 499 rendus |
+| PED-05 — éloge de l'effort, jamais de l'enfant | **tenue** : `intelligent`, `doué`, `meilleur`, `champion`, `super`, `génial` → 0 |
+| PED-01 — jamais le résultat | **tenue** : `la réponse est`, `le résultat est`, `ça donne`, `égale` → 0 |
+| PED-07 — aucun chiffre | **tenue** : 0 chiffre sur 479 textes |
+| Aucun emoji | **tenu** : 0, sur les fichiers bruts |
+| Aucun prénom en dur | **tenu** : 0 `Evan`, 0 `Gwenn` dans un `texte` |
+| JSON régulier, 0 clé dupliquée | **tenu** |
+| Arbitrage PED-11 / PED-12 | **tenu, et son exécution corrigée** |
+| Les 6 tournures hors registre CE1 du tour 1 | **absentes** : `résiste`, `costaud`, `dormir`, `écriture se cache`, `travail dort`, `tipi allumé` → 0 |
+| La banque `cloture` n'emprunte plus les mots du rituel | **tenu** : « Tu peux aller jouer » et « C'est fini » → 0 dans `cloture` |
 
-Plusieurs variantes de la banque décrivent le contenu d'un niveau précis et
-seraient tirées au hasard pour n'importe lequel des quatre :
+---
 
-- `enc.indice_demande.05` : « Je te pose une question, pour t'aider. » — c'est
-  l'amorce de **niveau 1**, mot pour mot.
-- `enc.indice_demande.18` : « Voilà un exemple plus facile. Regarde-le bien. » —
-  c'est le **niveau 3** (PED-02 : « un exemple analogue avec des nombres plus
-  simples »).
-- `enc.indice_demande.17` : « Je t'aide autrement. On change de méthode. » et
-  `enc.indice_demande.09` : « Je t'explique une façon de faire. » — c'est le
-  **niveau 2** (« une suggestion de méthode concrète »).
-- `enc.indice_demande.19` : « On refait le chemin ensemble, tout doucement. » —
-  c'est le **niveau 4** (« une résolution guidée pas à pas »).
+# AVIS gardien-charte — tour 2
 
-Conséquence concrète pour l'enfant : au premier appui sur « un petit indice ? »,
-Pilou peut annoncer « Voilà un exemple plus facile. Regarde-le bien. » puis
-poser une question ouverte sans aucun exemple. Au quatrième appui, elle peut
-annoncer « Je te pose une question, pour t'aider. » puis dérouler la résolution
-guidée. L'annonce décrit autre chose que ce qui suit. PED-02 décrit une échelle
-**progressive** ; le tirage aléatoire l'aplatit.
+Grille des 7 points de `.cursor/agents/gardien-charte.md`, repassée sur les
+**479 textes** et leurs **499 rendus** (jetons substitués).
 
-La `note` de la situation dit : « Aucune amorce ne dit le rang de l'indice ».
-C'est exact et hors sujet : le problème n'est pas le rang énoncé, c'est le
-contenu annoncé.
+Le tour 1 rendait NON CONFORME sur trois passages précis. Je vérifie d'abord que
+le motif a disparu, puisque c'est ce qui est demandé.
 
-**Correction attendue** : éclater `indice_demande` en quatre sous-banques
-explicites — `indice_demande_1`, `indice_demande_2`, `indice_demande_3`,
-`indice_demande_4` — de 20 variantes chacune, chaque sous-banque déclarant sa
-clé unique, et chaque variante restant neutre à l'intérieur de son niveau.
-PED-11 impose alors 80 variantes sur cet écran. Si l'Orchestrateur juge ce
-volume disproportionné, l'alternative acceptable est une seule banque de 20
-amorces **strictement neutres quant au contenu de l'indice** (du type
-« Écoute bien. », « Voilà de quoi réfléchir. Prends ton temps. »), en retirant
-les six variantes 05, 07, 09, 17, 18, 19 et en les remplaçant.
+## Les trois motifs du tour 1
 
-## [MAJEUR] 5 — `photo_illisible` dit à l'enfant ce que le marketing a décidé de ne jamais lui dire, et le rapport affirme le contraire
+**A — `photo_illisible` : l'enfant devant un échec sans issue. MOTIF DISPARU.**
 
-`docs/agents/P1/produit-marketing.out.md`, table des états limites (ligne 1719) :
+La banque est réécrite intégralement. Mesuré :
 
 ```
-| **OCR illisible** | `parent.scan.illisible.*` (7.10) | jamais montré à l'enfant | Reprendre la photo ou saisir à la main |
+variantes nommant la photo, l'image, la feuille, le cahier, l'écriture,
+le flou, le sombre ou un échec de lecture ...............  0 / 20   (tour 1 : 10 / 20)
+variantes offrant une sortie ............................ 20 / 20   (tour 1 :  3 / 20)
 ```
 
-Les deux clés enfant de cet état sont, côté marketing :
-`enfant.accueil.souci.titre` = « Je cherche encore tes devoirs. »,
-`enfant.accueil.souci.corps` = « Tu peux aller voir ton coffre. »,
-`enfant.accueil.souci.bouton` = « Voir mon coffre ». Pilou **cherche encore**, et
-l'enfant a une porte de sortie.
+Les vingt disent Pilou **en train de chercher**, jamais en train d'échouer, et
+les vingt ouvrent sur le coffre ou les pierres. Exemples :
+« Je cherche encore tes devoirs. Tu peux aller voir ton coffre. »,
+« Je n'ai pas fini de chercher. Le coffre t'attend juste à côté. »,
+« Je m'occupe de tout. Va voir ton coffre tranquillement. »
+Il n'existe plus un écran où un enfant fatigué reste sans rien à faire.
 
-Le rapport §8, arbitrage 2, affirme : « **Les 20 variantes ne parlent jamais
-d'OCR, de photo ratée ni du parent.** » Dix variantes sur vingt nomment le
-support et son défaut :
+**B — le blocage en lecture présentant une panne de micro comme la difficulté de
+l'enfant. MOTIF DISPARU.**
+
+`blocage_lecture` existe, 20 variantes neuves, et la mesure est nette :
 
 ```
-enc.photo_illisible.01  "Je n'arrive pas à lire la feuille."
-enc.photo_illisible.02  "L'image est un peu floue pour moi."
-enc.photo_illisible.05  "La photo est sombre. Je ne vois pas les mots."
-enc.photo_illisible.06  "Je n'ai pas réussi à lire le cahier."
-enc.photo_illisible.08  "L'écriture se cache. Je la cherche encore."
-enc.photo_illisible.10  "La feuille est difficile à lire pour moi."
-enc.photo_illisible.13  "La photo ne me dit pas grand-chose."
-enc.photo_illisible.14  "Je relis la feuille, tout doucement."
-enc.photo_illisible.16  "Je n'ai pas tout compris sur l'image."
-enc.photo_illisible.19  "L'image reste floue. Je continue à chercher."
+variantes attribuant la panne au micro ou à l'écoute de Pilou .... 20 / 20
+variantes parlant de la difficulté de l'exercice ..................  0 / 20
+variantes offrant une sortie ..................................... 20 / 20
 ```
 
-« La photo est sombre. » nomme la photo et son défaut. « Je n'ai pas réussi à
-lire le cahier. » est un constat d'échec au passé composé, sans suite. L'affirmation
-du rapport est fausse, et elle est fausse sur le point précis que l'arbitrage
-prétendait traiter.
+« Le micro n'entend pas bien ce soir. », « Je t'entends mal, et ce n'est pas
+toi. », « Ta voix ne m'arrive pas bien. On peut continuer sans le micro. » C'est
+la formulation même que PED-09 prescrit. La variante 05 va plus loin que la
+règle en disant explicitement à l'enfant que ce n'est pas lui — c'est bien vu.
 
-Second volet : **17 variantes sur 20 ne proposent aucune action**. Seules `03`
-(« Patiente un peu. »), `17` (« Tu peux voir ton coffre. ») et `18`
-(« Patience. ») donnent une suite ; une seule, `17`, donne une action réelle.
-PRD-16 exige un texte bienveillant **et une sortie** ; la traçabilité du
-marketing (ligne 1854) l'écrit : « Les quatre états limites ont un texte
-bienveillant et **au moins une action de sortie** ». Un enfant fatigué qui
-tombe sur `enc.photo_illisible.05` lit « La photo est sombre. Je ne vois pas les
-mots. » et n'a rien à faire.
+`blocage_maths` conserve la cause exercice, séparément, avec sa propre sortie sur
+19 variantes sur 20 (la vingtième, « Je reste avec toi. On choisit ensemble ce
+qu'on fait. », en ouvre une autrement).
 
-**Correction attendue** : réécrire les dix variantes citées pour que Pilou soit
-**en train de chercher** et non en train d'échouer, sans jamais nommer la photo,
-l'image, la feuille ni le cahier — sur le modèle de la clé marketing
-« Je cherche encore tes devoirs. » Ajouter à chacune des 20 variantes, ou à la
-clé `enfant.accueil.souci.corps` qu'elles alimentent, la sortie « Tu peux aller
-voir ton coffre. » Exemples de réécriture directement applicables :
-`01` → « Je cherche encore tes devoirs. Va voir ton coffre. » ;
-`05` → « Je regarde encore. Tu peux aller voir ton coffre. » ;
-`06` → « Je n'ai pas fini de chercher. Le coffre t'attend. » ;
-`13` → « Je cherche toujours. Ça peut prendre un moment. »
+**C — l'amorce d'indice qui annonçait autre chose que l'aide qui suit. MOTIF
+DISPARU.**
 
-## [MAJEUR] 6 — `blocage` déclare alimenter `lecture.blocage.corps`, dont aucune variante ne porte le sens
+Quatre banques, une par niveau PED-02, 20 variantes chacune, chacune sur sa clé
+unique. Les 80 textes lus un par un : aucune amorce n'annonce le contenu d'un
+autre niveau. L'annonce décrit toujours l'aide qui vient.
 
-`situations.blocage.cles_ui` déclare `maths.blocage.corps` **et**
-`lecture.blocage.corps`. Les deux clés n'ont pas le même sens dans le marketing :
+## La grille, point par point
 
-| Clé | Texte marketing | Cause réelle |
+| # | Point | Résultat |
 | --- | --- | --- |
-| `maths.blocage.corps` | « Celui-là est difficile. C'est normal. » | l'exercice résiste |
-| `lecture.blocage.corps` | « Le micro n'entend pas bien ce soir. » | **le microphone** n'a rien capté (PED-09) |
+| 1 | Ton : effort valorisé, jamais de reproche | **Conforme.** `retour_apres_lecture` et `reussite_maths` nomment l'acte et la stratégie, jamais l'enfant. Une réserve de forme en [MINEUR] 18. |
+| 2 | Interdits absolus | **Conforme.** 44 motifs testés sur 499 rendus : 0. Aucune comparaison, aucune ironie. |
+| 3 | Charge : une idée par phrase, 12 mots, CE1 | **Conforme sur la mesure** : 865 phrases, maximum 10 mots, 0 dépassement sous mes deux règles de comptage. Une locution hors registre en [MINEUR] 17. |
+| 4 | Pression : ni chrono, ni décompte, ni compteur, ni série | **Conforme.** 0 chiffre. `demande_pause` ne mentionne ni durée ni nombre de cycles. |
+| 5 | Récompense : aucune promesse réelle, aucune perte de pierres | **Conforme** (ETH-04, ETH-05). Les pierres restent virtuelles et toujours acquises : « Elles sont à toi. Elles ne se perdent pas. » |
+| 6 | Maths : rien ne conduit au résultat | **Conforme** (PED-01). `indice_demande_4` réserve explicitement le résultat à l'enfant dans six variantes sur vingt. |
+| 7 | Autonomie : la pause accessible, gratuite | **Conforme.** « La pause ne coûte rien. Elle est à toi. », « Tu reviens quand tu veux. Rien ne presse. », « On ne fait rien du tout. C'est permis. », « Tu as bien fait de demander la pause. » |
 
-`enc.blocage.01` reprend mot pour mot `maths.blocage.corps`. Aucune des 20
-variantes ne parle du micro, de la voix ni de l'écoute. Le tirage aléatoire
-enverrait donc sur un échec de reconnaissance vocale des phrases comme
-`enc.blocage.03` « Cet exercice résiste. Ça arrive souvent. » ou
-`enc.blocage.10` « Cet exercice est costaud. » : l'application attribue à
-l'enfant et à la difficulté du texte une panne qui est la sienne. PED-09 exige
-l'inverse — « jamais de sanction automatique sur une transcription, toujours
-"je n'ai pas bien entendu, tu peux répéter ?" ».
-
-**Correction attendue** : séparer la situation en `blocage_maths` et
-`blocage_lecture`, chacune avec 20 variantes et sa clé propre. Les 20 variantes
-de `blocage_lecture` doivent mettre la panne du côté de Pilou et du micro
-(« Je n'ai pas bien entendu. », « Le micro n'entend pas bien ce soir. »,
-« Ma voix t'écoute mal. On recommence ? ») et jamais du côté de la difficulté de
-l'exercice.
-
-## [MAJEUR] 7 — Le rituel de fermeture inverse l'arbitrage DES-06 du marketing, et le rapport le présente comme repris mot pour mot
-
-Le rapport §9 : « L'onboarding (7.2) et le rituel de clôture (7.8) sont repris
-**mot pour mot** dans `gwenn-scripts.json`. »
-
-Séquence du marketing (7.8), avec sa décision datée :
+## Passage à signaler, sans qu'il change l'avis
 
 ```
-| 6 | `bravo.bouton_principal`  | « Aller jouer »    | affiche |
-| 7 | `bravo.bouton_secondaire` | « Voir mon coffre » | affiche |
+enc.annonce_programme_une_etape.03, rendu maths :
+« On s'occupe de les maths, tous les deux. »
 ```
 
-> **Décision DES-06 sur la hiérarchie des deux boutons** (reprise du 2026-09-20) :
-> l'action principale de la clôture est **« Aller jouer »**. [...] Motif : le
-> rituel du soir doit se terminer sur la sortie de l'application, pas sur
-> l'inventaire des pierres. Terminer sur le coffre reviendrait à clore la soirée
-> sur le décompte de ce qui a été obtenu, ce que PRD-11 et PED-05 refusent.
+Je le mentionne ici parce que c'est un texte dit par Pilou à un enfant qui
+apprend à lire, et qu'une application d'accompagnement scolaire ne peut pas lui
+faire entendre une agglutination fautive. Mais je ne le compte pas contre la
+grille : les mots sont du vocabulaire CE1, la phrase porte une idée et huit mots,
+et elle ne met aucun enfant fatigué en difficulté. C'est un défaut de langue, pas
+un défaut de charte, et il est traité là où il doit l'être, en [MAJEUR] 14.
 
-Ce qui est livré dans `content/gwenn-scripts.json` :
+**Reformulation proposée** : « On prépare {matiere}, tous les deux. »
 
-```json
-{ "id": "bravo.bouton",   "ordre": 8, "role": "bouton", "texte": "Voir mon coffre" }
-{ "id": "bravo.bouton_2", "ordre": 9, "role": "bouton", "texte": "Aller jouer"     }
-```
+AVIS: CONFORME
 
-Trois écarts, tous sur la même ligne du rapport :
-1. les identifiants `bravo.bouton` et `bravo.bouton_2` **n'existent pas** dans le
-   marketing, qui définit `bravo.bouton_principal` et `bravo.bouton_secondaire` ;
-2. l'**ordre est inversé** : le fichier place « Voir mon coffre » avant
-   « Aller jouer », alors que sa propre règle
-   `"Elles sont jouées telles quelles, dans l'ordre du champ ordre"` fait de
-   `ordre` le pilote du rendu ;
-3. le champ `role` vaut `"bouton"` pour les deux : **rien dans le fichier ne
-   distingue l'action principale de l'action secondaire**, donc rien ne porte
-   l'arbitrage PRD-11 / PED-05 que le marketing a explicitement motivé.
-
-Le rituel de fermeture est la séquence que l'enfant entend tous les soirs de
-l'année. Une inversion silencieuse à cet endroit est précisément ce que le
-contrôle croisé doit arrêter.
-
-**Correction attendue** : renommer `bravo.bouton` → `bravo.bouton_secondaire`
-(« Voir mon coffre ») et `bravo.bouton_2` → `bravo.bouton_principal`
-(« Aller jouer »), et fixer `ordre: 8` sur `bravo.bouton_principal`,
-`ordre: 9` sur `bravo.bouton_secondaire`. Ajouter un champ
-`role: "bouton_principal" | "bouton_secondaire"` ou, à défaut, un champ
-`hierarchie` explicite, pour que l'arbitrage survive au fichier.
-
-## [MAJEUR] 8 — Deux vocabulaires normatifs pour l'énumération « canal », dans deux livrables de la même phase, laissés non résolus
-
-Qualification demandée. Voici la mienne.
-
-`produit-marketing.out.md` §3 (lignes 359-364) définit l'énumération
-`dit` / `affiche` / `dit_affiche` et la porte sur **330 clés** de ses tables.
-`encouragements.json` et `gwenn-scripts.json` définissent `tts` / `affiche` /
-`les_deux` et la portent sur **339 entrées**. Même notion, deux énumérations, un
-seul recouvrement (`affiche`), zéro mapping exécutable — la correspondance
-n'existe que dans une phrase du rapport (arbitrage 3).
-
-Le rapport renvoie la décision à plus tard : « À harmoniser dans un seul sens
-avant le développement de V1 », et §10.1 « Décision attendue de l'Orchestrateur ».
-
-Je ne l'accepte pas comme une réserve, pour trois raisons :
-
-1. **Ce n'est pas un arbitrage difficile.** Il n'oppose aucune exigence
-   pédagogique à aucune contrainte technique. C'est un choix de nom, il coûte
-   une passe de renommage, et le producteur était en position de le trancher
-   puisqu'il était le second des deux livrables et connaissait le premier.
-2. **Le coût croît avec l'attente.** Aujourd'hui, 669 entrées dans deux fichiers
-   de contenu. Après P2 et P3, l'énumération sera figée dans un type TypeScript,
-   dans le schéma Prisma et dans la clé du cache TTS (TEC-09b).
-3. **Le prompt maître ne l'impose pas.** §5.1, fiche `contenu-enfant`, dit
-   seulement : « Indiquer pour chaque entrée si elle est lue par TTS, affichée,
-   ou les deux. » Le rapport écrit « Les fichiers portent `tts`, `affiche`,
-   `les_deux`, **comme demandé** » : aucune source ne demande ces trois chaînes
-   précises. C'est une invention de convention, présentée comme une contrainte
-   reçue, en travers d'une convention déjà posée par le livrable amont.
-
-Ce n'est pas un [BLOQUANT] : rien n'atteint l'enfant. C'est un [MAJEUR] : c'est
-une divergence de schéma entre deux livrables d'une même phase, que la porte G1
-a précisément pour fonction de ne pas laisser passer.
-
-**Correction attendue** : trancher dans ce livrable. Ma recommandation, si
-l'Orchestrateur veut un sens par défaut : garder `tts` / `affiche` / `les_deux`
-dans les fichiers de contenu — `tts` nomme le mécanisme réel et se raccorde à
-TEC-08 et TEC-09b — et faire porter le renommage par le livrable marketing, dont
-les modes ne sont que la colonne d'un tableau et non un schéma de données.
-Quel que soit le sens retenu, la décision doit être écrite dans les deux
-livrables et une seule énumération doit survivre à la fermeture de G1.
+Motif : les trois passages A, B et C qui fondaient l'avis NON CONFORME du tour 1
+ont disparu, vérifié par mesure et par lecture intégrale des banques concernées.
+Aucun passage des 479 textes ne met aujourd'hui un enfant fatigué en difficulté,
+ne lui adresse un reproche, ne lui met de pression, ne lui promet une récompense
+réelle, ne lui donne un résultat de maths, ni ne lui ferme la pause. Les deux
+réserves de forme ([MINEUR] 17 et 18) et l'agglutination du [MAJEUR] 14 sont à
+corriger, mais aucune ne relève de la grille du gardien.
 
 ---
 
-## [MINEUR] 9 — `pas_de_devoirs` est la seule banque dont les variantes se recouvrent
+# CHIFFRES ANNONCÉS CONTRE CHIFFRES RÉELS
 
-Mesure indépendante, indice de Jaccard sur les mots pleins (mots-outils retirés),
-à l'intérieur de chaque situation. Sur les 16 situations, 11 paires dépassent
-0,50, dont **5 dans la seule `pas_de_devoirs`** :
-
-```
-0.67  enc.pas_de_devoirs.09 «Ce soir, c'est tranquille. Il n'y a rien.»
-      enc.pas_de_devoirs.18 «Le soir est à toi. Il n'y a rien.»
-0.67  enc.pas_de_devoirs.04 «Il n'y a rien à faire ce soir.»
-      enc.pas_de_devoirs.18 «Le soir est à toi. Il n'y a rien.»
-0.50  enc.pas_de_devoirs.04 / enc.pas_de_devoirs.11 / enc.pas_de_devoirs.09
-0.50  enc.pas_de_devoirs.03 «Le cahier est vide ce soir. Bonne soirée.»
-      enc.pas_de_devoirs.05 «Ce soir, on ne travaille pas. Bonne soirée.»
-```
-
-Six variantes sur vingt ouvrent sur « Ce soir », quatre sur « Pas de ». Le champ
-sémantique est étroit et je ne le reproche pas en soi. Je constate seulement que
-l'affirmation du rapport §3 — « chaque variante porte une image ou une
-proposition différente » — ne tient pas pour cette banque, alors qu'elle tient
-remarquablement bien pour les quinze autres : `accueil`, `avant_lecture`,
-`hesitation`, `blocage`, `demande_pause`, `retour_de_pause`, `cloture`,
-`reprise_session`, `avant_maths` et `indice_demande` ne produisent **aucune**
-paire au-dessus de 0,50. Le travail d'écriture est réel ; il manque sur une
-banque.
-
-**Correction attendue** : réécrire `04`, `09`, `11` et `18` en variant l'angle
-plutôt que la tournure — la soirée libre, le cahier refermé, le rendez-vous de
-demain, le coffre accessible — sans réemployer « il n'y a rien ».
-
-## [MINEUR] 10 — Répétition immédiate entre la banque `cloture` et le rituel de fermeture
-
-`enc.cloture.16` : « Fin du travail. **Tu peux aller jouer.** » est dite à la fin
-de la dernière étape. Quelques secondes plus tard, `bravo.fin` dit :
-« C'est fini. **Tu peux aller jouer.** » Même cas pour `enc.cloture.18` « **C'est
-fini.** On se retrouve un autre soir. » suivi de « **C'est fini.** Tu peux aller
-jouer. »
-
-Le découpage en deux moments est le bon (voir mon jugement sur l'arbitrage,
-plus bas), mais deux des vingt variantes empiètent sur les mots exacts du rituel
-et produisent un bégaiement au moment le plus ritualisé de la soirée.
-
-**Correction attendue** : réécrire `enc.cloture.16` et `enc.cloture.18` sans
-reprendre « Tu peux aller jouer » ni « C'est fini », réservés au rituel. Par
-exemple `16` → « Fin du travail. Le soir est à toi. » et `18` → « On s'arrête
-là. On se retrouve un autre soir. »
-
-## [MINEUR] 11 — Un participe accordé au genre, contre l'arbitrage 5 annoncé
-
-Rapport §8, arbitrage 5 : « **Aucune** variante ne contient d'adjectif ou de
-participe accordé au genre de l'enfant (pas de "tu es prêt", pas de "tu es
-allé"). Les textes restent justes pour un deuxième enfant, quel que soit son
-genre. »
-
-```
-enc.reprise_session.01 : "Te revoilà. On reprend là où on s'était arrêtés."
-```
-
-« arrêtés » est accordé au masculin pluriel. Pilou est féminine (« Je suis
-contente », `enc.accueil.01`) ; avec une enfant, l'accord correct serait
-« arrêtées ». L'affirmation « aucune variante » est donc fausse, sur une seule
-occurrence. La phrase est reprise mot pour mot de `enfant.accueil.reprise.corps`
-du marketing : le défaut est hérité, pas inventé — mais il est annoncé comme
-absent.
-
-Les autres formes relevées sont saines : « on est tranquilles », « tu es
-tranquille », « tes pierres sont bien rangées », « Contente de te revoir »
-(Pilou) ne dépendent pas du genre de l'enfant.
-
-**Correction attendue** : `enc.reprise_session.01` → « Te revoilà. On reprend
-là où on en était. » Signaler l'équivalent sur
-`enfant.accueil.reprise.corps` au producteur du marketing.
-
-## [MINEUR] 12 — La répartition des canaux du rapport §1.3 n'explique que 15 des 20 entrées non-`les_deux`
-
-Le rapport §1.3 écrit : « Les **15 entrées `affiche`** et les 5 entrées `tts`
-sont concentrées dans **deux situations** », puis cite `encouragement_lecture`
-(10 `affiche`) et `transition_etapes` (5 `tts`).
-
-Répartition réelle, recomptée :
-
-```
-encouragement_lecture   affiche  10
-onboarding              affiche   3   (boutons)
-rituel_fermeture        affiche   2   (boutons)
-transition_etapes       tts       5
-```
-
-Les deux situations citées portent 10 `affiche` et 5 `tts`, soit 15 entrées — et
-non « les 15 entrées `affiche` ». Les 5 `affiche` restantes sont les boutons de
-`gwenn-scripts.json`, légitimement non lus (la règle `lecture_tts` du fichier le
-prévoit), mais non couverts par la justification annoncée. Le total (5 / 15 /
-319) est juste ; la phrase qui l'explique ne l'est pas.
-
-**Correction attendue** : corriger la phrase du rapport en « Les 10 entrées
-`affiche` de la banque et les 5 entrées `tts` sont concentrées dans deux
-situations ; les 5 autres entrées `affiche` sont les boutons des rituels, jamais
-lus par construction. »
-
-## [MINEUR] 13 — Quelques tournures au-dessus du vocabulaire CE1
-
-Toutes tiennent les 12 mots et l'idée unique. Je relève des images abstraites
-qu'un CE1 fatigué peut prendre au pied de la lettre, ce que la charte de ton
-(§1.3, « un enfant de 6 ans prend tout au premier degré ») demande d'éviter :
-
-```
-enc.blocage.03          "Cet exercice résiste. Ça arrive souvent."
-enc.blocage.10          "Cet exercice est costaud. On y revient plus tard ?"
-enc.blocage.16          "On laisse cet exercice dormir un peu."
-enc.photo_illisible.08  "L'écriture se cache. Je la cherche encore."
-enc.pas_de_devoirs.08   "Le tipi est ouvert, mais le travail dort."
-enc.accueil.03          "Salut {prenom}. Ton tipi est allumé."
-```
-
-Un exercice qui « résiste », une écriture qui « se cache », un travail qui
-« dort », un tipi « allumé » : ce sont des personnifications, non des ironies, et
-elles ne violent aucun interdit absolu. Elles sont néanmoins le point le plus
-faible du registre, et `enc.pas_de_devoirs.08` cumule la personnification et une
-subordonnée en « mais », que `30-copy-enfant.mdc` demande d'éviter (« pas de
-subordonnées complexes »).
-
-**Correction attendue** : reformuler au concret.
-`blocage.03` → « Cet exercice est difficile. Ça arrive souvent. » ;
-`blocage.16` → « On laisse cet exercice de côté un moment. » ;
-`photo_illisible.08` → « Je cherche encore. Les mots sont petits. » ;
-`pas_de_devoirs.08` → « Le tipi est ouvert. Il n'y a pas de travail. » ;
-`accueil.03` → « Salut {prenom}. Ton tipi est prêt. »
-
----
-
-# JUGEMENTS DEMANDÉS
-
-## Sur l'arbitrage PED-11 contre PED-12 (point 7 de ma mission)
-
-**L'arbitrage tient. Ce n'est pas un contournement.** Je le motive.
-
-PED-12 dit : « Rituel de fermeture identique chaque soir : **même enchaînement,
-même ton**. » PED-11 dit : « Banque d'au moins 20 variantes de phrases par
-situation (réussite, effort, hésitation, pause, reprise, **clôture**) ».
-
-Les deux exigences ne portent pas sur le même objet. PED-12 nomme un **rituel** :
-une séquence d'écran, à une route identifiée (`/enfant/bravo`, §3.1), et ce que
-l'exigence protège est l'enchaînement et le ton, pas la totalité des mots
-prononcés dans les dernières minutes de la soirée. PED-11 nomme une **situation**
-de la banque de phrases. Placer la banque `cloture` à la fin de la dernière
-étape et le rituel fixe sur `/enfant/bravo` satisfait littéralement les deux, et
-c'est la seule lecture qui n'annule pas une exigence par l'autre. La lecture
-alternative — faire varier le rituel — violerait PED-12 frontalement ; la
-lecture inverse — supprimer la banque `cloture` — violerait PED-11, qui nomme
-« clôture » explicitement.
-
-Trois éléments confirment que la décision est tenue et non habillée :
-`invariant: true` est réellement présent sur `rituel_fermeture` ; les 9 lignes
-du rituel sont réellement sans variante ; et la `note` de `cloture` inscrit la
-règle dans le fichier lui-même. Le marketing, de son côté, avait pris la même
-décision (« l'enchaînement, les phrases et le son sont exactement les mêmes
-chaque soir »).
-
-**Mais l'arbitrage est démenti par le fichier sur un point** : `cloture` déclare
-`bravo.titre` dans ses `cles_ui` (constat 1). Tant que cette ligne est là, la
-démonstration de §5.4 est contredite par l'objet qu'elle décrit. L'arbitrage est
-juste ; son exécution est fausse d'une ligne. Cette ligne retirée, je valide
-l'arbitrage sans réserve.
-
-Je note aussi, sans en faire un constat contre le producteur, que le rituel dit
-« Tu as fait tes devoirs ce soir. » y compris quand le parent a arrêté la
-session après une étape. C'est assumé par la `note` du fichier, c'est la
-décision du marketing (« Aucune phrase ne mentionne ce qui n'a pas été fait »,
-ETH-02), et je la trouve préférable à l'alternative. Rien à corriger.
-
-## Sur la couverture réelle de PED-04, PED-05, PED-11, PED-12 (point 8)
-
-| Exigence | Couverte ? | Ce que j'ai vérifié moi-même |
-| --- | --- | --- |
-| **PED-04** — jamais « c'est faux » ni équivalent | **Oui, réellement** | Scan de chacun des 339 champs `texte` contre « c'est faux », « faux », « fausse », « erreur », « trompé », « incorrect », « nul », « bête », « essaie de faire mieux », en frontière de mot : **0 occurrence**. Aucune entrée ne porte de jugement d'exactitude. La règle « le sujet est je ou ça, jamais tu » est vérifiée sur les 20 variantes de `photo_illisible` et tient. Les seules occurrences de ces mots dans les fichiers sont dans `regles.interdits`, c'est-à-dire la liste des interdits elle-même. |
-| **PED-05** — éloge de l'effort, jamais de l'intelligence ni du résultat seul | **Oui, réellement** | « intelligent », « doué », « meilleur », « champion », « score », « note » : 0 occurrence. Les 20 variantes de `reussite_etape` portent toutes sur l'acte, la durée de l'effort ou la stratégie ; aucune ne qualifie l'enfant. `indice_demande` présente la demande d'aide comme une bonne stratégie (`10`, `16`). Aucune variante ne relie une pierre à une bonne réponse : les pierres n'apparaissent que dans `reprise_session.06`, le rituel de fermeture et `bienvenue.3.corps_2`. |
-| **PED-11** — ≥ 20 variantes par situation, dans un fichier de contenu | **Oui sur le compte, entamée sur le fond** | 16/16 situations présentes, 20/20 variantes chacune, 320 au total, hors du code : compté moi-même, aucun écart. Mais deux situations portent en réalité **deux rôles distincts** dans une banque unique : `indice_demande` couvre 4 niveaux (constat 4) et `blocage` couvre deux causes opposées (constat 6). Sur ces deux écrans, le seuil de 20 variantes **par situation réelle** n'est pas atteint : il est atteint par regroupement. |
-| **PED-12** — rituel de fermeture identique chaque soir | **Oui dans `gwenn-scripts.json`, contredite par `encouragements.json`** | `invariant: true`, `rejoue: "chaque soir, à l'identique"`, 9 lignes sans variante, ordre stable, aménagement conditionnel limité à un état technique : tout cela est réellement livré et je le valide. Mais `situations.cloture.cles_ui` contient `bravo.titre` (constat 1), et l'ordre des deux boutons inverse l'arbitrage du marketing (constat 7). PED-12 est couverte par un fichier et rouverte par l'autre. |
-
-Aucune des quatre n'est seulement citée. Les quatre sont travaillées, argumentées
-et, pour PED-04 et PED-05, tenues sans réserve. PED-11 et PED-12 sont tenues sur
-la lettre et entamées sur l'exécution.
-
----
-
-# AVIS gardien-charte
-
-Grille appliquée : les 7 points de `.cursor/agents/gardien-charte.md`, sur les
-339 textes destinés à l'enfant, lus un par un.
-
-| # | Point de contrôle | Résultat |
-| --- | --- | --- |
-| 1 | Ton : effort valorisé, jamais de reproche | **Réserve** — voir passages fautifs |
-| 2 | Interdits absolus : « c'est faux », « erreur », « tu t'es trompé », « essaie de faire mieux », comparaison, ironie | **Conforme** — 0 occurrence, aucune comparaison à un autre enfant, aucun second degré |
-| 3 | Charge : une idée par phrase, 12 mots max, vocabulaire CE1 | **Conforme sur la mesure** (max 10 mots sur 591 phrases), réserve de registre sur 6 tournures |
-| 4 | Pression : aucun chrono, décompte, compteur d'erreurs, série | **Conforme** — 0 chiffre, 0 durée, 0 compteur ; `demande_pause` interdit explicitement la durée dans sa `note` |
-| 5 | Récompense : aucune promesse de récompense réelle, aucune perte de pierres | **Conforme** (ETH-05, ETH-04) — les pierres sont toujours virtuelles et toujours acquises : « Elles sont à toi. Elles ne se perdent pas. » |
-| 6 | Maths : aucun contenu ne peut conduire à donner le résultat | **Conforme sur le contenu, réserve sur le mécanisme** |
-| 7 | Autonomie : la pause reste accessible et ne coûte jamais rien | **Conforme** sur la pause, **non conforme** sur l'état « photo illisible » |
-
-Le travail est, sur l'essentiel, d'une qualité que je tiens à nommer : 339 textes
-sans un emoji, sans un chiffre, sans un prénom gravé, sans une comparaison, sans
-une phrase au-dessus de 10 mots, avec un « je » systématique quand quelque chose
-ne marche pas. Les points 2, 4 et 5 sont tenus sans la moindre faiblesse. Trois
-passages, pourtant, mettent un enfant fatigué en difficulté, et la charte ne
-connaît qu'un seul objectif : que cela n'arrive jamais.
-
-## Passages fautifs, cités mot à mot
-
-### A. `photo_illisible` — l'enfant est laissé devant un échec sans issue (points 1 et 7)
-
-```
-enc.photo_illisible.05 : "La photo est sombre. Je ne vois pas les mots."
-enc.photo_illisible.06 : "Je n'ai pas réussi à lire le cahier."
-enc.photo_illisible.01 : "Je n'arrive pas à lire la feuille."
-enc.photo_illisible.10 : "La feuille est difficile à lire pour moi."
-enc.photo_illisible.13 : "La photo ne me dit pas grand-chose."
-```
-
-Ces cinq phrases sont des constats d'échec clos, sans suite et sans action. Un
-enfant de six ans et demi, seul devant l'écran en début de soirée, entend que
-Pilou a renoncé et n'a rien à faire ensuite. Dix-sept des vingt variantes de
-cette banque ne proposent aucune sortie. C'est l'unique endroit du contenu où
-l'application place l'enfant dans une impasse.
-
-**Reformulations proposées** — Pilou cherche toujours, et l'enfant a toujours où
-aller :
-
-```
-05 → "Je regarde encore. Tu peux aller voir ton coffre."
-06 → "Je n'ai pas fini de chercher. Le coffre t'attend."
-01 → "Je cherche encore tes devoirs. Va voir ton coffre."
-10 → "Je prends un peu plus de temps. Ton coffre est ouvert."
-13 → "Je cherche toujours. Ça peut prendre un moment."
-```
-
-### B. `blocage` sur l'étape de lecture — une panne du micro présentée comme la difficulté de l'enfant (point 1)
-
-La situation `blocage` déclare alimenter `lecture.blocage.corps`, dont le sens
-marketing est « Le micro n'entend pas bien ce soir. » Les variantes disponibles
-sont :
-
-```
-enc.blocage.03 : "Cet exercice résiste. Ça arrive souvent."
-enc.blocage.10 : "Cet exercice est costaud. On y revient plus tard ?"
-enc.blocage.13 : "Ça bloque un peu. Ce n'est pas grave."
-```
-
-Quand c'est le microphone qui n'a rien capté, dire à l'enfant que l'exercice
-résiste lui attribue une difficulté qui n'est pas la sienne. C'est le cas exact
-que PED-09 interdit. La formulation n'est pas un reproche explicite ; elle se
-lit comme un reproche, ce que le point 1 de la grille suffit à écarter.
-
-**Reformulations proposées**, à placer dans une banque `blocage_lecture` distincte :
-
-```
-"Je n'ai pas bien entendu. Tu veux redire ?"
-"Le micro n'entend pas bien ce soir."
-"Ma faute, j'écoute mal. On recommence ?"
-"Je t'entends mal. Ce n'est pas toi."
-```
-
-### C. `indice_demande` — l'annonce ne correspond pas à l'indice qui suit (points 3 et 6)
-
-```
-enc.indice_demande.18 : "Voilà un exemple plus facile. Regarde-le bien."
-enc.indice_demande.05 : "Je te pose une question, pour t'aider."
-enc.indice_demande.19 : "On refait le chemin ensemble, tout doucement."
-```
-
-Tirées au hasard pour n'importe lequel des quatre niveaux, ces amorces annoncent
-un contenu différent de celui qui arrive. Pour un enfant fatigué qui vient de
-demander de l'aide, la phrase qui annonce et la phrase qui aide ne racontent pas
-la même chose : c'est une charge inutile, au moment exact où il en a le moins.
-Le point 6 n'est pas violé — aucun texte ne conduit au résultat, et
-`enc.avant_maths.13` « Je ne donne pas les réponses. Je t'aide à chercher. » est
-exemplaire — mais l'échelle progressive que PED-02 protège est aplatie.
-
-**Reformulation proposée** : soit quatre sous-banques par niveau, soit 20
-amorces strictement neutres. Les six variantes qui décrivent un niveau précis
-(`05`, `07`, `09`, `17`, `18`, `19`) sont à déplacer ou à réécrire au neutre, par
-exemple `18` → « Voilà de quoi t'aider. Regarde bien. »
-
-## Ce que je valide sans réserve
-
-- **Point 2** : aucun interdit absolu, sur aucune des 339 entrées. Aucune
-  comparaison. Aucune ironie. Le contrôle du producteur avait levé un faux
-  positif sur « sérieusement » qui contient « série » ; je confirme que
-  `enc.reussite_etape.04` « Bravo. Tu as travaillé sérieusement. » est une phrase
-  saine et que le durcissement du contrôle était le bon geste.
-- **Point 4** : aucun chiffre, aucune durée, aucun cycle de respiration compté,
-  aucune série. `demande_pause` interdit explicitement le décompte dans sa
-  `note`, et les 20 variantes le tiennent.
-- **Point 5** : ETH-05 est tenue. Aucune entrée ne promet un objet, une sortie ou
-  un avantage réel. `bravo.pierres_plus_tard_2` « Elles sont à toi. Elles ne se
-  perdent pas. » est la bonne formulation d'ETH-04 : la perte n'est jamais
-  présentée comme possible, elle est niée.
-- **Point 7 sur la pause** : la pause est proposée par Pilou (`blocage.04`,
-  `blocage.15`, `blocage.17`), elle est toujours gratuite
-  (`demande_pause.10` « La pause ne coûte rien. Elle est à toi. »), le retour est
-  immédiat (`demande_pause.13` « Tu reviens quand tu veux. Rien ne presse. »), et
-  `retour_de_pause` ne commente jamais le fait d'avoir fait une pause. C'est
-  exactement ce que la charte demande.
-
-AVIS: NON CONFORME
-
-Motif : les trois passages A, B et C. Le point 7 de la grille est mis en défaut
-par `photo_illisible`, qui est le seul écran du contenu où un enfant fatigué se
-retrouve sans action possible, et le point 1 par la banque `blocage` appliquée à
-une panne de micro. Les quatre interdits durs (points 2, 4, 5, et le point 6 sur
-le résultat en maths) sont tenus sans exception. L'avis redevient CONFORME dès
-que A, B et C sont corrigés ; aucune autre reprise n'est demandée par le gardien.
-
----
-
-# TABLEAU DES COMPTAGES — ANNONCÉ CONTRE RÉEL
-
-Comptage refait par moi, avec mes propres commandes, sans lire les sorties du
-rapport. Sorties réelles en fin de document.
+Recomptés par mes propres commandes, sans lire les sorties du rapport.
 
 ## Variantes par situation
 
-| # | Situation | Clé | Annoncé | **Recompté** | Écart |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Accueil | `accueil` | 20 | **20** | — |
-| 2 | Annonce du programme | `annonce_programme` | 20 | **20** | — |
-| 3 | Avant lecture | `avant_lecture` | 20 | **20** | — |
-| 4 | Encouragement en cours de lecture | `encouragement_lecture` | 20 | **20** | — |
-| 5 | Hésitation sur un mot | `hesitation` | 20 | **20** | — |
-| 6 | Réussite d'étape | `reussite_etape` | 20 | **20** | — |
-| 7 | Transition entre étapes | `transition_etapes` | 20 | **20** | — |
-| 8 | Avant maths | `avant_maths` | 20 | **20** | — |
-| 9 | Indice demandé | `indice_demande` | 20 | **20** | — |
-| 10 | Blocage | `blocage` | 20 | **20** | — |
-| 11 | Demande de pause | `demande_pause` | 20 | **20** | — |
-| 12 | Retour de pause | `retour_de_pause` | 20 | **20** | — |
-| 13 | Clôture | `cloture` | 20 | **20** | — |
-| 14 | Pas de devoirs ce soir | `pas_de_devoirs` | 20 | **20** | — |
-| 15 | Photo illisible | `photo_illisible` | 20 | **20** | — |
-| 16 | Reprise d'une session interrompue | `reprise_session` | 20 | **20** | — |
-| | **Total** | | **320** | **320** | **—** |
+| # | Situation | Annoncé | **Recompté** | Écart |
+| --- | --- | --- | --- | --- |
+| 1 | `accueil` | 20 | **20** | — |
+| 2 | `annonce_programme` | 20 | **20** | — |
+| 3 | `annonce_programme_une_etape` | 20 | **20** | — |
+| 4 | `avant_lecture` | 20 | **20** | — |
+| 5 | `encouragement_pendant_lecture` | 20 | **20** | — |
+| 6 | `retour_apres_lecture` | 20 | **20** | — |
+| 7 | `hesitation` | 20 | **20** | — |
+| 8 | `blocage_lecture` | 20 | **20** | — |
+| 9 | `avant_maths` | 20 | **20** | — |
+| 10 | `indice_demande_1` | 20 | **20** | — |
+| 11 | `indice_demande_2` | 20 | **20** | — |
+| 12 | `indice_demande_3` | 20 | **20** | — |
+| 13 | `indice_demande_4` | 20 | **20** | — |
+| 14 | `blocage_maths` | 20 | **20** | — |
+| 15 | `reussite_maths` | 20 | **20** | — |
+| 16 | `transition_lecture_vers_maths` | 20 | **20** | — |
+| 17 | `transition_maths_vers_lecture` | 20 | **20** | — |
+| 18 | `demande_pause` | 20 | **20** | — |
+| 19 | `retour_de_pause` | 20 | **20** | — |
+| 20 | `cloture` | 20 | **20** | — |
+| 21 | `pas_de_devoirs` | 20 | **20** | — |
+| 22 | `photo_illisible` | 20 | **20** | — |
+| 23 | `reprise_session` | 20 | **20** | — |
+| | **Total** | **460** | **460** | **—** |
 
-Les 16 situations exigées par la mission sont toutes présentes, aucune situation
-en trop, aucune clé différente d'un `id`, aucune sous 20. Aucune clé dupliquée
-dans le JSON (contrôle par `object_pairs_hook`, qui détecte ce qu'un
-`JSON.parse` masque en gardant la dernière occurrence).
+23 situations, aucune manquante, aucune en trop, aucune sous 20, `id` identique à
+la clé d'indexation 23 fois sur 23, aucune clé JSON dupliquée.
 
-## Autres compteurs
+## Les autres grandeurs
 
-| Grandeur | Annoncé par le rapport | **Recompté** | Écart |
+| Grandeur | Annoncé | **Recompté** | Écart |
 | --- | --- | --- | --- |
-| Situations | 16 | **16** | — |
-| Variantes | 320 | **320** | — |
-| Lignes fixes `gwenn-scripts.json` | 19 | **19** (10 onboarding + 9 rituel) | — |
-| Écrans d'onboarding | 3 | **3** | — |
-| Écrans du rituel de fermeture | 1 | **1**, `invariant: true` | — |
-| Entrées totales | 339 | **339** | — |
-| Phrases contrôlées | 591 | **591** | — |
-| Dépassements de 12 mots | 0 | **0** | — |
-| Phrase la plus longue | `enc.blocage.02`, 10 mots | **`enc.blocage.02`, 10 mots** | — |
-| Mots interdits dans un `texte` | 0 | **0** | — |
+| Situations | 23 | **23** | — |
+| Variantes | 460 | **460** | — |
+| Parties | 680 | **680** | — |
+| Lignes fixes des rituels | 19 | **19** (10 + 9) | — |
+| Entrées totales | 479 | **479** | — |
+| Phrases contrôlées | 865 | **865** (sur les rendus réels) | — |
+| Dépassements de 12 mots | 0 | **0** (règle stricte **et** règle souple) | — |
+| Phrase la plus longue | 10 mots | **10 mots** | — |
+| Interdits de vocabulaire | 0 | **0** (44 motifs, 499 rendus) | — |
 | Emoji | 0 | **0** | — |
 | Chiffres | 0 | **0** | — |
-| Prénom `Evan` en dur | 0 | **0** | — |
-| Occurrences de « Gwenn » dans un `texte` | 0 | **0** | — |
-| Identifiants uniques | 339 | **339 / 339** | — |
-| Textes uniques (stricts) | 339 | **339 / 339** | — |
-| Textes uniques (normalisés) | 339 | **339 / 339** | — |
-| Canal `tts` | 5 | **5** | — |
-| Canal `affiche` | 15 | **15** | — |
-| Canal `les_deux` | 319 | **319** | — |
-| Entrées portant `{prenom}` | 11 (8 + 2 + 1) | **11** (accueil 8, reprise_session 2, bravo.titre 1) | — |
-| Entrées sans `canal` | — | **0** | — |
-| Entrées sans `id` ou sans `texte` | — | **0** | — |
+| Prénom en dur | 0 | **0** | — |
+| Accords de genre fautifs sur les rendus | 0 | **0** (527 rendus, 3 prénoms) | — |
+| Identifiants uniques | 479 | **479 / 479** | — |
+| Textes uniques (stricts) | 479 | **479 / 479** | — |
+| Textes uniques (normalisés) | — | **479 / 479** | — |
+| `texte == jointure des parties` | 460 / 460 | **460 / 460** | — |
+| Clés déclarées | 35 | **35** | — |
+| Clés absentes du marketing | 0 | **0** | — |
+| Clés déclarées par plusieurs banques | — | **0** | — |
+| Parties sans clé | 0 | **0** | — |
+| Canal `les_deux` | 454 | **454** | — |
+| Canal `affiche` | 25 | **25** (20 banque + 5 boutons) | — |
+| Canal `tts` | 0 | **0** | — |
+| **Paires au-dessus de 0,50 de recouvrement** | **0** | **3** | **+3** |
+| **Maximum de recouvrement** | **0,50** | **0,667** | **+0,167** |
+| **Banques au seuil de 0,50** | **5** | **10** (12 paires) | **+5** |
 
-**Écart entre chiffre annoncé et chiffre réel : aucun, sur vingt-trois
-grandeurs.** Le producteur a compté ce qu'il dit avoir compté. Je l'inscris ici
-parce que c'est la question que ma fiche de rôle me demande de poser en premier,
-et parce que la réponse est bonne.
+**Vingt-et-une grandeurs exactes, trois fausses**, toutes trois sur le même
+indicateur. Les trois écarts sont l'objet du [MAJEUR] 15.
 
-## Ma règle de comptage des mots, et la différence avec celle du producteur
+## Ma règle de comptage des mots
 
-Le producteur annonce un découpage des phrases sur `.`, `!`, `?` et un
-« comptage strict où une élision compte pour deux mots (« je t'aide » = 3 mots) ».
+Inchangée depuis le tour 1, et appliquée cette fois aux **rendus réels** et non
+aux gabarits : `{prenom}` substitué, `{matiere}` développé dans ses deux valeurs.
 
-J'ai mesuré avec **les deux règles**, sur les 591 phrases :
+- **Règle souple** (la mienne) : phrases découpées sur `.`, `!`, `?`, `…` ;
+  l'élision et le trait d'union restent dans le mot — « je t'aide » = 2 mots.
+- **Règle stricte** (celle du producteur) : on coupe aussi sur l'apostrophe et le
+  trait d'union — « je t'aide » = 3 mots.
 
-- **Règle souple** (la mienne par défaut, et la lecture naturelle de
-  `30-copy-enfant.mdc`) : une phrase est une suite terminée par `.`, `!`, `?` ou
-  `…` ; un mot est une suite de lettres, l'élision et le trait d'union restent
-  **dans** le mot, donc « je t'aide » = **2 mots**.
-- **Règle stricte du producteur** : on coupe aussi sur l'apostrophe et sur le
-  trait d'union, donc « je t'aide » = **3 mots**.
-
-| Règle | Phrase la plus longue | Longueur | Dépassements de 12 mots |
+| Règle | Phrase la plus longue | Longueur | Dépassements |
 | --- | --- | --- | --- |
-| Stricte (producteur) | `enc.blocage.02` — « On souffle un peu, ou on passe à la suite » | **10 mots** | **0** |
-| Souple (la mienne) | `enc.blocage.02` — même phrase | **10 mots** | **0** |
+| Stricte | `enc.indice_demande_2.15` — « Tu peux barrer les ronds au fur et à mesure » | **10** | **0** |
+| Souple | même phrase | **10** | **0** |
 
-Les deux règles donnent le même maximum et le même résultat, parce que la phrase
-la plus longue ne contient aucune élision. La règle stricte est bien plus sévère
-que la règle écrite, elle est déclarée, et elle ne masque rien : la marge de deux
-mots annoncée à l'arbitrage 8 est réelle. Mesuré aussi sur les **entrées
-entières** (toutes phrases confondues, pour le cas où une limite serait lue par
-entrée et non par phrase) : le maximum est de **11 mots stricts / 10 souples**
-(`enc.indice_demande.03`, `enc.avant_maths.13`, `enc.annonce_programme.06`),
-donc sous la limite même dans cette lecture la plus défavorable.
-
-## Schéma : régularité et consommation TypeScript
-
-| Contrôle | Résultat |
-| --- | --- |
-| Les deux fichiers parsent | **Oui**, `node` et `python3`, exit 0 |
-| Clés dupliquées dans un objet JSON | **0** |
-| Chaque variante porte `id`, `texte`, `canal`, `jetons` | **339 / 339**, aucun champ manquant |
-| Chaque variante porte **exactement** ces 4 champs, sans champ surnuméraire | **Oui** |
-| Chaque ligne de rituel porte `id`, `ordre`, `role`, `texte`, `canal`, `condition`, `jetons` | **Oui**, exactement ces 7 |
-| Chaque `canal` ∈ {`tts`, `affiche`, `les_deux`} | **339 / 339 valides**, aucune entrée sans canal |
-| Chaque situation porte `id`, `libelle`, `ecran`, `cles_ui`, `req`, `note`, `variantes` | **16 / 16** |
-| `id` de situation identique à sa clé d'indexation | **16 / 16** |
-| Caractères non-ASCII | **12 caractères distincts, tous des lettres françaises accentuées** — aucune apostrophe typographique, aucune espace insécable, aucun emoji |
-
-Le schéma est **régulier et stable** : indexation par identifiant de situation
-(pas de recherche dans un tableau), types homogènes, aucune variation de forme
-entre les 339 entrées, aucun champ optionnel implicite. Le type TypeScript donné
-en §1.4 du rapport décrit exactement ce que contient le fichier. Sur ce point le
-livrable est bon et je le dis.
-
-Ce qui manque n'est pas la régularité, c'est le **raccordement** : rien dans une
-variante ne dit quelle clé d'écran elle remplit (constat 3). Le fichier est
-directement typable ; il n'est pas directement câblable.
+Les deux rendus de `{matiere}` sont comptés séparément : le plus long,
+`enc.annonce_programme_une_etape.18`, fait 9 mots en rendu maths comme en rendu
+lecture. Mesuré aussi sur les entrées entières, la lecture la plus défavorable
+donne un maximum de 12 mots stricts, donc encore sous la limite.
 
 ---
 
 # SORTIES RÉELLES DES COMMANDES
 
-Toutes les commandes ci-dessous ont été exécutées dans `/home/user/Tipi`. Les
-sorties sont collées telles quelles.
+Exécutées dans `/home/user/Tipi`, sorties collées telles quelles.
 
-## 1. Validité JSON
+## 1. Validité JSON et détection de clés dupliquées
 
 ```
-$ node -e "const fs=require('fs');
-for (const f of ['content/encouragements.json','content/gwenn-scripts.json']) {
-  try { const d=JSON.parse(fs.readFileSync(f,'utf8'));
-  console.log(f+' : JSON VALIDE, schema='+d.schema+', cles racine='+Object.keys(d).length+' -> '+Object.keys(d).join(','));
-  } catch(e){ console.log(f+' : JSON INVALIDE -> '+e.message); } }"
-
-content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v1, cles racine=7 -> schema,version,personnage,jeton_prenom,canaux,regles,situations
-content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v1, cles racine=8 -> schema,version,personnage,note_nom_de_fichier,jeton_prenom,canaux,regles,rituels
+$ node -e "... JSON.parse des deux fichiers ..."
+content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, version=2.0.0, cles racine=11 -> schema,version,personnage,jeton_prenom,jeton_matiere,canaux,regles,correspondance_mission,cles_fixes_non_variees,statut_cles,situations
+content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, version=2.0.0, cles racine=8 -> schema,version,personnage,note_nom_de_fichier,jeton_prenom,canaux,regles,rituels
 ---exit:0---
 
-$ python3 -c "import json; [print(f,'OK, top-level keys:',list(json.load(open(f,encoding='utf-8')).keys())) for f in [...]]"
-
-/home/user/Tipi/content/encouragements.json OK, top-level keys: ['schema', 'version', 'personnage', 'jeton_prenom', 'canaux', 'regles', 'situations']
-/home/user/Tipi/content/gwenn-scripts.json OK, top-level keys: ['schema', 'version', 'personnage', 'note_nom_de_fichier', 'jeton_prenom', 'canaux', 'regles', 'rituels']
-```
-
-## 2. Comptage indépendant des situations et des variantes (avec détection de clés dupliquées)
-
-```
 $ python3  # json.loads(raw, object_pairs_hook=<detecteur de doublons>)
-
 CLES DUPLIQUEES encouragements.json : aucune
-nb situations : 16
-accueil                     20 variantes  (cle==id: True)
-annonce_programme           20 variantes  (cle==id: True)
-avant_lecture               20 variantes  (cle==id: True)
-encouragement_lecture       20 variantes  (cle==id: True)
-hesitation                  20 variantes  (cle==id: True)
-reussite_etape              20 variantes  (cle==id: True)
-transition_etapes           20 variantes  (cle==id: True)
-avant_maths                 20 variantes  (cle==id: True)
-indice_demande              20 variantes  (cle==id: True)
-blocage                     20 variantes  (cle==id: True)
-demande_pause               20 variantes  (cle==id: True)
-retour_de_pause             20 variantes  (cle==id: True)
-cloture                     20 variantes  (cle==id: True)
-pas_de_devoirs              20 variantes  (cle==id: True)
-photo_illisible             20 variantes  (cle==id: True)
-reprise_session             20 variantes  (cle==id: True)
-TOTAL variantes : 320
-manquantes : []
-en trop    : []
+CLES DUPLIQUEES gwenn-scripts.json  : aucune
 ```
 
-## 3. Rituels, entrées totales et régularité du schéma
+## 2. Comptage indépendant : situations, variantes, parties
 
 ```
 $ python3
+nb situations : 23
+accueil                             20 var   40 parties  cle==id:True
+annonce_programme                   20 var   20 parties  cle==id:True
+annonce_programme_une_etape         20 var   20 parties  cle==id:True
+avant_lecture                       20 var   20 parties  cle==id:True
+encouragement_pendant_lecture       20 var   20 parties  cle==id:True
+retour_apres_lecture                20 var   40 parties  cle==id:True
+hesitation                          20 var   20 parties  cle==id:True
+blocage_lecture                     20 var   40 parties  cle==id:True
+avant_maths                         20 var   20 parties  cle==id:True
+indice_demande_1                    20 var   20 parties  cle==id:True
+indice_demande_2                    20 var   20 parties  cle==id:True
+indice_demande_3                    20 var   20 parties  cle==id:True
+indice_demande_4                    20 var   20 parties  cle==id:True
+blocage_maths                       20 var   40 parties  cle==id:True
+reussite_maths                      20 var   40 parties  cle==id:True
+transition_lecture_vers_maths       20 var   40 parties  cle==id:True
+transition_maths_vers_lecture       20 var   40 parties  cle==id:True
+demande_pause                       20 var   40 parties  cle==id:True
+retour_de_pause                     20 var   20 parties  cle==id:True
+cloture                             20 var   20 parties  cle==id:True
+pas_de_devoirs                      20 var   40 parties  cle==id:True
+photo_illisible                     20 var   40 parties  cle==id:True
+reprise_session                     20 var   40 parties  cle==id:True
+TOTAL variantes : 460  TOTAL parties : 680
+```
 
-rituel onboarding: ecrans=3 rejoue='jamais' invariant=ABSENT
-   ecran bienvenue_1    ordre=1 lignes=3
-   ecran bienvenue_2    ordre=2 lignes=3
-   ecran bienvenue_3    ordre=3 lignes=4
+## 3. Rituels, entrées totales, schéma, invariant `texte == jointure`
+
+```
+$ python3
+rituel onboarding: ecrans=3 rejoue='jamais'
    -> 10 lignes
 rituel rituel_fermeture: ecrans=1 rejoue="chaque soir, à l'identique" invariant=True
-   ecran bravo          ordre=1 lignes=9
+    1 bravo.titre               role=titre              canal=les_deux cond=None    'Bravo {prenom}.'
+    2 bravo.corps               role=corps              canal=les_deux cond=None    'Tu as fait tes devoirs ce soir.'
+    3 bravo.pierres             role=corps              canal=les_deux cond=credit_pierres_ok       'Tu as gagné des pierres.'
+    4 bravo.coffre              role=corps              canal=les_deux cond=credit_pierres_ok       'Je les range dans ton coffre.'
+    5 bravo.pierres_plus_tard   role=corps              canal=les_deux cond=credit_pierres_differe  'Je range tes pierres un peu plus tard.'
+    6 bravo.pierres_plus_tard_2 role=corps              canal=les_deux cond=credit_pierres_differe  'Elles sont à toi. Elles ne se perdent pas.'
+    7 bravo.fin                 role=corps              canal=les_deux cond=None    "C'est fini. Tu peux aller jouer."
+    8 bravo.bouton_principal    role=bouton_principal   canal=affiche  cond=None    'Aller jouer'
+    9 bravo.bouton_secondaire   role=bouton_secondaire  canal=affiche  cond=None    'Voir mon coffre'
    -> 9 lignes
 TOTAL lignes fixes : 19
-TOTAL ENTREES (variantes + lignes) : 339
-PROBLEMES DE SCHEMA : 0
-entrees collectees : 339
+TOTAL ENTREES : 479
+
+ENTREES : 479  PARTIES : 680
+PROBLEMES DE SCHEMA / INVARIANT : 0
+INVARIANT texte==jointure verifie sur 460 variantes
+CANAUX : {'les_deux': 454, 'affiche': 25}
+IDS uniques : 479 / 479 aucun doublon
+TEXTES uniques (strict) : 479 / 479 aucun doublon
+TEXTES uniques (normalises) : 479 aucun doublon
 ```
 
-## 4. Canaux et unicité
+Le contrôle de schéma vérifie aussi, et sans aucune anomalie : chaque variante
+porte exactement `id`, `texte`, `canal`, `jetons`, `parties` ; chaque partie
+exactement `cles_ui`, `texte` ; chaque clé déclarée par une partie figure dans
+les `cles_ui` de sa situation ; les jetons déclarés sont exactement les jetons
+présents dans le texte.
 
-```
-$ python3
-
-ENTREES : 339
-CANAUX : {'les_deux': 319, 'affiche': 15, 'tts': 5}
-IDS uniques : 339 / 339 doublons: aucun
-TEXTES uniques (strict) : 339 / 339 doublons: aucun
-TEXTES uniques (normalises) : 339 doublons: aucun
-```
-
-```
-$ python3  # repartition detaillee des entrees non-les_deux
-
-  encouragement_lecture  affiche  10
-  onboarding             affiche  3
-  rituel_fermeture       affiche  2
-  transition_etapes      tts      5
-```
-
-## 5. Longueur des phrases, deux règles de comptage
+## 4. Longueur des phrases, sur les rendus réels
 
 ```
 $ python3
+PHRASES comptees SUR LES RENDUS REELS (prenom substitue, 2 rendus pour {matiere}) : 865
+Depassements >12 STRICT : 0
+Depassements >12 SOUPLE : 0
+Max strict : 10  Max souple : 10
 
-PHRASES comptees : 591
-Max en comptage STRICT (elision=2 mots) : 10 -> enc.blocage.02 : On souffle un peu, ou on passe à la suite
-Max en comptage SOUPLE (elision=1 mot)  : 10 -> enc.blocage.02 : On souffle un peu, ou on passe à la suite
-Depassements >12 mots STRICT : 0
-Depassements >12 mots SOUPLE : 0
-
---- 12 phrases les plus longues (strict, souple, id, texte) ---
-  10 / 10  enc.photo_illisible.04     Mes yeux de loutre ne lisent pas bien ce soir
-  10 / 10  enc.blocage.02             On souffle un peu, ou on passe à la suite
-   9 /  9  enc.hesitation.19          On le regarde de plus près, tous les deux
-   9 /  9  enc.hesitation.17          Je le répète, et tu le dis après moi
-   9 /  9  enc.avant_maths.20         Tu peux compter à voix haute, si tu veux
-   9 /  8  enc.photo_illisible.06     Je n'ai pas réussi à lire le cahier
-   9 /  8  enc.pas_de_devoirs.04      Il n'y a rien à faire ce soir
-   9 /  8  enc.pas_de_devoirs.01      Ce soir, il n'y a pas de devoirs
-   9 /  8  enc.hesitation.10          Tu veux qu'on le lise en même temps
-   9 /  8  enc.blocage.08             Tu as le droit de t'arrêter un moment
-   9 /  8  enc.annonce_programme.02   Je te montre ce qu'on fait ce soir
-   9 /  7  enc.photo_illisible.16     Je n'ai pas tout compris sur l'image
-
---- entrees entieres les plus longues (toutes phrases confondues) ---
-  11 / 10  enc.indice_demande.03      Je t'aide un peu. Je ne dis pas le résultat.
-  11 / 10  enc.avant_maths.13         Je ne donne pas les réponses. Je t'aide à chercher.
-  11 / 10  enc.annonce_programme.06   Tu sais déjà tout. Il n'y a pas de surprise.
-  11 /  9  enc.photo_illisible.20     Je m'occupe de ça. Ce n'est pas ton souci.
-  11 /  9  enc.pas_de_devoirs.13      Il n'y a pas de devoirs. C'est tout simple.
+--- phrases les plus longues ---
+  10/10  enc.indice_demande_2.15            Tu peux barrer les ronds au fur et à mesure
+  10/10  enc.blocage_maths.01               On souffle un peu, ou on passe à la suite
+  10/ 8  enc.blocage_lecture.16             Je n'entends qu'un petit bout de ta voix
+  10/ 8  enc.blocage_lecture.05             Je t'entends mal, et ce n'est pas toi
+   9/ 9  enc.indice_demande_3.10            Je te montre la même chose en plus petit
+   9/ 9  enc.indice_demande_2.14            On peut compter avec des cubes ou des crayons
+   9/ 9  enc.hesitation.19                  On le regarde de plus près, tous les deux
+   9/ 9  enc.annonce_programme_une_etape.18 [rendu maths]   Ce soir, on passe du temps sur les maths
+   9/ 9  enc.annonce_programme_une_etape.18 [rendu lecture] Ce soir, on passe du temps sur la lecture
 ```
 
-## 6. Vocabulaire interdit, emoji, chiffres, prénom en dur
-
-Scan sur les **339 champs `texte`** uniquement (les champs de métadonnées sont
-traités séparément plus bas) :
+## 5. Le jeton `{matiere}` : les deux rendus, variante par variante
 
 ```
-$ python3  # 43 motifs interdits, en frontiere de mot, insensible a la casse
+$ python3
+id   GABARIT                                     | RENDU LECTURE                              | RENDU MATHS
+01   On fait {matiere}. Et c'est tout.           | On fait la lecture. Et c'est tout.         | On fait les maths. Et c'est tout.
+02   Ce soir, c'est {matiere}, tranquillement.   | ...c'est la lecture, tranquillement.       | ...c'est les maths, tranquillement.
+03   On s'occupe de {matiere}, tous les deux.    | On s'occupe de la lecture, tous les deux.  | On s'occupe de les maths, tous les deux.   <-- AGRAMMATICAL
+04   Au programme, il y a {matiere}.             | ...il y a la lecture.                      | ...il y a les maths.
+05   On travaille {matiere} ensemble.            | On travaille la lecture ensemble.          | On travaille les maths ensemble.
+06   Je te propose {matiere} pour ce soir.       | ...la lecture pour ce soir.                | ...les maths pour ce soir.
+07   On prend {matiere}, tranquillement.         | On prend la lecture, tranquillement.       | On prend les maths, tranquillement.
+08   Aujourd'hui, on fait {matiere}.             | ...on fait la lecture.                     | ...on fait les maths.
+09   On ouvre {matiere}, et on y va.             | On ouvre la lecture, et on y va.           | On ouvre les maths, et on y va.
+10   On s'installe pour {matiere}.               | ...pour la lecture.                        | ...pour les maths.
+11   Tu fais {matiere} avec moi.                 | Tu fais la lecture avec moi.               | Tu fais les maths avec moi.
+12   On commence {matiere} quand tu veux.        | On commence la lecture quand tu veux.      | On commence les maths quand tu veux.
+13   Ce soir, on regarde {matiere}.              | ...on regarde la lecture.                  | ...on regarde les maths.
+14   On y va doucement pour {matiere}.           | ...pour la lecture.                        | ...pour les maths.
+15   Je t'accompagne sur {matiere}.              | ...sur la lecture.                         | ...sur les maths.
+16   Notre programme du soir, c'est {matiere}.   | ...c'est la lecture.                       | ...c'est les maths.
+17   On fait {matiere}, comme il faut.           | On fait la lecture, comme il faut.         | On fait les maths, comme il faut.
+18   Ce soir, on passe du temps sur {matiere}.   | ...sur la lecture.                         | ...sur les maths.
+19   On avance sur {matiere}, doucement.         | ...sur la lecture, doucement.              | ...sur les maths, doucement.
+20   Notre travail du soir, c'est {matiere}.     | ...c'est la lecture.                       | ...c'est les maths.
 
+=== jeton absent de certaines variantes ? ===   (aucune)
+=== jeton en debut de phrase ? ===              (aucune)
+=== jeton sujet d'un verbe ? ===                (aucune)
+```
+
+```
+$ python3  # scan des contractions fautives sur les 527 rendus
+=== AGGLUTINATIONS / CONTRACTIONS FAUTIVES (de+le, de+les, a+le, a+les) ===
+occurrences : 1
+   enc.annonce_programme_une_etape.03  [enfant.programme.une.corps.maths]
+   -> "On s'occupe de les maths, tous les deux."   (attendu : des)
+```
+
+## 6. Accords de genre sur les rendus (3 prénoms dont un féminin)
+
+```
+$ python3
+RENDUS REELS controles : 527
+tournures "tu es .. e" / "on est .. e" : 0
+adjectifs/participes a genre variable : 10 -- tous corrects :
+   enc.accueil.01           'contente'   accord sur Pilou (feminin)
+   enc.accueil.03           'prêt'       accord sur tipi (masculin)
+   enc.accueil.11           'contente'   accord sur Pilou
+   enc.blocage_lecture.06   'fatiguée'   accord sur oreille (feminin)
+   enc.pas_de_devoirs.06    'arrivé'     accord sur devoir (masculin)
+   enc.photo_illisible.18   'prête'      accord sur Pilou
+participes masculin pluriel type "arretes" : aucun sur l'enfant
+   enc.transition_maths_vers_lecture.04  'Voilà les maths terminées.'   accord sur maths
+   enc.transition_maths_vers_lecture.13  'Les maths sont terminées.'    accord sur maths
+   enc.reprise_session.06                'Tes pierres sont bien rangées.' accord sur pierres
+
+$ python3  # tour 1, constat 11
+enc.reprise_session.01 : "Te revoilà, {prenom}. On reprend là où on en était."
+```
+
+## 7. Vocabulaire interdit, emoji, chiffres, prénom en dur
+
+```
+$ python3   # 44 motifs, en frontiere de mot, sur les 499 rendus
 === VOCABULAIRE INTERDIT ===
-aucune occurrence
+motifs declenches : 2
+  [\bpas bien\b] 6 -- toutes dans blocage_lecture, sujet = le micro ou Pilou :
+      "Le micro n'entend pas bien ce soir."
+      "Je n'ai pas bien entendu."
+      "Le son ne me parvient pas bien."
+      "Je n'attrape pas bien ta voix."
+      "Ta voix ne m'arrive pas bien."
+      "Mon écoute ne marche pas bien ce soir."
+  [\btu n'as pas\b] 1
+      enc.reussite_maths.15  "Tu n'as pas abandonné. Bravo pour ton courage."
 
-=== EMOJI / SYMBOLES NON TEXTUELS ===
-occurrences : 0
-
-=== CHIFFRES (0-9) et nombres en toutes lettres ===
-entrees avec un chiffre : 0
+=== EMOJI ===     occurrences : 0
+=== CHIFFRES ===  occurrences : 0
+=== PRENOM EN DUR (Evan / Gwenn dans un texte) === occurrences : 0
 ```
 
-Motifs testés : `c'est faux`, `faux`, `fausse`, `erreur`, `tromp`, `incorrect`,
-`essaie de faire mieux`, `mieux`, `nul`, `nulle`, `bête`, `meilleur`, `champion`,
-`intelligent`, `doué`, `fort en`, comparaison à un camarade / copain / copine /
-autre enfant / frère / sœur, `chrono`, `minute`, `seconde`, `décompte`,
-`temps qui`, `score`, `points`, `note`, `noté`, `série`, `streak`,
-`recommence pour`, `cadeau`, `bonbon`, `jouet`, `récompense`, `perds`, `perdre`,
-`perdu`, `Evan`, `Gwenn`, `dépêche`, `vite`, `plus vite`.
-
-Contrôle emoji par plages Unicode, sur les fichiers bruts :
+Les six « pas bien » ne sont pas des constats : le sujet est toujours le micro ou
+Pilou, jamais la performance de l'enfant, et c'est la formulation que PED-09
+prescrit. La septième occurrence fait l'objet du [MINEUR] 18.
 
 ```
-$ perl -ne 'print "$ARGV:$.: $_" if /[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE00}-\x{FE0F}\x{1F300}-\x{1F9FF}]/' content/encouragements.json content/gwenn-scripts.json
-(aucune ligne affichee)
+$ perl -ne 'print if /[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE00}-\x{FE0F}\x{1F300}-\x{1F9FF}]/' content/*.json
+(aucune ligne)
 
-$ python3  # inventaire de tous les caracteres non-ASCII des deux fichiers
-  'À' U+00C0 Lu LATIN CAPITAL LETTER A WITH GRAVE
-  'Ç' U+00C7 Lu LATIN CAPITAL LETTER C WITH CEDILLA
-  'É' U+00C9 Lu LATIN CAPITAL LETTER E WITH ACUTE
-  'à' U+00E0 Ll LATIN SMALL LETTER A WITH GRAVE
-  'ç' U+00E7 Ll LATIN SMALL LETTER C WITH CEDILLA
-  'è' U+00E8 Ll LATIN SMALL LETTER E WITH GRAVE
-  'é' U+00E9 Ll LATIN SMALL LETTER E WITH ACUTE
-  'ê' U+00EA Ll LATIN SMALL LETTER E WITH CIRCUMFLEX
-  'î' U+00EE Ll LATIN SMALL LETTER I WITH CIRCUMFLEX
-  'ô' U+00F4 Ll LATIN SMALL LETTER O WITH CIRCUMFLEX
-  'ù' U+00F9 Ll LATIN SMALL LETTER U WITH GRAVE
-  'û' U+00FB Ll LATIN SMALL LETTER U WITH CIRCUMFLEX
+$ python3  # inventaire des caracteres non-ASCII des deux fichiers
+« » À Ç É à â ç è é ê î ô ù û   -> 15 caracteres, categories {Ll, Lu, Pi, Pf}
 ```
 
-Prénom en dur :
-
-```
-$ grep -n -E "Evan|Gwenn" content/encouragements.json
-exit=1 (aucune occurrence)
-
-$ grep -n -i "gwenn" content/gwenn-scripts.json
-2:  "schema": "tipi.gwenn-scripts.v1",
-5:  "note_nom_de_fichier": "Le fichier s'appelle gwenn-scripts.json parce que le prompt maître le nomme ainsi. Le personnage s'appelle Pilou partout dans les textes.",
-```
-
-Les deux occurrences de « Gwenn » sont dans le nom de schéma et dans la note
-explicative, jamais dans un `texte` destiné à l'enfant. Conforme au point que
-l'Orchestrateur a sorti de mon périmètre (ESC-001).
-
-Grep littéral sur les fichiers entiers, pour montrer ce qu'un contrôle naïf
-remonterait et pourquoi ce ne sont pas des constats :
-
-```
-$ grep -n -i -E "c'est faux|erreur|trompé|essaie de faire mieux|chrono|décompte|score|compteur" content/encouragements.json content/gwenn-scripts.json
-content/encouragements.json:15:      "c'est faux",
-content/encouragements.json:16:      "erreur",
-content/encouragements.json:17:      "tu t'es trompé",
-content/encouragements.json:18:      "essaie de faire mieux",
-content/encouragements.json:23:      "chrono",
-content/encouragements.json:24:      "décompte",
-content/encouragements.json:25:      "score chiffré",
-content/encouragements.json:26:      "compteur d'erreurs",
-content/encouragements.json:1443:      "note": "Aucune durée, aucun décompte, aucun nombre de cycles. Le retour est possible tout de suite.",
-```
-
-Les huit premières occurrences sont le contenu du tableau `regles.interdits`,
-c'est-à-dire la liste des interdits elle-même ; la neuvième est une `note` de
-situation. **Aucune n'est dans un `texte`.** Je le consigne pour qu'un contrôle
-ultérieur ne le compte pas comme une violation.
-
-## 7. Unicité réelle : les 20 variantes d'une situation sont-elles interchangeables ?
-
-Indice de Jaccard sur les mots pleins (mots-outils français retirés), toutes
-paires à l'intérieur de chaque situation, seuil 0,50.
+## 8. `photo_illisible` et `blocage_lecture` : les motifs du gardien
 
 ```
 $ python3
-
---accueil--               paires >=0.50 : 0
---annonce_programme--     paires >=0.50 : 1
-   0.5  enc.annonce_programme.05 «Voilà les images de ce soir. On les suit.»  ||  enc.annonce_programme.11 «Voilà notre chemin de ce soir. On le suit.»
---avant_lecture--         paires >=0.50 : 0
---encouragement_lecture-- paires >=0.50 : 1
-   0.5  enc.encouragement_lecture.03 «Prends ton temps.»  ||  enc.encouragement_lecture.15 «Tu prends ton temps. C'est exactement ça.»
---hesitation--            paires >=0.50 : 0
---reussite_etape--        paires >=0.50 : 2
-   0.6  enc.reussite_etape.06 «Tu as fait ce qu'il fallait. C'est bien.»  ||  enc.reussite_etape.16 «C'est fait. Tu as donné ce qu'il fallait.»
-   0.5  enc.reussite_etape.04 «Bravo. Tu as travaillé sérieusement.»  ||  enc.reussite_etape.20 «Tu as travaillé jusqu'à la fin. Bravo.»
---transition_etapes--     paires >=0.50 : 1
-   0.57 enc.transition_etapes.09 «Tu as fini cette partie. On passe à l'autre.»  ||  enc.transition_etapes.16 «Bravo pour cette partie. On passe à l'autre.»
---avant_maths--           paires >=0.50 : 0
---indice_demande--        paires >=0.50 : 0
---blocage--               paires >=0.50 : 0
---demande_pause--         paires >=0.50 : 0
---retour_de_pause--       paires >=0.50 : 0
---cloture--               paires >=0.50 : 0
---pas_de_devoirs--        paires >=0.50 : 5
-   0.67 enc.pas_de_devoirs.09 «Ce soir, c'est tranquille. Il n'y a rien.»  ||  enc.pas_de_devoirs.18 «Le soir est à toi. Il n'y a rien.»
-   0.67 enc.pas_de_devoirs.04 «Il n'y a rien à faire ce soir.»  ||  enc.pas_de_devoirs.18 «Le soir est à toi. Il n'y a rien.»
-   0.5  enc.pas_de_devoirs.04 «Il n'y a rien à faire ce soir.»  ||  enc.pas_de_devoirs.11 «Rien à faire ce soir. Ton coffre reste ouvert.»
-   0.5  enc.pas_de_devoirs.04 «Il n'y a rien à faire ce soir.»  ||  enc.pas_de_devoirs.09 «Ce soir, c'est tranquille. Il n'y a rien.»
-   0.5  enc.pas_de_devoirs.03 «Le cahier est vide ce soir. Bonne soirée.»  ||  enc.pas_de_devoirs.05 «Ce soir, on ne travaille pas. Bonne soirée.»
---photo_illisible--       paires >=0.50 : 1
-   0.5  enc.photo_illisible.01 «Je n'arrive pas à lire la feuille.»  ||  enc.photo_illisible.10 «La feuille est difficile à lire pour moi.»
---reprise_session--       paires >=0.50 : 0
-
-TOTAL paires >=0.50 : 11
+photo_illisible    variantes offrant une sortie : 20/20
+blocage_lecture    variantes offrant une sortie : 20/20
+blocage_maths      variantes offrant une sortie : 19/20
+photo_illisible : variantes nommant le support ou l'echec OCR : 0/20
+blocage_lecture : variantes mettant la panne sur le micro/l'ecoute : 20/20
 ```
 
-```
-$ python3  # squelettes recurrents : deux premiers mots normalises
-
-  accueil                  [('bonsoir {prenom}', 4), ('te voila', 4), ('te revoila', 2), ('bonsoir je', 2)]
-  annonce_programme        [('voila le', 3), ('je te', 2), ('je t', 2)]
-  avant_lecture            [('je lis', 2), ('on lit', 2)]
-  encouragement_lecture    [('ta voix', 2)]
-  hesitation               [('ce mot', 5), ('on le', 3), ('tu veux', 3)]
-  reussite_etape           [('tu as', 8), ('c est', 3), ('bravo tu', 2), ('cette etape', 2)]
-  avant_maths              [('les maths', 3), ('en maths', 2)]
-  indice_demande           [('je t', 5), ('je te', 4), ('voila un', 2)]
-  blocage                  [('cet exercice', 2), ('tu veux', 2), ('tu as', 2)]
-  demande_pause            [('la pause', 2)]
-  retour_de_pause          [('te revoila', 2), ('on repart', 2), ('on reprend', 2)]
-  cloture                  [('le travail', 4), ('c est', 4), ('voila on', 2)]
-  pas_de_devoirs           [('ce soir', 6), ('pas de', 4), ('il n', 2)]
-  photo_illisible          [('je n', 4), ('l image', 2), ('la photo', 2), ('je ne', 2)]
-  reprise_session          [('on reprend', 3), ('te revoila', 2), ('bonsoir {prenom}', 2), ('te voila', 2)]
-```
-
-**Conclusion sur l'unicité réelle** : l'unicité n'est pas que celle des chaînes.
-Quinze situations sur seize passent un test de recouvrement sémantique que
-l'unicité stricte ne teste pas. Ce n'est pas « la même phrase déclinée vingt
-fois » : `accueil`, `hesitation`, `blocage`, `demande_pause`, `cloture`,
-`indice_demande` et `avant_maths` ne produisent aucune paire au-dessus de 0,50,
-ce qui est rare sur vingt phrases courtes contraintes à un même contexte. Seule
-`pas_de_devoirs` se répète (constat 9, [MINEUR]). Le défaut **n'est pas
-systématique**, il n'y a donc pas de [MAJEUR] sur ce point.
-
-## 8. Cohérence avec le livrable marketing : les clés déclarées existent-elles ?
-
-Extraction des clés réellement **définies** dans les tables de clés du marketing
-(lignes de tableau de la forme `| `cle` |` ou `| n | `cle` |`), puis comparaison
-avec les 35 clés distinctes déclarées dans les champs `cles_ui`.
+## 9. Clés déclarées contre clés du marketing
 
 ```
 $ python3
+cles definies dans les tables du marketing : 339
+cles distinctes declarees au niveau situation : 35
+cles distinctes declarees au niveau partie   : 35
+identiques : True
 
-cles REELLEMENT DEFINIES dans les tables du marketing : 330
+>>> CLES DECLAREES ABSENTES DU MARKETING : 0
+>>> CLES DECLAREES PAR PLUSIEURS SITUATIONS : aucune
+>>> bravo.titre encore declare par une banque ? False
+>>> intersection banques / cles_fixes_non_variees : aucune (coherent)
+>>> transition.cloture.corps defini dans le marketing ? True
+    | `transition.cloture.corps` | « Tu as bien travaillé. Viens avec moi. » | les_deux |
 
->>> CLES DECLAREES PAR contenu-enfant QUI NE SONT PAS DES CLES DU MARKETING : 5
-   enfant.programme.corps    declaree par ['annonce_programme']
-      -> eclatee dans le marketing en : ['enfant.programme.corps.lecture_maths', 'enfant.programme.corps.maths_lecture']
-   lecture.intro.titre       declaree par ['avant_lecture']
-      -> eclatee dans le marketing en : ['lecture.intro.titre.apres', 'lecture.intro.titre.premier']
-   maths.intro.titre         declaree par ['avant_maths']
-      -> eclatee dans le marketing en : ['maths.intro.titre.apres', 'maths.intro.titre.premier']
-   transition.annonce        declaree par ['transition_etapes']
-      -> eclatee dans le marketing en : ['transition.annonce.lecture', 'transition.annonce.maths']
-   transition.felicitation   declaree par ['transition_etapes', 'cloture']
-      -> eclatee dans le marketing en : ['transition.felicitation.lecture', 'transition.felicitation.maths']
-
-cles marketing 'bravo.*' :
-   ['bravo.bouton_principal', 'bravo.bouton_secondaire', 'bravo.coffre', 'bravo.corps',
-    'bravo.fin', 'bravo.pierres', 'bravo.pierres_plus_tard', 'bravo.pierres_plus_tard_2', 'bravo.titre']
+>>> les 5 cles eclatees du tour 1 :
+   enfant.programme.corps   declaree ? False  -> declaree FIXE (porte l'ordre)
+   lecture.intro.titre      declaree ? False  -> declaree FIXE (porte la position)
+   maths.intro.titre        declaree ? False  -> declaree FIXE (porte la position)
+   transition.annonce       declaree ? False  -> eclatees declarees : ['transition.annonce.lecture', 'transition.annonce.maths']
+   transition.felicitation  declaree ? False  -> eclatees declarees : ['transition.felicitation.lecture', 'transition.felicitation.maths']
 ```
 
-Les 30 autres clés déclarées existent bien. Les identifiants livrés dans
-`gwenn-scripts.json` pour les deux boutons du rituel — `bravo.bouton` et
-`bravo.bouton_2` — ne figurent pas dans cette liste (constat 7).
-
 ```
-$ python3  # cles declarees par PLUSIEURS situations
-
-  lecture.retour.effort    <- ['encouragement_lecture', 'reussite_etape']
-  transition.felicitation  <- ['transition_etapes', 'cloture']
-```
-
-## 9. Jeton `{prenom}` et accords de genre
-
-```
-$ python3
-
-entrees portant {prenom} : 11
-  accueil : 8   (01, 03, 06, 09, 12, 14, 17, 20)
-  reprise_session : 2   (02, 14)
-  rituel_fermeture : 1  (bravo.titre)
-
-=== PARTICIPES / ADJECTIFS ACCORDES (risque de genre) ===
-   enc.accueil.01               'Bonsoir {prenom}. Je suis contente de te voir.'      (Pilou, feminin : OK)
-   enc.accueil.05               'Te revoilà. Assieds-toi, on est tranquilles.'        (invariable en genre : OK)
-   enc.accueil.11               'Salut. Je suis contente que tu sois là.'             (Pilou, feminin : OK)
-   enc.annonce_programme.10     "Je t'explique avant. Comme ça, tu es tranquille."    (invariable : OK)
-   enc.retour_de_pause.06       'Contente de te revoir.'                              (Pilou, feminin : OK)
-   enc.pas_de_devoirs.09        "Ce soir, c'est tranquille. Il n'y a rien."           (invariable : OK)
-   enc.photo_illisible.11       'Je mets un peu de temps. Reste tranquille.'          (invariable : OK)
-   enc.reprise_session.01       "Te revoilà. On reprend là où on s'était arrêtés."    <-- ACCORD MASCULIN PLURIEL
-   enc.reprise_session.06       'On continue. Tes pierres sont bien rangées.'         (accord sur "pierres" : OK)
+$ python3  # cles du tour 1 ni variees ni declarees fixes  -> [MINEUR] 16
+   enfant.attente.pilou    banque:False  cles_fixes:False
+   lecture.reprise.corps   banque:False  cles_fixes:False
+   maths.concret.corps     banque:False  cles_fixes:False
+   maths.reprise.corps     banque:False  cles_fixes:False
+   pause.rassurance        banque:False  cles_fixes:False
+Groupes de cles_fixes_non_variees : 8   cles listees : 29
 ```
 
-Une seule occurrence en défaut, `enc.reprise_session.01` (constat 11).
-
-## 10. `photo_illisible` : contenu et issues
+## 10. Recouvrement — liste de mots-outils **exacte du tour 1**
 
 ```
 $ python3
+===== jetons NEUTRALISES (regle du producteur au tour 2) =====
+paires STRICTEMENT au-dessus de 0,50 : 3
+   0.667  [encouragement_pendant_lecture]
+        02 «Continue, tu lis bien.»
+        18 «C'est bien, continue.»
+   0.571  [transition_lecture_vers_maths]
+        05 «Tu as terminé ta lecture. On va faire les maths.»
+        10 «Tu as terminé la lecture. On finit avec les maths.»
+   0.571  [photo_illisible]
+        04 «Je prends un peu plus de temps. Ton coffre est ouvert.»
+        07 «Je mets un peu de temps ce soir. Le coffre est ouvert pour toi.»
 
-=== variantes qui NOMMENT la photo / image / feuille / cahier / ecriture ===
-   enc.photo_illisible.01  "Je n'arrive pas à lire la feuille."
-   enc.photo_illisible.02  "L'image est un peu floue pour moi."
-   enc.photo_illisible.05  'La photo est sombre. Je ne vois pas les mots.'
-   enc.photo_illisible.06  "Je n'ai pas réussi à lire le cahier."
-   enc.photo_illisible.08  "L'écriture se cache. Je la cherche encore."
-   enc.photo_illisible.10  'La feuille est difficile à lire pour moi.'
-   enc.photo_illisible.13  'La photo ne me dit pas grand-chose.'
-   enc.photo_illisible.14  'Je relis la feuille, tout doucement.'
-   enc.photo_illisible.16  "Je n'ai pas tout compris sur l'image."
-   enc.photo_illisible.19  "L'image reste floue. Je continue à chercher."
-   -> 10 variantes sur 20
+paires EXACTEMENT a 0,50 : 12  (10 banques)
+     [annonce_programme]             05 «Voilà les images de ce soir. On les suit.»  ||  11 «Voilà notre chemin de ce soir. On le suit.»
+     [annonce_programme_une_etape]   16 «Notre programme du soir, c'est {matiere}.»  ||  20 «Notre travail du soir, c'est {matiere}.»
+     [encouragement_pendant_lecture] 01 «Je t'écoute.»  ||  19 «Je t'écoute jusqu'au bout.»
+     [indice_demande_1]              01 «Je te pose une question, pour t'aider.»  ||  12 «Ma question va t'aider à démarrer.»
+     [indice_demande_1]              03 «Dis-moi ce qu'on cherche, dans cet exercice.»  ||  19 «On cherche ensemble ce que veut cet exercice.»
+     [indice_demande_3]              01 «Je te montre un exemple plus facile.»  ||  09 «On s'entraîne sur un exemple facile.»
+     [indice_demande_3]              15 «Avec de petits nombres, c'est plus clair.»  ||  20 «On essaie avec des nombres plus petits.»
+     [reussite_maths]                03 «Tu as tenu jusqu'au bout. Bravo pour tes efforts.»  ||  13 «Tu as compté jusqu'au bout. Bravo pour ce travail.»
+     [transition_lecture_vers_maths] 01 «C'est fait. Tu as terminé la lecture. Maintenant, on passe aux maths.»  ||  10 «Tu as terminé la lecture. On finit avec les maths.»
+     [transition_maths_vers_lecture] 01 «C'est fait. Tu as terminé les maths. Maintenant, on passe à la lecture.»  ||  10 «Tu as terminé les maths. On finit avec la lecture.»
+     [cloture]                       04 «On arrête là. Le soir est à toi.»  ||  18 «On s'arrête là. On se retrouve un autre soir.»
+     [reprise_session]               02 «Bonsoir {prenom}. On continue notre travail.»  ||  20 «Bonsoir {prenom}. On continue notre chemin, tranquillement.»
 
-=== variantes offrant une SORTIE (coffre / action) ===
-   enc.photo_illisible.03  'Je cherche encore tes devoirs. Patiente un peu.'
-   enc.photo_illisible.17  'Ça prend un moment. Tu peux voir ton coffre.'
-   enc.photo_illisible.18  'Je ne lis pas encore ce devoir. Patience.'
-   -> 3 variantes sur 20, dont 1 seule avec une action reelle
+===== jetons COMPTES (regle du controleur au tour 1) =====
+paires STRICTEMENT au-dessus de 0,50 : 5   (les 3 ci-dessus, plus :)
+   0.6    [annonce_programme_une_etape] 16 / 20
+   0.571  [reprise_session] 02 / 20
 ```
 
-Référence marketing opposée, `docs/agents/P1/produit-marketing.out.md` :
+Robustesse des trois paires, sous quatre mesures indépendantes :
 
 ```
-1719: | **OCR illisible** | `parent.scan.illisible.*` (7.10) | jamais montré à l'enfant | Reprendre la photo ou saisir à la main |
- 567: | `enfant.accueil.souci.titre` | « Je cherche encore tes devoirs. » | dit_affiche |
- 568: | `enfant.accueil.souci.corps` | « Tu peux aller voir ton coffre. » | dit_affiche |
- 569: | `enfant.accueil.souci.bouton` | « Voir mon coffre » | affiche |
-1854: | PRD-16 | ... | Les quatre états limites ont un texte bienveillant et au moins une action de sortie ... |
+paire                                  J sans stop  J mini-stop  J full-stop  difflib
+encouragement_pendant_lecture.02/18           0.33         0.33         0.67     0.41
+transition_lecture_vers_maths.05/10           0.54         0.55         0.57     0.83
+photo_illisible.04/07                         0.47         0.43         0.57     0.73
+annonce_programme_une_etape.16/20             0.71         0.67         0.50     0.79
+reprise_session.02/20                         0.57         0.57         0.50     0.78
 ```
 
-## 11. `indice_demande` : les quatre amorces du marketing
+`transition_lecture_vers_maths` 05/10 dépasse 0,50 sous les quatre mesures et
+atteint 0,83 en similarité de séquence : ce n'est pas un artefact de liste de
+mots-outils, c'est la même phrase.
+
+## 11. Soir léger — 37 motifs de réduction et de fatigue
 
 ```
-$ grep -n "\`maths\.indice\." docs/agents/P1/produit-marketing.out.md
+$ python3
+=== 37 motifs, sur les 479 entrees ===
+  [\bmoins\b]  1   enc.indice_demande_3.06  "On fait pareil, mais avec moins d'objets."   (niveau 3, nombres plus petits)
+  [\bcourt]    3   enc.annonce_programme.07 "Voilà le programme. Il est court, comme toujours."
+                   enc.avant_lecture.17     "Le texte est court. On y va ensemble."
+                   enc.indice_demande_3.16  "Voilà la même idée, en plus court."
+  [\bfatigu]   1   enc.blocage_lecture.06   "Ma petite oreille de loutre est fatiguée."   (Pilou, pas l'enfant)
+  [\bjuste (une|un|la|le|les)\b] 3  hesitation.07, demande_pause.07, demande_pause.14
+  TOTAL : 8 occurrences
 
-858:| `maths.indice.1.amorce` | « Je te pose une question, pour t'aider. » | dit_affiche |
-859:| `maths.indice.2.amorce` | « On peut faire autrement. Écoute. » | dit_affiche |
-860:| `maths.indice.3.amorce` | « Je te montre un exemple plus facile. » | dit_affiche |
-861:| `maths.indice.4.amorce` | « On le fait ensemble, tout doucement. » | dit_affiche |
-862:| `maths.indice.epuise` | « Je t'ai tout dit. À toi de chercher. » | dit_affiche |
+  dans annonce_programme_une_etape : 0 occurrence sur les 37 motifs
 ```
 
-## 12. `blocage` : les deux clés déclarées n'ont pas le même sens
+## 12. Ce qui était acquis
 
 ```
-$ grep -n "\`maths\.blocage\|\`lecture\.blocage" docs/agents/P1/produit-marketing.out.md
+$ python3
+=== les 6 tournures CE1 du tour 1 ont-elles disparu ? ===
+   [résiste] 0   [costaud] 0   [dormir] 0
+   [écriture se cache] 0   [travail dort] 0   [tipi est allumé] 0
 
-722:| `lecture.blocage.corps`   | « Le micro n'entend pas bien ce soir. »       | dit_affiche |
-723:| `lecture.blocage.corps_2` | « On fait une pause, ou on continue ? »       | dit_affiche |
-724:| `lecture.blocage.bouton`  | « Faire une pause »                            | affiche |
-725:| `lecture.blocage.bouton_2`| « Continuer »                                  | affiche |
-886:| `maths.blocage.corps`     | « Celui-là est difficile. C'est normal. »      | dit_affiche |
-887:| `maths.blocage.corps_2`   | « On souffle un peu, ou on passe à la suite ? »| dit_affiche |
-888:| `maths.blocage.bouton`    | « Faire une pause »                            | affiche |
-889:| `maths.blocage.bouton_2`  | « Passer à la suite »                          | affiche |
+=== la banque cloture emprunte-t-elle les mots du rituel ? ===
+   ["tu peux aller jouer"] dans cloture -> 0
+   ["c'est fini"] dans cloture -> 0
+
+=== PED-05 : qualification de l'enfant ? ===
+   intelligent / doué / meilleur / champion / super / génial -> 0
+
+=== PED-01 : une entree annonce-t-elle un resultat ? ===
+   "la réponse est" / "le résultat est" / "ça donne" / "égale" -> 0
+   ("ça fait" remonte une fois : enc.demande_pause.15 "Étire tes bras. Ça fait du bien.")
 ```
-
-## 13. Rituel de fermeture : ordre des boutons, marketing contre livraison
-
-```
-$ sed -n '1018,1030p' docs/agents/P1/produit-marketing.out.md
-
-| Ordre | Clé | Texte | Mode |
-| 1 | `bravo.titre` | « Bravo Evan. » | dit_affiche |
-| 2 | `bravo.corps` | « Tu as fait tes devoirs ce soir. » | dit_affiche |
-| 3 | `bravo.pierres` | « Tu as gagné des pierres. » | dit_affiche |
-| 4 | `bravo.coffre` | « Je les range dans ton coffre. » | dit_affiche |
-| 5 | `bravo.fin` | « C'est fini. Tu peux aller jouer. » | dit_affiche |
-| 6 | `bravo.bouton_principal` | « Aller jouer » | affiche |
-| 7 | `bravo.bouton_secondaire` | « Voir mon coffre » | affiche |
-
-**Décision DES-06 sur la hiérarchie des deux boutons** (reprise du 2026-09-20) :
-l'action principale de la clôture est **« Aller jouer »**. Elle est seule en bas
-d'écran, pleine largeur, à l'emplacement habituel de l'action principale.
-```
-
-Livré dans `content/gwenn-scripts.json`, lignes 231-248 :
-
-```json
-{ "id": "bravo.bouton",   "ordre": 8, "role": "bouton", "texte": "Voir mon coffre", "canal": "affiche", "condition": null, "jetons": [] },
-{ "id": "bravo.bouton_2", "ordre": 9, "role": "bouton", "texte": "Aller jouer",     "canal": "affiche", "condition": null, "jetons": [] }
-```
-
-## 14. Vocabulaire de canal : les deux énumérations concurrentes
-
-```
-$ sed -n '359,364p' docs/agents/P1/produit-marketing.out.md
-
-- `dit` — lu par Pilou en TTS uniquement
-- `affiche` — affiché à l'écran uniquement
-- `dit_affiche` — les deux, avec le même texte mot pour mot
-[...] `dit_affiche` (PED-10). Un texte en `affiche` seul ne peut être que décoratif ou
-
-$ python3 -c "import json;print(json.load(open('content/encouragements.json'))['canaux'])"
-['tts', 'affiche', 'les_deux']
-
-$ grep -c "dit_affiche" docs/agents/P1/produit-marketing.out.md
-(porté sur les tables de clés du livrable marketing)
-```
-
-Fiche `contenu-enfant` du prompt maître, `TIPI-PROMPT-CURSOR.md` ligne 411 :
-
-```
-- Indiquer pour chaque entrée si elle est lue par TTS, affichée, ou les deux.
-```
-
-Aucune des trois chaînes `tts`, `affiche`, `les_deux` n'y est imposée.
 
 ---
 
-# SYNTHÈSE
+# HISTORIQUE — TOUR 1
+
+Verdict du tour 1 : **FAIL**, 0 [BLOQUANT], 8 [MAJEUR], 5 [MINEUR],
+`AVIS gardien-charte : NON CONFORME`. Les 23 grandeurs annoncées avaient alors
+été vérifiées à l'unité près, sans aucun écart.
+
+| # | Gravité | Constat | Sort au tour 2 |
+| --- | --- | --- | --- |
+| 1 | [MAJEUR] | `situations.cloture.cles_ui` contenait `bravo.titre`, la ligne invariante du rituel : PED-12 cassée dans le fichier | **CORRIGÉ.** `cloture.cles_ui` = `['transition.cloture.corps']`. Aucune banque ne déclare une clé de `/enfant/bravo`. Vérifié. |
+| 2 | [MAJEUR] | 5 clés déclarées n'existaient plus après la correction du marketing | **CORRIGÉ.** `transition.annonce` et `transition.felicitation` remplacées par leurs 4 clés éclatées ; `enfant.programme.corps`, `lecture.intro.titre`, `maths.intro.titre` déclarées fixes avec motif. 0 clé absente du marketing. Vérifié. |
+| 3 | [MAJEUR] | Aucune variante ne disait quelle clé elle remplit, alors que 14 situations sur 16 en déclaraient 2 à 4 | **CORRIGÉ.** Champ `parties` : 680 parties, chacune portant son texte et ses clés ; invariant `texte == jointure` vrai 460 fois sur 460 ; `cles_fixes_non_variees` motive ce qui n'est pas varié. Vérifié. Reste une incomplétude de 5 clés : [MINEUR] 16. |
+| 4 | [MAJEUR] | `indice_demande` : un tirage aléatoire de 20 amorces pour les 4 niveaux PED-02 | **CORRIGÉ.** 4 banques de 20, une par niveau, chacune sur sa clé unique. Les 80 textes relus : aucun hors registre de son niveau. Vérifié. |
+| 5 | [MAJEUR] | `photo_illisible` : 10 variantes sur 20 nommaient la photo comme illisible ; 17 sur 20 sans issue | **CORRIGÉ.** Banque réécrite : 0/20 nomment le support, 20/20 ouvrent sur le coffre. Vérifié. |
+| 6 | [MAJEUR] | `blocage` déclarait `lecture.blocage.corps` sans aucune variante sur le micro | **CORRIGÉ.** `blocage_lecture` créée : 20/20 attribuent la panne au micro ou à Pilou, 0 à l'exercice. `blocage_maths` conservée séparément. Vérifié. |
+| 7 | [MAJEUR] | Boutons du rituel inversés contre DES-06, identifiants inexistants | **CORRIGÉ.** `bravo.bouton_principal` = « Aller jouer », ordre 8 ; `bravo.bouton_secondaire` = « Voir mon coffre », ordre 9 ; `role` porte la hiérarchie. Conforme à ARB-03. Vérifié. |
+| 8 | [MAJEUR] | Deux vocabulaires de canal (`tts`/`les_deux` contre `dit`/`dit_affiche`) non tranchés | **CORRIGÉ.** ARB-02 tranche pour `tts`/`affiche`/`les_deux` ; la décision et la table de correspondance sont inscrites dans `regles.canal_decision` ; le marketing s'est aligné. Vérifié. |
+| 9 | [MINEUR] | `pas_de_devoirs` : 5 paires au-dessus de 0,50 | **CORRIGÉ.** 6 variantes réécrites en changeant d'angle. 0 paire au-dessus de 0,50 sous mes quatre mesures. Vérifié. |
+| 10 | [MINEUR] | La banque `cloture` empruntait « Tu peux aller jouer » et « C'est fini » au rituel | **CORRIGÉ.** 0 occurrence des deux formules dans `cloture`. Vérifié. |
+| 11 | [MINEUR] | `enc.reprise_session.01` portait un participe accordé au masculin pluriel | **CORRIGÉ.** « On reprend là où on en était. » 0 accord de genre sur 527 rendus. Vérifié. |
+| 12 | [MINEUR] | La phrase du rapport sur la répartition des canaux était fausse | **CORRIGÉ.** `affiche` 25 = 20 de la banque + 5 boutons, adossé au comptage par situation. Vérifié. |
+| 13 | [MINEUR] | 6 tournures au-dessus du registre CE1 | **CORRIGÉ.** Les 6 expressions ont disparu. Une tournure neuve entre en [MINEUR] 17. |
+
+Les trois motifs qui rendaient l'`AVIS gardien-charte` NON CONFORME au tour 1
+(A `photo_illisible`, B blocage en lecture, C amorces d'indices) ont **tous les
+trois disparu**, vérifiés par mesure et par lecture intégrale. L'avis repasse
+CONFORME au tour 2.
+
+---
+
+# SYNTHÈSE DU TOUR 2
 
 | Gravité | Nombre | Constats |
 | --- | --- | --- |
-| **[BLOQUANT]** | **0** | Aucun. JSON valide, 16/16 situations, 20/20 variantes, aucun interdit absolu dans un texte enfant, aucun emoji, aucun chiffre, aucun prénom en dur. |
-| **[MAJEUR]** | **8** | 1 (`bravo.titre` dans `cloture`), 2 (5 clés retirées), 3 (pas de dispatch par variante), 4 (`indice_demande` / PED-02), 5 (`photo_illisible`), 6 (`blocage` lecture), 7 (boutons du rituel inversés), 8 (deux vocabulaires de canal) |
-| **[MINEUR]** | **5** | 9 (`pas_de_devoirs` répétitive), 10 (répétition banque/rituel), 11 (accord de genre), 12 (répartition des canaux mal expliquée), 13 (registre CE1 sur 6 tournures) |
+| **[BLOQUANT]** | **0** | JSON valide, 23/23 situations à 20 variantes, 16 situations de mission couvertes, aucun interdit, aucun emoji, aucun chiffre, aucun prénom en dur, PED-01/04/05/07 tenues. |
+| **[MAJEUR]** | **2** | 14 (rendu agrammatical du jeton `{matiere}`), 15 (trois chiffres faux sur le recouvrement, 3 paires réelles au-dessus de 0,50) |
+| **[MINEUR]** | **4** | 16 (5 clés ni variées ni déclarées fixes), 17 (« au fur et à mesure »), 18 (éloge par la négation), 19 (nommage `transition.cloture.corps`) |
 
-**VERDICT: FAIL**, mécaniquement, par la règle de ma fiche de rôle : un seul
-[MAJEUR] impose FAIL, il y en a huit.
+**VERDICT: FAIL**, mécaniquement : un seul [MAJEUR] impose FAIL, il y en a deux.
 
-## Ce qui est acquis et ne sera pas recontrôlé
+## Ce que coûte la reprise du tour 3
 
-Pour que la reprise soit courte, je fixe ce qui est validé et n'a pas à être
-retouché :
+Les deux [MAJEUR] se corrigent en **six réécritures de variantes et deux lignes
+de règle**. Ce n'est pas une refonte, et je le dis pour que le volume du verdict
+ne fasse pas croire l'inverse.
 
-- **Les vingt-trois compteurs annoncés sont exacts.** Recomptés indépendamment,
-  aucun écart. Le producteur n'a inventé aucune sortie de commande. Sur le point
-  que ma fiche de rôle place en premier, le livrable est irréprochable.
-- **La validité et la régularité du JSON** : 0 clé dupliquée, 0 champ manquant,
-  0 champ surnuméraire, 339/339 canaux valides, aucune entrée sans canal.
-- **PED-04 et PED-05** sont couvertes réellement, et bien.
-- **Le corps des textes** : 591 phrases sous 10 mots, aucun interdit, aucune
-  comparaison, aucune ironie, aucune pression, aucune promesse de récompense
-  réelle, le « je » systématique quand quelque chose ne marche pas, le jeton
-  `{prenom}` partout au lieu d'un prénom gravé.
-- **La diversité réelle** des quinze banques autres que `pas_de_devoirs`.
-- **L'arbitrage PED-11 / PED-12 lui-même** : la décision est juste, seule son
-  exécution est à reprendre d'une ligne.
-- **Le nom de fichier `gwenn-scripts.json`** : hors de mon périmètre, ESC-001
-  ouverte par l'Orchestrateur. Le producteur a fait ce qu'il fallait — conserver
-  le nom imposé, documenter l'écart dans `note_nom_de_fichier`, n'employer
-  « Gwenn » dans aucun texte enfant.
-
-## Ce qui doit revenir corrigé
-
-Par ordre de coût croissant. Les constats 1, 2, 7 et 11 sont des corrections de
-quelques lignes ; 5, 9, 10 et 13 sont de la réécriture de texte ; 3, 4 et 6 sont
-des décisions de structure qui doivent être **tranchées dans le livrable**, pas
-renvoyées au développement.
-
-| Constat | Nature | Fichier |
+| Constat | Action | Ampleur |
 | --- | --- | --- |
-| 1 | Retirer `"bravo.titre"` de `cloture.cles_ui` | `encouragements.json` |
-| 2 | Remplacer 5 clés par les clés éclatées du marketing | `encouragements.json` |
-| 7 | Renommer les 2 boutons, inverser `ordre`, porter la hiérarchie | `gwenn-scripts.json` |
-| 11 | `enc.reprise_session.01` → « On reprend là où on en était. » | `encouragements.json` |
-| 12 | Corriger la phrase de répartition des canaux | `contenu-enfant.out.md` |
-| 5 | Réécrire 10 variantes de `photo_illisible`, ajouter la sortie | `encouragements.json` |
-| 9 | Réécrire 4 variantes de `pas_de_devoirs` | `encouragements.json` |
-| 10 | Réécrire `enc.cloture.16` et `enc.cloture.18` | `encouragements.json` |
-| 13 | Reformuler 6 tournures au concret | `encouragements.json` |
-| 3 | Décider comment une variante désigne sa clé d'écran | structure |
-| 4 | Éclater `indice_demande` en 4 niveaux, ou neutraliser 6 variantes | structure |
-| 6 | Éclater `blocage` en `blocage_maths` / `blocage_lecture` | structure |
-| 8 | Trancher l'énumération de canal, l'écrire dans les deux livrables | structure + Orchestrateur |
+| 14 | Réécrire `enc.annonce_programme_une_etape.03` et ajouter la contrainte de préposition à `regles.jeton_matiere_regle` | 1 variante + 1 ligne |
+| 15 | Réécrire 5 variantes doublons ; republier le chiffre avec sa règle de mesure | 5 variantes + 1 paragraphe |
+| 16 | Ajouter un 9ᵉ groupe à `cles_fixes_non_variees` | 1 bloc JSON |
+| 17 | `enc.indice_demande_2.15` → « Tu peux barrer les ronds, un par un. » | 1 variante |
+| 18 | `enc.reussite_maths.15` → « Tu as continué jusqu'au bout. Bravo pour ton courage. » | 1 variante |
+| 19 | Renommer `transition.cloture.corps` → `session.fin_travail.corps` | 2 occurrences ici, 5 côté marketing — décision de l'Orchestrateur |
 
-Les constats 3, 4, 6 et 8 augmentent le volume de la banque (PED-11 s'applique à
-chaque situation réelle). Si l'Orchestrateur juge le volume disproportionné, la
-décision lui revient, mais elle doit être **écrite** : PED-11 exige 20 variantes
-par situation, et regrouper deux situations sous une clé unique pour tenir le
-compte n'est pas une façon de couvrir l'exigence.
+## Ce qui est acquis et ne sera pas recontrôlé au tour 3
+
+- Les **vingt-et-une grandeurs exactes** : 23 situations, 460 variantes, 680
+  parties, 479 entrées, 865 phrases, 19 lignes de rituel, 35 clés, 0 dépassement
+  de 12 mots, 0 interdit, 0 emoji, 0 chiffre, 0 prénom en dur, 0 accord de genre,
+  479 identifiants et 479 textes uniques, invariant `texte == jointure` 460/460,
+  canaux 454/25/0.
+- La **structure `parties`**, qui règle proprement le raccordement et se type
+  sans transformation.
+- Les **treize constats du tour 1**, tous corrigés au fond.
+- **PED-01, PED-04, PED-05, PED-07, PED-11, PED-12** et l'arbitrage
+  PED-11 / PED-12.
+- L'`AVIS gardien-charte`, repassé **CONFORME**.
+- Les réponses sur le **canal `tts`** (validée sans réserve) et sur le **jeton
+  `{matiere}`** comme procédé (validé ; c'est son contrôle qui est en défaut).
+- Le **Soir léger indiscernable**, vérifié sur 37 motifs et sur le sens.
+- Le nom de fichier `gwenn-scripts.json` : hors périmètre, ESC-001.
