@@ -10,6 +10,14 @@ Outils : Vitest, Testing Library, msw pour les appels externes.
 Couverture obligatoire
 - Moteur de session : chaque transition, la pause et le retour de pause, la reprise après fermeture (PRD-18), l'abandon parent.
 - Service pierres : +1 par étape, +1 bonus pour 2 étapes, jamais de delta négatif, solde toujours égal à la somme du ledger, écriture impossible depuis le client.
+  > **Amendement de l'Orchestrateur — ARB-08 et ARB-13.** La ligne ci-dessus
+  > reprend le prompt maître, qui dit « +1 bonus pour 2 étapes ». Cette règle a
+  > été **révoquée**. Le barème opposable est : `+1 par étape terminée`, plus un
+  > bonus versé lorsque **toutes les étapes programmées** du soir sont
+  > terminées, calibré pour qu'une **soirée complète vaille toujours 3 pierres**
+  > quel que soit le nombre d'étapes. Écris tes tests contre ce barème et non
+  > contre la ligne d'origine, conservée ici pour la traçabilité. Motifs dans
+  > `docs/agents/GATES.md`.
 - Code parent : hash vérifié, mauvais code rejeté, blocage après 5 tentatives, code absent des logs et des réponses d'API.
 - Pipeline d'analyse : OCR vide, OCR illisible, JSON DeepSeek non conforme, deuxième tentative, bascule en état illisible.
 - Matching de lecture : tolérance aux accents, à la casse, à la ponctuation, à un mot manquant ; jamais de verdict binaire exposé.
