@@ -5,11 +5,18 @@
 // - Les champs sont en camelCase côté TypeScript et mappés en snake_case côté
 //   Postgres avec @map, pour que les noms de colonnes soient EXACTEMENT ceux de
 //   la section 3.7. La table de correspondance champ par champ est dans
-//   docs/agents/P2/architecture.out.md, section 3.2.
-// - Trois contraintes ne sont pas exprimables en Prisma et vivent dans
-//   supabase/policies.sql, partie B : le CHECK `delta > 0` de gem_ledger
-//   (ETH-04), l'unicité partielle « une seule session active par enfant »
-//   (PRD-18) et le CHECK `tentatives_echouees >= 0` (SEC-02).
+//   docs/agents/P2/architecture.out.md, section 3.1.
+// - HUIT contraintes ne sont pas exprimables en Prisma (ni CHECK, ni index
+//   unique partiel) et vivent dans supabase/policies.sql, partie B. Les voici
+//   toutes, parce que ce fichier-ci est celui que lira `dev-feature` :
+//     1. CHECK  gem_ledger.delta > 0                          (ETH-04)
+//     2. CHECK  gem_ledger.delta <= 1                          (barème 3.7)
+//     3. CHECK  child.gem_balance >= 0                         (SEC-06)
+//     4. CHECK  settings_access.tentatives_echouees >= 0       (SEC-02)
+//     5. CHECK  reward_threshold.gems_requis > 0               (PRD-14)
+//     6. CHECK  family.retention_audio_jours BETWEEN 0 AND 365 (SEC-05)
+//     7. UNIQUE partiel : une seule session active par enfant  (PRD-18)
+//     8. CHECK  cohérence session.etat / session.etape_courante (TEC-10)
 // - Aucun accès client à cette base : toutes les lectures et écritures passent
 //   par une route serveur Next.js (TEC-11, TEC-13, SEC-06). Les politiques RLS
 //   de supabase/policies.sql refusent tout à `anon` et `authenticated` (SEC-03).
@@ -65,13 +72,16 @@ enum StatutTentative {
 }
 
 /// Motif d'un crédit de pierres. Barème de 3.7 : +1 par étape terminée,
-/// +1 bonus si les deux étapes du soir sont terminées. Aucune autre valeur
-/// n'existe : jamais de pierre par bonne réponse (PED-05).
+/// +1 bonus quand TOUTES les étapes programmées du soir sont terminées.
+/// Le bonus ne porte pas un « 2 » en dur : une étape vide n'étant jamais
+/// programmée (arbitrage de l'Orchestrateur, tour 1), une soirée à une seule
+/// étape est une soirée complète. Aucune autre valeur n'existe : jamais de
+/// pierre par bonne réponse (PED-05).
 /// Sert aussi de clé d'idempotence avec sessionId (@@unique ci-dessous).
 enum RaisonGem {
   etape_lecture_terminee
   etape_maths_terminee
-  bonus_deux_etapes
+  bonus_soiree_complete
 }
 
 /// Thèmes commutables (PRD-17, DES-01, DES-02).
@@ -280,15 +290,25 @@ model Attempt {
 /// ETH-04 : aucun delta négatif, garanti par le CHECK `gem_ledger_delta_positif`
 /// de supabase/policies.sql, partie B — pas seulement par le code.
 model GemLedger {
-  id        String    @id @default(uuid()) @db.Uuid
-  childId   String    @map("child_id") @db.Uuid
-  sessionId String?   @map("session_id") @db.Uuid
+  id      String @id @default(uuid()) @db.Uuid
+  childId String @map("child_id") @db.Uuid
+
+  /// OBLIGATOIRE, et c'est ce qui rend l'idempotence vraie : PostgreSQL traite
+  /// les NULL comme distincts dans un index unique, donc une colonne nullable
+  /// aurait laissé passer deux crédits (NULL, 'etape_lecture_terminee').
+  /// Aucun crédit du barème de 3.7 n'existe hors d'une session.
+  sessionId String @map("session_id") @db.Uuid
+
   delta     Int       @db.SmallInt
   raison    RaisonGem
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  child   Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
-  session Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  child   Child   @relation(fields: [childId], references: [id], onDelete: Cascade)
+  /// Cascade et non SetNull : SetNull est impossible sur une colonne
+  /// obligatoire, et aucune route ne supprime une session. La seule suppression
+  /// du produit est celle du foyer (SEC-07), qui efface tout en une
+  /// transaction.
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   /// Idempotence du crédit : une raison ne peut être créditée qu'une fois par
   /// session. Un double appui sur le bouton principal ne crédite pas deux fois.
