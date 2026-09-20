@@ -35,7 +35,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "enfant.accueil.reprise.bouton": {
       "id": "enfant.accueil.reprise.bouton",
@@ -44,7 +45,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Variante de reprise** (l'app a été fermée en cours de soirée, PRD-18) :",
+      "exclusif_avec": []
     },
     "enfant.accueil.vide.bouton": {
       "id": "enfant.accueil.vide.bouton",
@@ -53,7 +55,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — aucun devoir préparé ce soir** (PRD-16) :",
+      "exclusif_avec": []
     },
     "enfant.accueil.souci.bouton": {
       "id": "enfant.accueil.souci.bouton",
@@ -62,52 +65,62 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — les devoirs n'ont pas pu être chargés** :",
+      "exclusif_avec": []
     },
     "enfant.attente.pilou": {
       "id": "enfant.attente.pilou",
       "ecran": "/enfant",
       "texte": "Je regarde tes devoirs. J'arrive.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "enfant.programme.carte.lecture": {
       "id": "enfant.programme.carte.lecture",
       "ecran": "/enfant/programme",
       "texte": "La lecture",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "enfant.programme.carte.maths": {
       "id": "enfant.programme.carte.maths",
       "ecran": "/enfant/programme",
       "texte": "Les maths",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "enfant.programme.corps.lecture_maths": {
       "id": "enfant.programme.corps.lecture_maths",
       "ecran": "/enfant/programme",
       "texte": "D'abord la lecture. Après, les maths.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "enfant.programme.corps.maths_lecture"
+      ]
     },
     "enfant.programme.corps.maths_lecture": {
       "id": "enfant.programme.corps.maths_lecture",
       "ecran": "/enfant/programme",
       "texte": "D'abord les maths. Après, la lecture.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "enfant.programme.corps.lecture_maths"
+      ]
     },
     "enfant.programme.bouton": {
       "id": "enfant.programme.bouton",
@@ -116,7 +129,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "enfant.programme.une.titre": {
       "id": "enfant.programme.une.titre",
@@ -125,7 +139,10 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "Variante à une seule étape** (une seule matière reconnue, matière retirée par",
+      "exclusif_avec": [
+        "enfant.programme.titre"
+      ]
     },
     "enfant.programme.une.bouton": {
       "id": "enfant.programme.une.bouton",
@@ -134,7 +151,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Variante à une seule étape** (une seule matière reconnue, matière retirée par",
+      "exclusif_avec": []
     },
     "enfant.programme.souci.titre": {
       "id": "enfant.programme.souci.titre",
@@ -143,16 +161,18 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "exclusif_avec": []
     },
     "enfant.programme.souci.corps": {
       "id": "enfant.programme.souci.corps",
       "ecran": "/enfant/programme",
       "texte": "On regarde ton coffre en attendant.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "exclusif_avec": []
     },
     "enfant.programme.souci.bouton": {
       "id": "enfant.programme.souci.bouton",
@@ -161,25 +181,32 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "exclusif_avec": []
     },
     "lecture.intro.titre.premier": {
       "id": "lecture.intro.titre.premier",
       "ecran": "/enfant/session/lecture",
       "texte": "On commence par la lecture.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "lecture.intro.titre.apres"
+      ]
     },
     "lecture.intro.titre.apres": {
       "id": "lecture.intro.titre.apres",
       "ecran": "/enfant/session/lecture",
       "texte": "Maintenant, la lecture.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "lecture.intro.titre.premier"
+      ]
     },
     "lecture.intro.bouton": {
       "id": "lecture.intro.bouton",
@@ -188,16 +215,18 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.modele.corps": {
       "id": "lecture.modele.corps",
       "ecran": "/enfant/session/lecture",
       "texte": "Voilà. Maintenant, c'est ton tour.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.modele.bouton": {
       "id": "lecture.modele.bouton",
@@ -206,25 +235,28 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.modele.relire": {
       "id": "lecture.modele.relire",
       "ecran": "/enfant/session/lecture",
       "texte": "Réécouter",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.micro.consigne": {
       "id": "lecture.micro.consigne",
       "ecran": "/enfant/session/lecture",
       "texte": "Appuie sur le micro. Lis à voix haute.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.micro.bouton": {
       "id": "lecture.micro.bouton",
@@ -233,7 +265,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.micro.bouton_stop": {
       "id": "lecture.micro.bouton_stop",
@@ -242,7 +275,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.retour.bouton": {
       "id": "lecture.retour.bouton",
@@ -251,7 +285,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.hesitation.bouton": {
       "id": "lecture.hesitation.bouton",
@@ -260,7 +295,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Hésitation détectée sur un mot** — situation `hesitation` :",
+      "exclusif_avec": []
     },
     "lecture.hesitation.bouton_2": {
       "id": "lecture.hesitation.bouton_2",
@@ -269,25 +305,28 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Hésitation détectée sur un mot** — situation `hesitation` :",
+      "exclusif_avec": []
     },
     "lecture.pas_entendu.corps": {
       "id": "lecture.pas_entendu.corps",
       "ecran": "/enfant/session/lecture",
       "texte": "Je n'ai pas bien entendu.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "exclusif_avec": []
     },
     "lecture.pas_entendu.corps_2": {
       "id": "lecture.pas_entendu.corps_2",
       "ecran": "/enfant/session/lecture",
       "texte": "Tu peux redire, s'il te plaît ?",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "exclusif_avec": []
     },
     "lecture.pas_entendu.bouton": {
       "id": "lecture.pas_entendu.bouton",
@@ -296,7 +335,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "exclusif_avec": []
     },
     "lecture.pas_entendu.bouton_2": {
       "id": "lecture.pas_entendu.bouton_2",
@@ -305,7 +345,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "exclusif_avec": []
     },
     "lecture.blocage.bouton": {
       "id": "lecture.blocage.bouton",
@@ -314,7 +355,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "exclusif_avec": []
     },
     "lecture.blocage.bouton_2": {
       "id": "lecture.blocage.bouton_2",
@@ -323,16 +365,18 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "exclusif_avec": []
     },
     "lecture.question.intro": {
       "id": "lecture.question.intro",
       "ecran": "/enfant/session/lecture",
       "texte": "J'ai une petite question sur l'histoire.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.question.bouton": {
       "id": "lecture.question.bouton",
@@ -341,61 +385,68 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.question.retour_ok": {
       "id": "lecture.question.retour_ok",
       "ecran": "/enfant/session/lecture",
       "texte": "Oui, c'est bien ça. Tu as bien écouté.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.question.retour_autre": {
       "id": "lecture.question.retour_autre",
       "ecran": "/enfant/session/lecture",
       "texte": "Tu veux relire le début, pour voir ?",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.question.passer": {
       "id": "lecture.question.passer",
       "ecran": "/enfant/session/lecture",
       "texte": "Je ne sais pas",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "lecture.breton.intro": {
       "id": "lecture.breton.intro",
       "ecran": "/enfant/session/lecture",
       "texte": "Ce texte est en breton.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "exclusif_avec": []
     },
     "lecture.breton.corps": {
       "id": "lecture.breton.corps",
       "ecran": "/enfant/session/lecture",
       "texte": "Je ne sais pas le lire. Toi, oui.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "exclusif_avec": []
     },
     "lecture.breton.consigne": {
       "id": "lecture.breton.consigne",
       "ecran": "/enfant/session/lecture",
       "texte": "Lis-le à voix haute, tranquillement.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "exclusif_avec": []
     },
     "lecture.breton.bouton": {
       "id": "lecture.breton.bouton",
@@ -404,7 +455,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "exclusif_avec": []
     },
     "lecture.breton.bouton_2": {
       "id": "lecture.breton.bouton_2",
@@ -413,7 +465,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "exclusif_avec": []
     },
     "session.pause.bouton": {
       "id": "session.pause.bouton",
@@ -422,7 +475,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "session.sortie_parent.titre": {
       "id": "session.sortie_parent.titre",
@@ -431,16 +485,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "exclusif_avec": []
     },
     "session.sortie_parent.corps": {
       "id": "session.sortie_parent.corps",
       "ecran": "/enfant/session/lecture",
       "texte": "Les pierres déjà gagnées sont conservées.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "exclusif_avec": []
     },
     "session.sortie_parent.bouton": {
       "id": "session.sortie_parent.bouton",
@@ -449,34 +505,38 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "exclusif_avec": []
     },
     "session.sortie_parent.annuler": {
       "id": "session.sortie_parent.annuler",
       "ecran": "/enfant/session/lecture",
       "texte": "Revenir à la session",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "exclusif_avec": []
     },
     "lecture.micro_absent.corps": {
       "id": "lecture.micro_absent.corps",
       "ecran": "/enfant/session/lecture",
       "texte": "Le micro ne marche pas ce soir.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "exclusif_avec": []
     },
     "lecture.micro_absent.corps_2": {
       "id": "lecture.micro_absent.corps_2",
       "ecran": "/enfant/session/lecture",
       "texte": "Lis à voix haute. Appuie quand tu as fini.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "exclusif_avec": []
     },
     "lecture.micro_absent.bouton": {
       "id": "lecture.micro_absent.bouton",
@@ -485,61 +545,72 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "exclusif_avec": []
     },
     "lecture.sans_voix.corps": {
       "id": "lecture.sans_voix.corps",
       "ecran": "/enfant/session/lecture",
       "texte": "Je ne peux pas lire à voix haute ce soir.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — voix de Pilou indisponible**",
+      "exclusif_avec": []
     },
     "lecture.sans_voix.corps_2": {
       "id": "lecture.sans_voix.corps_2",
       "ecran": "/enfant/session/lecture",
       "texte": "Le texte est là. Lis-le tranquillement.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — voix de Pilou indisponible**",
+      "exclusif_avec": []
     },
     "lecture.reprise.corps": {
       "id": "lecture.reprise.corps",
       "ecran": "/enfant/session/lecture",
       "texte": "On reprend la lecture.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "exclusif_avec": []
     },
     "lecture.reprise.corps_2": {
       "id": "lecture.reprise.corps_2",
       "ecran": "/enfant/session/lecture",
       "texte": "On était ici.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "exclusif_avec": []
     },
     "maths.intro.titre.premier": {
       "id": "maths.intro.titre.premier",
       "ecran": "/enfant/session/maths",
       "texte": "On commence par les maths.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "maths.intro.titre.apres"
+      ]
     },
     "maths.intro.titre.apres": {
       "id": "maths.intro.titre.apres",
       "ecran": "/enfant/session/maths",
       "texte": "Maintenant, les maths.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "maths.intro.titre.premier"
+      ]
     },
     "maths.intro.bouton": {
       "id": "maths.intro.bouton",
@@ -548,16 +619,18 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.concret.corps": {
       "id": "maths.concret.corps",
       "ecran": "/enfant/session/maths",
       "texte": "Regarde les ronds. Tu peux les compter.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.concret.bouton": {
       "id": "maths.concret.bouton",
@@ -566,7 +639,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.consigne.titre": {
       "id": "maths.consigne.titre",
@@ -575,7 +649,8 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.exo.bouton_indice": {
       "id": "maths.exo.bouton_indice",
@@ -584,7 +659,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.exo.bouton_fini": {
       "id": "maths.exo.bouton_fini",
@@ -593,52 +669,58 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.indice.epuise": {
       "id": "maths.indice.epuise",
       "ecran": "/enfant/session/maths",
       "texte": "Je t'ai tout dit. À toi de chercher.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.demande_resultat.1": {
       "id": "maths.demande_resultat.1",
       "ecran": "/enfant/session/maths",
       "texte": "Je ne donne pas les réponses. Je t'aide à chercher.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "exclusif_avec": []
     },
     "maths.demande_resultat.2": {
       "id": "maths.demande_resultat.2",
       "ecran": "/enfant/session/maths",
       "texte": "Je garde la réponse pour toi. Tu vas trouver.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "exclusif_avec": []
     },
     "maths.demande_resultat.3": {
       "id": "maths.demande_resultat.3",
       "ecran": "/enfant/session/maths",
       "texte": "C'est toi qui trouves. Moi, je t'aide.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "exclusif_avec": []
     },
     "maths.demande_resultat.4": {
       "id": "maths.demande_resultat.4",
       "ecran": "/enfant/session/maths",
       "texte": "Non, je ne la dis pas. Veux-tu un indice ?",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "exclusif_avec": []
     },
     "maths.blocage.bouton": {
       "id": "maths.blocage.bouton",
@@ -647,7 +729,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Blocage détecté** (PED-08, après 3 sollicitations sans réponse exploitable) :",
+      "exclusif_avec": []
     },
     "maths.blocage.bouton_2": {
       "id": "maths.blocage.bouton_2",
@@ -656,7 +739,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Blocage détecté** (PED-08, après 3 sollicitations sans réponse exploitable) :",
+      "exclusif_avec": []
     },
     "maths.fini.bouton": {
       "id": "maths.fini.bouton",
@@ -665,7 +749,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "transition.bouton": {
       "id": "transition.bouton",
@@ -674,25 +759,28 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "maths.sans_indice.corps": {
       "id": "maths.sans_indice.corps",
       "ecran": "/enfant/session/maths",
       "texte": "Je n'ai pas d'indice pour celui-là.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "exclusif_avec": []
     },
     "maths.sans_indice.corps_2": {
       "id": "maths.sans_indice.corps_2",
       "ecran": "/enfant/session/maths",
       "texte": "Compte sur tes doigts, ça marche bien.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "exclusif_avec": []
     },
     "maths.sans_indice.bouton": {
       "id": "maths.sans_indice.bouton",
@@ -701,7 +789,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "exclusif_avec": []
     },
     "maths.sans_indice.bouton_2": {
       "id": "maths.sans_indice.bouton_2",
@@ -710,52 +799,58 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "exclusif_avec": []
     },
     "maths.reprise.corps": {
       "id": "maths.reprise.corps",
       "ecran": "/enfant/session/maths",
       "texte": "On reprend les maths.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "exclusif_avec": []
     },
     "maths.reprise.corps_2": {
       "id": "maths.reprise.corps_2",
       "ecran": "/enfant/session/maths",
       "texte": "On était sur celui-là.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "exclusif_avec": []
     },
     "pause.inspire": {
       "id": "pause.inspire",
       "ecran": "/enfant/pause",
       "texte": "On inspire.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "pause.expire": {
       "id": "pause.expire",
       "ecran": "/enfant/pause",
       "texte": "On souffle.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "pause.rassurance": {
       "id": "pause.rassurance",
       "ecran": "/enfant/pause",
       "texte": "Tu reviens quand tu veux.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "pause.bouton": {
       "id": "pause.bouton",
@@ -764,40 +859,48 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "coffre.solde.valeur": {
       "id": "coffre.solde.valeur",
       "ecran": "/enfant/coffre",
       "texte": "{n}",
       "canal": "affiche",
-      "role": "texte",
+      "role": "valeur",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "coffre.palier.reste": {
       "id": "coffre.palier.reste",
       "ecran": "/enfant/coffre",
       "texte": "Encore {n} pierres.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "exclusif_avec": [
+        "coffre.palier.atteint"
+      ]
     },
     "coffre.cosmetiques.verrouille": {
       "id": "coffre.cosmetiques.verrouille",
       "ecran": "/enfant/coffre",
       "texte": "Il faut {n} pierres pour celui-là.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": "Cosmétiques de Pilou",
+      "exclusif_avec": [
+        "coffre.cosmetiques.debloque"
+      ]
     },
     "coffre.titre": {
       "id": "coffre.titre",
@@ -806,25 +909,28 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "coffre.solde.label": {
       "id": "coffre.solde.label",
       "ecran": "/enfant/coffre",
       "texte": "Tes pierres",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "coffre.rassurance": {
       "id": "coffre.rassurance",
       "ecran": "/enfant/coffre",
       "texte": "Tes pierres restent là. Elles ne partent jamais.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "coffre.bouton": {
       "id": "coffre.bouton",
@@ -833,7 +939,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "coffre.palier.titre": {
       "id": "coffre.palier.titre",
@@ -842,43 +949,50 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "exclusif_avec": []
     },
     "coffre.palier.atteint": {
       "id": "coffre.palier.atteint",
       "ecran": "/enfant/coffre",
       "texte": "Ça y est. Tu as assez de pierres.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "exclusif_avec": [
+        "coffre.palier.reste"
+      ]
     },
     "coffre.palier.maison": {
       "id": "coffre.palier.maison",
       "ecran": "/enfant/coffre",
       "texte": "Je garde tes pierres. Le reste se décide à la maison.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "exclusif_avec": []
     },
     "coffre.palier.vide": {
       "id": "coffre.palier.vide",
       "ecran": "/enfant/coffre",
       "texte": "Ton coffre se remplit tout doucement.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Aucun palier défini** — état vide :",
+      "exclusif_avec": []
     },
     "coffre.palier.vide_2": {
       "id": "coffre.palier.vide_2",
       "ecran": "/enfant/coffre",
       "texte": "Tes pierres s'accumulent. C'est bien.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Aucun palier défini** — état vide :",
+      "exclusif_avec": []
     },
     "coffre.cosmetiques.titre": {
       "id": "coffre.cosmetiques.titre",
@@ -887,7 +1001,8 @@
       "canal": "les_deux",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "Cosmétiques de Pilou",
+      "exclusif_avec": []
     },
     "coffre.cosmetiques.bouton_appliquer": {
       "id": "coffre.cosmetiques.bouton_appliquer",
@@ -896,43 +1011,50 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "Cosmétiques de Pilou",
+      "exclusif_avec": []
     },
     "coffre.cosmetiques.debloque": {
       "id": "coffre.cosmetiques.debloque",
       "ecran": "/enfant/coffre",
       "texte": "Celui-là est à toi.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Cosmétiques de Pilou",
+      "exclusif_avec": [
+        "coffre.cosmetiques.verrouille"
+      ]
     },
     "coffre.cosmetiques.vide": {
       "id": "coffre.cosmetiques.vide",
       "ecran": "/enfant/coffre",
       "texte": "Il n'y a rien à mettre pour l'instant.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Cosmétiques de Pilou",
+      "exclusif_avec": []
     },
     "coffre.souci.corps": {
       "id": "coffre.souci.corps",
       "ecran": "/enfant/coffre",
       "texte": "Je n'arrive pas à ouvrir le coffre.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — solde non récupérable** :",
+      "exclusif_avec": []
     },
     "coffre.souci.corps_2": {
       "id": "coffre.souci.corps_2",
       "ecran": "/enfant/coffre",
       "texte": "Tes pierres sont bien là. Reviens tout à l'heure.",
       "canal": "les_deux",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — solde non récupérable** :",
+      "exclusif_avec": []
     },
     "coffre.souci.bouton": {
       "id": "coffre.souci.bouton",
@@ -941,7 +1063,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur — solde non récupérable** :",
+      "exclusif_avec": []
     }
   }
 }

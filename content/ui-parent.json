@@ -32,9 +32,10 @@
       "ecran": "/parent",
       "texte": "Tipi n'a pas retrouvé la soirée en cours. Vous pouvez repartir d'ici.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "État d'erreur** (état applicatif illisible, base injoignable)",
+      "exclusif_avec": []
     },
     "parent.scan.titre": {
       "id": "parent.scan.titre",
@@ -43,16 +44,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.corps": {
       "id": "parent.scan.corps",
       "ecran": "/parent",
       "texte": "Prenez une photo par consigne ou par exercice.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.bouton_ajouter": {
       "id": "parent.scan.bouton_ajouter",
@@ -61,7 +64,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.bouton_principal": {
       "id": "parent.scan.bouton_principal",
@@ -70,54 +74,60 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.compteur": {
       "id": "parent.scan.compteur",
       "ecran": "/parent",
       "texte": "{n} photo » / « {n} photos",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.photo_supprimer": {
       "id": "parent.scan.photo_supprimer",
       "ecran": "/parent",
       "texte": "Retirer cette photo",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.astuce": {
       "id": "parent.scan.astuce",
       "ecran": "/parent",
       "texte": "Posez la feuille à plat, bien éclairée.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.saisie_manuelle": {
       "id": "parent.scan.saisie_manuelle",
       "ecran": "/parent",
       "texte": "Saisir le devoir à la main",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.reglages_aria": {
       "id": "parent.scan.reglages_aria",
       "ecran": "/parent",
       "texte": "Réglages",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.vide.titre": {
       "id": "parent.scan.vide.titre",
@@ -126,16 +136,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — aucune photo ajoutée** :",
+      "exclusif_avec": []
     },
     "parent.scan.vide.corps": {
       "id": "parent.scan.vide.corps",
       "ecran": "/parent",
       "texte": "Ajoutez une photo, ou saisissez le devoir à la main.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — aucune photo ajoutée** :",
+      "exclusif_avec": []
     },
     "parent.scan.vide.bouton": {
       "id": "parent.scan.vide.bouton",
@@ -144,7 +156,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — aucune photo ajoutée** :",
+      "exclusif_avec": []
     },
     "parent.scan.sans_devoir.bouton": {
       "id": "parent.scan.sans_devoir.bouton",
@@ -153,27 +166,30 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — pas de devoirs ce soir** (PRD-16)",
+      "exclusif_avec": []
     },
     "parent.scan.sans_devoir.confirmation": {
       "id": "parent.scan.sans_devoir.confirmation",
       "ecran": "/parent",
       "texte": "Pilou dira simplement qu'il n'y a rien ce soir. Le coffre reste accessible.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — pas de devoirs ce soir** (PRD-16)",
+      "exclusif_avec": []
     },
     "parent.scan.sans_devoir.valider": {
       "id": "parent.scan.sans_devoir.valider",
       "ecran": "/parent",
       "texte": "Ouvrir Tipi à {prenom}",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": "État vide — pas de devoirs ce soir** (PRD-16)",
+      "exclusif_avec": []
     },
     "parent.scan.camera_refusee.titre": {
       "id": "parent.scan.camera_refusee.titre",
@@ -182,16 +198,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.camera_refusee.corps": {
       "id": "parent.scan.camera_refusee.corps",
       "ecran": "/parent",
       "texte": "Autorisez l'accès dans les réglages du téléphone, ou saisissez le devoir à la main.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.camera_refusee.bouton": {
       "id": "parent.scan.camera_refusee.bouton",
@@ -200,7 +218,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.envoi_echec.titre": {
       "id": "parent.scan.envoi_echec.titre",
@@ -209,16 +228,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.envoi_echec.corps": {
       "id": "parent.scan.envoi_echec.corps",
       "ecran": "/parent",
       "texte": "Vérifiez la connexion, puis réessayez. La photo est conservée.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.envoi_echec.bouton": {
       "id": "parent.scan.envoi_echec.bouton",
@@ -227,7 +248,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.illisible.titre": {
       "id": "parent.scan.illisible.titre",
@@ -236,16 +258,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.illisible.corps": {
       "id": "parent.scan.illisible.corps",
       "ecran": "/parent",
       "texte": "Reprenez la photo à plat et bien éclairée, ou saisissez le devoir à la main.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.illisible.bouton": {
       "id": "parent.scan.illisible.bouton",
@@ -254,7 +278,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.illisible.bouton_2": {
       "id": "parent.scan.illisible.bouton_2",
@@ -263,7 +288,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.analyse_echec.titre": {
       "id": "parent.scan.analyse_echec.titre",
@@ -272,16 +298,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.analyse_echec.corps": {
       "id": "parent.scan.analyse_echec.corps",
       "ecran": "/parent",
       "texte": "Vous pouvez relancer l'analyse, ou saisir le devoir à la main.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.analyse_echec.bouton": {
       "id": "parent.scan.analyse_echec.bouton",
@@ -290,25 +318,28 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.scan.analyse_en_cours": {
       "id": "parent.scan.analyse_en_cours",
       "ecran": "/parent",
       "texte": "Analyse en cours…",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Pendant l'analyse** :",
+      "exclusif_avec": []
     },
     "parent.scan.analyse_duree": {
       "id": "parent.scan.analyse_duree",
       "ecran": "/parent",
       "texte": "Cela prend une quinzaine de secondes.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Pendant l'analyse** :",
+      "exclusif_avec": []
     },
     "parent.apercu.titre": {
       "id": "parent.apercu.titre",
@@ -317,65 +348,76 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.resume": {
       "id": "parent.apercu.resume",
       "ecran": "/parent/programme",
       "texte": "2 étapes ce soir : lecture, maths. Environ 12 minutes.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "parent.apercu.resume_une"
+      ]
     },
     "parent.apercu.resume_une": {
       "id": "parent.apercu.resume_une",
       "ecran": "/parent/programme",
       "texte": "1 étape ce soir : lecture. Environ 6 minutes.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "parent.apercu.resume"
+      ]
     },
     "parent.apercu.etape_lecture": {
       "id": "parent.apercu.etape_lecture",
       "ecran": "/parent/programme",
       "texte": "Lecture",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.etape_maths": {
       "id": "parent.apercu.etape_maths",
       "ecran": "/parent/programme",
       "texte": "Maths",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.duree": {
       "id": "parent.apercu.duree",
       "ecran": "/parent/programme",
       "texte": "environ {n} min",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.exercices": {
       "id": "parent.apercu.exercices",
       "ecran": "/parent/programme",
       "texte": "{n} exercice » / « {n} exercices",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.bouton_retirer": {
       "id": "parent.apercu.bouton_retirer",
@@ -384,7 +426,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.bouton_monter": {
       "id": "parent.apercu.bouton_monter",
@@ -393,7 +436,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.bouton_modifier": {
       "id": "parent.apercu.bouton_modifier",
@@ -402,7 +446,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.bouton_principal": {
       "id": "parent.apercu.bouton_principal",
@@ -411,7 +456,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.bouton_retour": {
       "id": "parent.apercu.bouton_retour",
@@ -420,16 +466,18 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.basse_energie.label": {
       "id": "parent.apercu.basse_energie.label",
       "ecran": "/parent/programme",
       "texte": "Soir léger",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Mode basse énergie** (PRD-04) :",
+      "exclusif_avec": []
     },
     "parent.apercu.basse_energie.aide": {
       "id": "parent.apercu.basse_energie.aide",
@@ -438,47 +486,52 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": "Mode basse énergie** (PRD-04) :",
+      "exclusif_avec": []
     },
     "parent.apercu.basse_energie.actif": {
       "id": "parent.apercu.basse_energie.actif",
       "ecran": "/parent/programme",
       "texte": "Soir léger activé : une seule étape ce soir.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Mode basse énergie** (PRD-04) :",
+      "exclusif_avec": []
     },
     "parent.apercu.passage_enfant": {
       "id": "parent.apercu.passage_enfant",
       "ecran": "/parent/programme",
       "texte": "Passez le téléphone à {prenom}. Pilou prend le relais.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.regroupe": {
       "id": "parent.apercu.regroupe",
       "ecran": "/parent/programme",
       "texte": "Tout a été regroupé en 2 étapes. Le reste attendra demain.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": "Plus de 2 étapes détectées** (PED-06) :",
+      "exclusif_avec": []
     },
     "parent.apercu.reporte": {
       "id": "parent.apercu.reporte",
       "ecran": "/parent/programme",
       "texte": "Reporté à demain : {liste}",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{liste}"
       ],
-      "condition": null
+      "condition": "Plus de 2 étapes détectées** (PED-06) :",
+      "exclusif_avec": []
     },
     "parent.apercu.vide.titre": {
       "id": "parent.apercu.vide.titre",
@@ -487,16 +540,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "exclusif_avec": []
     },
     "parent.apercu.vide.corps": {
       "id": "parent.apercu.vide.corps",
       "ecran": "/parent/programme",
       "texte": "Reprenez une photo, ou saisissez le devoir à la main.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "exclusif_avec": []
     },
     "parent.apercu.vide.bouton": {
       "id": "parent.apercu.vide.bouton",
@@ -505,7 +560,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "exclusif_avec": []
     },
     "parent.apercu.vide.bouton_2": {
       "id": "parent.apercu.vide.bouton_2",
@@ -514,7 +570,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — rien d'exploitable dans les photos** :",
+      "exclusif_avec": []
     },
     "parent.apercu.echec.titre": {
       "id": "parent.apercu.echec.titre",
@@ -523,16 +580,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.echec.corps": {
       "id": "parent.apercu.echec.corps",
       "ecran": "/parent/programme",
       "texte": "Vous pouvez relancer l'analyse, ou saisir le devoir à la main.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.echec.bouton": {
       "id": "parent.apercu.echec.bouton",
@@ -541,7 +600,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.lancement_echec.titre": {
       "id": "parent.apercu.lancement_echec.titre",
@@ -550,16 +610,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.lancement_echec.corps": {
       "id": "parent.apercu.lancement_echec.corps",
       "ecran": "/parent/programme",
       "texte": "Le programme est conservé. Réessayez dans un instant.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.apercu.lancement_echec.bouton": {
       "id": "parent.apercu.lancement_echec.bouton",
@@ -568,7 +630,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.titre": {
       "id": "parent.resume.titre",
@@ -579,18 +642,20 @@
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.date": {
       "id": "parent.resume.date",
       "ecran": "/parent/resume",
       "texte": "{date}",
       "canal": "affiche",
-      "role": "texte",
+      "role": "valeur",
       "jetons": [
         "{date}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.etapes.titre": {
       "id": "parent.resume.etapes.titre",
@@ -599,29 +664,36 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.etape_faite": {
       "id": "parent.resume.etape_faite",
       "ecran": "/parent/resume",
       "texte": "{matiere} : terminée",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{matiere}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "parent.resume.etape_passee"
+      ]
     },
     "parent.resume.etape_passee": {
       "id": "parent.resume.etape_passee",
       "ecran": "/parent/resume",
       "texte": "{matiere} : passée",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{matiere}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": [
+        "parent.resume.etape_faite"
+      ]
     },
     "parent.resume.observation.titre": {
       "id": "parent.resume.observation.titre",
@@ -630,16 +702,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.pierres": {
       "id": "parent.resume.pierres",
       "ecran": "/parent/resume",
       "texte": "Les pierres de ce soir sont dans le coffre.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.bouton": {
       "id": "parent.resume.bouton",
@@ -648,7 +722,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.bouton_2": {
       "id": "parent.resume.bouton_2",
@@ -657,7 +732,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.vide.titre": {
       "id": "parent.resume.vide.titre",
@@ -666,18 +742,20 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": "État vide — séance sans devoir** :",
+      "exclusif_avec": []
     },
     "parent.resume.vide.corps": {
       "id": "parent.resume.vide.corps",
       "ecran": "/parent/resume",
       "texte": "{prenom} a ouvert Tipi. Il n'y avait rien à faire.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": "État vide — séance sans devoir** :",
+      "exclusif_avec": []
     },
     "parent.resume.indispo.titre": {
       "id": "parent.resume.indispo.titre",
@@ -686,25 +764,28 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.indispo.corps": {
       "id": "parent.resume.indispo.corps",
       "ecran": "/parent/resume",
       "texte": "Il apparaîtra ici dans quelques instants. La séance est bien enregistrée.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.audio_absent": {
       "id": "parent.resume.audio_absent",
       "ecran": "/parent/resume",
       "texte": "L'enregistrement n'est plus disponible. Les audios sont effacés automatiquement.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.creation.titre": {
       "id": "reglages.code.creation.titre",
@@ -713,27 +794,30 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.creation.corps": {
       "id": "reglages.code.creation.corps",
       "ecran": "/reglages/code",
       "texte": "Ce code protège les réglages. Il n'est pas demandé à {prenom}.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.creation.avert": {
       "id": "reglages.code.creation.avert",
       "ecran": "/reglages/code",
       "texte": "Notez-le : il ne peut pas être récupéré.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.creation.confirmer.titre": {
       "id": "reglages.code.creation.confirmer.titre",
@@ -742,7 +826,8 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.creation.bouton": {
       "id": "reglages.code.creation.bouton",
@@ -751,25 +836,28 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.creation.discordance": {
       "id": "reglages.code.creation.discordance",
       "ecran": "/reglages/code",
       "texte": "Les deux saisies ne correspondent pas. Recommencez.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.creation.longueur": {
       "id": "reglages.code.creation.longueur",
       "ecran": "/reglages/code",
       "texte": "Le code fait exactement 10 chiffres.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.saisie.titre": {
       "id": "reglages.code.saisie.titre",
@@ -778,16 +866,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.saisie.corps": {
       "id": "reglages.code.saisie.corps",
       "ecran": "/reglages/code",
       "texte": "10 chiffres",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.saisie.bouton": {
       "id": "reglages.code.saisie.bouton",
@@ -796,45 +886,50 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.saisie.effacer": {
       "id": "reglages.code.saisie.effacer",
       "ecran": "/reglages/code",
       "texte": "Effacer",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.saisie.annuler": {
       "id": "reglages.code.saisie.annuler",
       "ecran": "/reglages/code",
       "texte": "Annuler",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.refuse": {
       "id": "reglages.code.refuse",
       "ecran": "/reglages/code",
       "texte": "Ce code ne correspond pas.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.refuse_reste": {
       "id": "reglages.code.refuse_reste",
       "ecran": "/reglages/code",
       "texte": "Il reste {n} essais avant un blocage temporaire.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.bloque.titre": {
       "id": "reglages.code.bloque.titre",
@@ -843,18 +938,20 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.bloque.corps": {
       "id": "reglages.code.bloque.corps",
       "ecran": "/reglages/code",
       "texte": "Trop d'essais. Réessayez dans {duree}.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [
         "{duree}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.bloque.aide": {
       "id": "reglages.code.bloque.aide",
@@ -863,7 +960,8 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.sortie.titre": {
       "id": "reglages.code.sortie.titre",
@@ -874,16 +972,18 @@
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.code.sortie.corps": {
       "id": "reglages.code.sortie.corps",
       "ecran": "/reglages/code",
       "texte": "Les pierres déjà gagnées sont conservées.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.titre": {
       "id": "reglages.titre",
@@ -892,7 +992,8 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.bouton_fermer": {
       "id": "reglages.bouton_fermer",
@@ -901,90 +1002,100 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.enfant": {
       "id": "reglages.menu.enfant",
       "ecran": "/reglages",
       "texte": "Profil d'{prenom}",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.theme": {
       "id": "reglages.menu.theme",
       "ecran": "/reglages",
       "texte": "Apparence",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.paliers": {
       "id": "reglages.menu.paliers",
       "ecran": "/reglages",
       "texte": "Paliers de récompense",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.sons": {
       "id": "reglages.menu.sons",
       "ecran": "/reglages",
       "texte": "Sons",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.donnees": {
       "id": "reglages.menu.donnees",
       "ecran": "/reglages",
       "texte": "Données et confidentialité",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.audio": {
       "id": "reglages.menu.audio",
       "ecran": "/reglages",
       "texte": "Enregistrements vocaux",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.code": {
       "id": "reglages.menu.code",
       "ecran": "/reglages",
       "texte": "Code parent",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.calibration": {
       "id": "reglages.menu.calibration",
       "ecran": "/reglages",
       "texte": "Calibration des photos",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.menu.apropos": {
       "id": "reglages.menu.apropos",
       "ecran": "/reglages",
       "texte": "À propos",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.titre": {
       "id": "reglages.enfant.titre",
@@ -995,36 +1106,40 @@
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.prenom": {
       "id": "reglages.enfant.prenom",
       "ecran": "/reglages",
       "texte": "Prénom",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.naissance": {
       "id": "reglages.enfant.naissance",
       "ecran": "/reglages",
       "texte": "Date de naissance",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.age": {
       "id": "reglages.enfant.age",
       "ecran": "/reglages",
       "texte": "{n} ans",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.age_aide": {
       "id": "reglages.enfant.age_aide",
@@ -1033,25 +1148,28 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.niveau": {
       "id": "reglages.enfant.niveau",
       "ecran": "/reglages",
       "texte": "Niveau",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.bilingue": {
       "id": "reglages.enfant.bilingue",
       "ecran": "/reglages",
       "texte": "Classe bilingue français-breton",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.bilingue_aide": {
       "id": "reglages.enfant.bilingue_aide",
@@ -1060,7 +1178,8 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.enfant.bouton": {
       "id": "reglages.enfant.bouton",
@@ -1069,7 +1188,8 @@
       "canal": "affiche",
       "role": "bouton",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.theme.titre": {
       "id": "reglages.theme.titre",
@@ -1078,16 +1198,18 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.theme.pilou": {
       "id": "reglages.theme.pilou",
       "ecran": "/reglages",
       "texte": "Pilou",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.theme.pilou_aide": {
       "id": "reglages.theme.pilou_aide",
@@ -1096,16 +1218,18 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.theme.apple": {
       "id": "reglages.theme.apple",
       "ecran": "/reglages",
       "texte": "Apple",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.theme.apple_aide": {
       "id": "reglages.theme.apple_aide",
@@ -1114,16 +1238,18 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.theme.corps": {
       "id": "reglages.theme.corps",
       "ecran": "/reglages",
       "texte": "Le changement est immédiat. Les textes et Pilou ne changent pas.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.titre": {
       "id": "reglages.paliers.titre",
@@ -1132,64 +1258,71 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.corps": {
       "id": "reglages.paliers.corps",
       "ecran": "/reglages",
       "texte": "Vous définissez le palier et vous donnez la récompense. Tipi compte seulement les pierres.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.solde": {
       "id": "reglages.paliers.solde",
       "ecran": "/reglages",
       "texte": "{prenom} a {n} pierres aujourd'hui.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}",
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.ajouter": {
       "id": "reglages.paliers.ajouter",
       "ecran": "/reglages",
       "texte": "Ajouter un palier",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.gems": {
       "id": "reglages.paliers.gems",
       "ecran": "/reglages",
       "texte": "Nombre de pierres",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.description": {
       "id": "reglages.paliers.description",
       "ecran": "/reglages",
       "texte": "Ce que vous proposez",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.description_ex": {
       "id": "reglages.paliers.description_ex",
       "ecran": "/reglages",
       "texte": "Par exemple : ce que vous avez prévu de faire ensemble.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.description_aide": {
       "id": "reglages.paliers.description_aide",
@@ -1200,36 +1333,40 @@
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.atteint": {
       "id": "reglages.paliers.atteint",
       "ecran": "/reglages",
       "texte": "Atteint le {date}",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{date}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.supprimer": {
       "id": "reglages.paliers.supprimer",
       "ecran": "/reglages",
       "texte": "Supprimer ce palier",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.paliers.vide": {
       "id": "reglages.paliers.vide",
       "ecran": "/reglages",
       "texte": "Aucun palier pour l'instant. Les pierres s'accumulent quand même.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.sons.titre": {
       "id": "reglages.sons.titre",
@@ -1238,25 +1375,28 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.sons.effets": {
       "id": "reglages.sons.effets",
       "ecran": "/reglages",
       "texte": "Sons de l'application",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.sons.voix": {
       "id": "reglages.sons.voix",
       "ecran": "/reglages",
       "texte": "Voix de Pilou",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.sons.voix_aide": {
       "id": "reglages.sons.voix_aide",
@@ -1265,7 +1405,8 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.sons.silence_aide": {
       "id": "reglages.sons.silence_aide",
@@ -1274,7 +1415,8 @@
       "canal": "affiche",
       "role": "aide",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.titre": {
       "id": "reglages.donnees.titre",
@@ -1283,119 +1425,130 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.intro": {
       "id": "reglages.donnees.intro",
       "ecran": "/reglages",
       "texte": "Voici ce que Tipi garde, et pourquoi.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.photos": {
       "id": "reglages.donnees.photos",
       "ecran": "/reglages",
       "texte": "Les photos des devoirs, pour lire les consignes.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.textes": {
       "id": "reglages.donnees.textes",
       "ecran": "/reglages",
       "texte": "Le texte des devoirs, pour préparer la séance.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.audio": {
       "id": "reglages.donnees.audio",
       "ecran": "/reglages",
       "texte": "Les enregistrements vocaux, pour que vous puissiez les réécouter.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.session": {
       "id": "reglages.donnees.session",
       "ecran": "/reglages",
-      "texte": "Le déroulé des séances, pour reprendre là où {prenom} s'est arrêté.",
+      "texte": "Le déroulé des séances, pour reprendre au bon endroit après une interruption.",
       "canal": "affiche",
-      "role": "texte",
-      "jetons": [
-        "{prenom}"
-      ],
-      "condition": null
+      "role": "indetermine",
+      "jetons": [],
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.pierres": {
       "id": "reglages.donnees.pierres",
       "ecran": "/reglages",
       "texte": "L'historique des pierres, pour que le compte soit toujours juste.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.ia": {
       "id": "reglages.donnees.ia",
       "ecran": "/reglages",
       "texte": "Le texte des devoirs est analysé par un service d'intelligence artificielle. Le prénom d'{prenom} et les photos ne lui sont jamais envoyés.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.export": {
       "id": "reglages.donnees.export",
       "ecran": "/reglages",
       "texte": "Exporter mes données",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.supprimer": {
       "id": "reglages.donnees.supprimer",
       "ecran": "/reglages",
       "texte": "Tout supprimer",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.supprimer_conf": {
       "id": "reglages.donnees.supprimer_conf",
       "ecran": "/reglages",
       "texte": "Cette suppression est définitive. Les pierres et l'historique seront effacés.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.supprimer_valider": {
       "id": "reglages.donnees.supprimer_valider",
       "ecran": "/reglages",
       "texte": "Supprimer définitivement",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.donnees.pas_de_pub": {
       "id": "reglages.donnees.pas_de_pub",
       "ecran": "/reglages",
       "texte": "Tipi ne contient aucune publicité, aucun achat et aucun traceur publicitaire.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.audio.titre": {
       "id": "reglages.audio.titre",
@@ -1404,61 +1557,68 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.audio.corps": {
       "id": "reglages.audio.corps",
       "ecran": "/reglages",
       "texte": "Les enregistrements sont effacés automatiquement après la durée choisie.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.audio.duree": {
       "id": "reglages.audio.duree",
       "ecran": "/reglages",
       "texte": "Conserver pendant",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.audio.option_7": {
       "id": "reglages.audio.option_7",
       "ecran": "/reglages",
       "texte": "7 jours",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.audio.option_30": {
       "id": "reglages.audio.option_30",
       "ecran": "/reglages",
       "texte": "30 jours",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.audio.option_0": {
       "id": "reglages.audio.option_0",
       "ecran": "/reglages",
       "texte": "Ne rien conserver",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.audio.purger": {
       "id": "reglages.audio.purger",
       "ecran": "/reglages",
       "texte": "Effacer maintenant",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.codeparent.titre": {
       "id": "reglages.codeparent.titre",
@@ -1467,45 +1627,50 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.codeparent.corps": {
       "id": "reglages.codeparent.corps",
       "ecran": "/reglages",
       "texte": "Le code protège les réglages. Il n'est jamais montré à {prenom}.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.codeparent.changer": {
       "id": "reglages.codeparent.changer",
       "ecran": "/reglages",
       "texte": "Changer le code",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.codeparent.actuel": {
       "id": "reglages.codeparent.actuel",
       "ecran": "/reglages",
       "texte": "Code actuel",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.codeparent.nouveau": {
       "id": "reglages.codeparent.nouveau",
       "ecran": "/reglages",
       "texte": "Nouveau code",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.calibration.titre": {
       "id": "reglages.calibration.titre",
@@ -1514,45 +1679,50 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.calibration.corps": {
       "id": "reglages.calibration.corps",
       "ecran": "/reglages",
       "texte": "Les premières photos sont conservées avec leur analyse, pour régler la lecture automatique.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.calibration.restantes": {
       "id": "reglages.calibration.restantes",
       "ecran": "/reglages",
       "texte": "{n} photos encore enregistrées pour la calibration.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{n}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.calibration.voir": {
       "id": "reglages.calibration.voir",
       "ecran": "/reglages",
       "texte": "Voir le détail d'une analyse",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.calibration.desactiver": {
       "id": "reglages.calibration.desactiver",
       "ecran": "/reglages",
       "texte": "Arrêter la calibration",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.apropos.titre": {
       "id": "reglages.apropos.titre",
@@ -1561,92 +1731,102 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.apropos.version": {
       "id": "reglages.apropos.version",
       "ecran": "/reglages",
       "texte": "Version {version}",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{version}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.apropos.corps": {
       "id": "reglages.apropos.corps",
       "ecran": "/reglages",
       "texte": "Tipi accompagne {prenom} dans ses devoirs du soir.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.vide.paliers": {
       "id": "reglages.vide.paliers",
       "ecran": "/reglages",
       "texte": "Aucun palier pour l'instant.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.vide.audio": {
       "id": "reglages.vide.audio",
       "ecran": "/reglages",
       "texte": "Aucun enregistrement conservé.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.vide.calibration": {
       "id": "reglages.vide.calibration",
       "ecran": "/reglages",
       "texte": "Aucune analyse enregistrée pour l'instant.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.echec.sauvegarde": {
       "id": "reglages.echec.sauvegarde",
       "ecran": "/reglages",
       "texte": "La modification n'a pas pu être enregistrée. Réessayez.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.echec.export": {
       "id": "reglages.echec.export",
       "ecran": "/reglages",
       "texte": "L'export n'a pas pu être préparé. Réessayez dans un instant.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "action",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.echec.suppression": {
       "id": "reglages.echec.suppression",
       "ecran": "/reglages",
       "texte": "La suppression n'a pas pu aller au bout. Rien n'a été effacé.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "reglages.session_expiree": {
       "id": "reglages.session_expiree",
       "ecran": "/reglages",
       "texte": "Les réglages se sont refermés. Saisissez le code à nouveau.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "notif.resume.titre": {
       "id": "notif.resume.titre",
@@ -1657,16 +1837,18 @@
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "notif.resume.corps": {
       "id": "notif.resume.corps",
       "ecran": "notification",
       "texte": "Le résumé est prêt.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "notif.resume.sans_devoir.titre": {
       "id": "notif.resume.sans_devoir.titre",
@@ -1675,111 +1857,122 @@
       "canal": "affiche",
       "role": "titre",
       "jetons": [],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "notif.resume.sans_devoir.corps": {
       "id": "notif.resume.sans_devoir.corps",
       "ecran": "notification",
       "texte": "{prenom} a ouvert Tipi. Il n'y avait rien à faire.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "corps",
       "jetons": [
         "{prenom}"
       ],
-      "condition": null
+      "condition": null,
+      "exclusif_avec": []
     },
     "parent.resume.observation.lecture_fluide": {
       "id": "parent.resume.observation.lecture_fluide",
       "ecran": "/parent/resume",
       "texte": "{prenom} a lu le texte en entier, sans s'arrêter longtemps.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": "la lecture s'est faite sans hésitation marquée"
+      "condition": "la lecture s'est faite sans hésitation marquée",
+      "exclusif_avec": []
     },
     "parent.resume.observation.hesitations": {
       "id": "parent.resume.observation.hesitations",
       "ecran": "/parent/resume",
       "texte": "{prenom} a buté sur quelques mots. Ils sont listés ci-dessous, si vous voulez les revoir.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": "au moins un mot a demandé une reprise"
+      "condition": "au moins un mot a demandé une reprise",
+      "exclusif_avec": []
     },
     "parent.resume.observation.maths_indices": {
       "id": "parent.resume.observation.maths_indices",
       "ecran": "/parent/resume",
       "texte": "{prenom} a demandé de l'aide sur les maths. Pilou l'a guidé sans donner les réponses.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": "au moins un indice a été demandé"
+      "condition": "au moins un indice a été demandé",
+      "exclusif_avec": []
     },
     "parent.resume.observation.maths_sans_indice": {
       "id": "parent.resume.observation.maths_sans_indice",
       "ecran": "/parent/resume",
       "texte": "{prenom} a fait les maths seul, sans demander d'indice.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": "aucun indice demandé"
+      "condition": "aucun indice demandé",
+      "exclusif_avec": []
     },
     "parent.resume.observation.pause": {
       "id": "parent.resume.observation.pause",
       "ecran": "/parent/resume",
       "texte": "{prenom} a fait une pause. Il est revenu ensuite.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": "au moins une pause prise, et la session a repris"
+      "condition": "au moins une pause prise, et la session a repris",
+      "exclusif_avec": []
     },
     "parent.resume.observation.blocage": {
       "id": "parent.resume.observation.blocage",
       "ecran": "/parent/resume",
       "texte": "Un exercice a bloqué. Il pourrait valoir le coup de le refaire ensemble, à tête reposée.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": "blocage détecté selon PED-08"
+      "condition": "blocage détecté selon PED-08",
+      "exclusif_avec": []
     },
     "parent.resume.observation.soir_leger": {
       "id": "parent.resume.observation.soir_leger",
       "ecran": "/parent/resume",
       "texte": "Soirée en mode Soir léger : une seule étape.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": "Soir léger activé par le parent"
+      "condition": "Soir léger activé par le parent",
+      "exclusif_avec": []
     },
     "parent.resume.observation.breton": {
       "id": "parent.resume.observation.breton",
       "ecran": "/parent/resume",
       "texte": "Le texte en breton a été lu par {prenom} seul. Pilou ne le corrige pas.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [
         "{prenom}"
       ],
-      "condition": "un exercice en breton était au programme"
+      "condition": "un exercice en breton était au programme",
+      "exclusif_avec": []
     },
     "parent.resume.observation.arret_avant_fin": {
       "id": "parent.resume.observation.arret_avant_fin",
       "ecran": "/parent/resume",
       "texte": "La séance a été arrêtée avant la fin. Les pierres acquises sont conservées.",
       "canal": "affiche",
-      "role": "texte",
+      "role": "indetermine",
       "jetons": [],
-      "condition": "la séance s'est terminée avant la dernière étape, que l'arrêt vienne du parent (PRD-13) ou d'une clôture automatique : la phrase est exacte dans les deux cas"
+      "condition": "la séance s'est terminée avant la dernière étape, que l'arrêt vienne du parent (PRD-13) ou d'une clôture automatique : la phrase est exacte dans les deux cas",
+      "exclusif_avec": []
     }
   }
 }

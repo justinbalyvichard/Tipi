@@ -1477,12 +1477,12 @@ mesure rien.
 | --- | --- |
 | Lecture fluide | « {prenom} a lu le texte en entier, sans s'arrêter longtemps. » |
 | Hésitations en lecture | « {prenom} a buté sur quelques mots. Ils sont listés ci-dessous, si vous voulez les revoir. » |
-| Maths avec indices | « {prenom} a demandé de l'aide sur les maths. Pilou l'a guidé sans donner les réponses. » |
-| Maths sans indice | « {prenom} a fait les maths seul, sans demander d'indice. » |
-| Pause prise | « {prenom} a fait une pause. Il est revenu ensuite. » |
+| Maths avec indices | « {prenom} a demandé de l'aide sur les maths. Pilou a donné des indices, jamais les réponses. » |
+| Maths sans indice | « {prenom} a fait les maths sans demander d'indice. » |
+| Pause prise | « {prenom} a fait une pause, puis a repris la séance. » |
 | Blocage | « Un exercice a bloqué. Il pourrait valoir le coup de le refaire ensemble, à tête reposée. » |
 | Soir léger | « Soirée en mode Soir léger : une seule étape. » |
-| Exercice breton | « Le texte en breton a été lu par {prenom} seul. Pilou ne le corrige pas. » |
+| Exercice breton | « {prenom} a lu le texte en breton sans aide. Pilou ne corrige pas le breton. » |
 | Session arrêtée par le parent | « La séance a été arrêtée avant la fin. Les pierres acquises sont conservées. » |
 
 **Mots hésitants** : listés en clair, sans commentaire, sans nombre, sous le
@@ -1701,7 +1701,7 @@ d'information n'est exclusivement vocal.
 | `reglages.donnees.photos` | « Les photos des devoirs, pour lire les consignes. » |
 | `reglages.donnees.textes` | « Le texte des devoirs, pour préparer la séance. » |
 | `reglages.donnees.audio` | « Les enregistrements vocaux, pour que vous puissiez les réécouter. » |
-| `reglages.donnees.session` | « Le déroulé des séances, pour reprendre là où {prenom} s'est arrêté. » |
+| `reglages.donnees.session` | « Le déroulé des séances, pour reprendre au bon endroit après une interruption. » |
 | `reglages.donnees.pierres` | « L'historique des pierres, pour que le compte soit toujours juste. » |
 | `reglages.donnees.ia` | « Le texte des devoirs est analysé par un service d'intelligence artificielle. Le prénom d'{prenom} et les photos ne lui sont jamais envoyés. » |
 | `reglages.donnees.export` | « Exporter mes données » |
