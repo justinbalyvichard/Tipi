@@ -1,6 +1,6 @@
 {
-  "schema": "tipi.gwenn-scripts.v1",
-  "version": "1.0.0",
+  "schema": "tipi.gwenn-scripts.v2",
+  "version": "2.0.0",
   "personnage": "Pilou",
   "note_nom_de_fichier": "Le fichier s'appelle gwenn-scripts.json parce que le prompt maître le nomme ainsi. Le personnage s'appelle Pilou partout dans les textes.",
   "jeton_prenom": "{prenom}",
@@ -11,8 +11,10 @@
   ],
   "regles": {
     "fixite": "Ces répliques n'ont aucune variante. Elles sont jouées telles quelles, dans l'ordre du champ ordre.",
+    "cle_ui": "Dans ce fichier, le champ id EST la clé d'écran du livrable marketing.",
     "lecture_tts": "Pilou lit, dans l'ordre, toutes les lignes dont le canal vaut tts ou les_deux et dont la condition est remplie.",
-    "condition": "null signifie toujours jouée. Une chaîne nomme l'état applicatif qui déclenche ou remplace la ligne."
+    "condition": "null signifie toujours jouée. Une chaîne nomme l'état applicatif qui déclenche ou remplace la ligne.",
+    "role": "titre, corps, bouton_principal ou bouton_secondaire. La hiérarchie des boutons est portée par le rôle, jamais par l'ordre d'affichage seul (DES-06)."
   },
   "rituels": {
     "onboarding": {
@@ -27,7 +29,7 @@
         "ETH-04"
       ],
       "rejoue": "jamais",
-      "note": "Joué une seule fois à vie. Aucun bouton passer, aucune saisie, aucun numéro d'écran affiché.",
+      "note": "Joué une seule fois à vie. Aucun bouton passer, aucune saisie, aucun numéro d'écran affiché. Une seule action par écran (DES-06).",
       "ecrans": [
         {
           "id": "bienvenue_1",
@@ -55,7 +57,7 @@
             {
               "id": "bienvenue.1.bouton",
               "ordre": 3,
-              "role": "bouton",
+              "role": "bouton_principal",
               "texte": "Bonjour Pilou",
               "canal": "affiche",
               "condition": null,
@@ -89,7 +91,7 @@
             {
               "id": "bienvenue.2.bouton",
               "ordre": 3,
-              "role": "bouton",
+              "role": "bouton_principal",
               "texte": "D'accord",
               "canal": "affiche",
               "condition": null,
@@ -132,7 +134,7 @@
             {
               "id": "bienvenue.3.bouton",
               "ordre": 4,
-              "role": "bouton",
+              "role": "bouton_principal",
               "texte": "On y va",
               "canal": "affiche",
               "condition": null,
@@ -151,12 +153,13 @@
         "PRD-11",
         "PED-05",
         "PED-07",
+        "DES-06",
         "ETH-04",
         "ETH-05"
       ],
       "rejoue": "chaque soir, à l'identique",
       "invariant": true,
-      "note": "Même enchaînement, même ton, même son, quelle que soit la soirée. Aucune variante n'est autorisée ici, y compris si une seule étape a été faite ou si le parent a arrêté la session.",
+      "note": "Même enchaînement, même ton, même son, quelle que soit la soirée. Aucune variante n'est autorisée ici, y compris si une seule étape a été faite ou si le parent a arrêté la session. L'action principale est « Aller jouer » : le rituel se termine sur la sortie de l'application, pas sur l'inventaire des pierres (DES-06, PRD-11, PED-05).",
       "ecrans": [
         {
           "id": "bravo",
@@ -229,19 +232,19 @@
               "jetons": []
             },
             {
-              "id": "bravo.bouton",
+              "id": "bravo.bouton_principal",
               "ordre": 8,
-              "role": "bouton",
-              "texte": "Voir mon coffre",
+              "role": "bouton_principal",
+              "texte": "Aller jouer",
               "canal": "affiche",
               "condition": null,
               "jetons": []
             },
             {
-              "id": "bravo.bouton_2",
+              "id": "bravo.bouton_secondaire",
               "ordre": 9,
-              "role": "bouton",
-              "texte": "Aller jouer",
+              "role": "bouton_secondaire",
+              "texte": "Voir mon coffre",
               "canal": "affiche",
               "condition": null,
               "jetons": []
