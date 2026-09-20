@@ -9,20 +9,105 @@
     "les_deux"
   ],
   "jetons_connus": {
-    "{prenom}": "Prenom de l'enfant, lu depuis child.prenom. Jamais ecrit en dur (PRD-02).",
-    "{n}": "Nombre de pierres. Inventaire, jamais un score (PED-07, ETH-04).",
-    "{date}": "Date de la seance. Seule donnee numerique du resume parent (PRD-06).",
-    "{matiere}": "« la lecture » ou « les maths », selon l'etape concernee.",
-    "{liste}": "Liste construite par l'application, par exemple les mots a revoir.",
-    "{duree}": "Duree estimee, cote parent uniquement. Jamais montree a l'enfant.",
-    "{version}": "Numero de version de l'application, sous-page A propos."
+    "{n}": "Nombre de pierres. Inventaire, jamais un score (PED-07, ETH-04)."
   },
   "regles": {
     "perimetre": "Textes FIXES de l'interface : titres, libellés de bouton, étiquettes, états vides, messages d'état. Un texte qui varie d'un soir à l'autre n'a rien à faire ici : il vit dans content/encouragements.json. Les rituels vivent dans content/gwenn-scripts.json.",
     "propriete_des_cles": "Une clé d'écran a exactement un fichier propriétaire, celui qui porte son texte. La liste cles_fixes_non_variees de encouragements.json ne porte aucun texte : elle déclare seulement ce que la banque ne fait pas varier.",
     "source": "docs/agents/P1/produit-marketing.out.md. Les textes sont extraits de ses tables, jamais ressaisis.",
-    "role": "Règle mécanique : dernier segment commençant par « bouton » donne bouton, « titre » donne titre, un segment finissant par « aide » donne aide, tout le reste donne texte.",
-    "condition": "null quand le texte s'affiche dans le cas nominal de son écran. Sinon, la condition d'affichage en clair.",
+    "role": "Règle mécanique, aucun rôle deviné : un dernier segment commençant par « bouton » donne bouton ; un verbe d'action de la liste publiée donne action ; « titre » donne titre ; un segment finissant par « aide » donne aide ; un segment commençant par « corps » donne corps ; un texte réduit à un jeton donne valeur ; tout le reste donne indetermine. La valeur de repli s'appelle indetermine et non texte, pour qu'un composant ne la rende pas en corps de texte par défaut.",
+    "condition": "null quand le texte s'affiche dans le cas nominal de son écran. Sinon, la condition d'affichage en clair. Le champ condition_source dit d'où elle vient : intertitre (reprise mot pour mot de l'intertitre du livrable marketing), segment_de_cle (mise en phrase de l'état que la clé nomme elle-même, table publiée ci-dessous), ou definie_ici (les neuf observations du résumé parent, créées par ce livrable).",
+    "conditions_par_segment": [
+      {
+        "segment": "camera_refusee",
+        "condition": "l'accès à l'appareil photo est refusé"
+      },
+      {
+        "segment": "envoi_echec",
+        "condition": "l'envoi de la photo a échoué"
+      },
+      {
+        "segment": "analyse_echec",
+        "condition": "l'analyse des photos n'a pas abouti"
+      },
+      {
+        "segment": "lancement_echec",
+        "condition": "le lancement de la session a échoué"
+      },
+      {
+        "segment": "illisible",
+        "condition": "l'OCR n'a rien pu lire sur la photo"
+      },
+      {
+        "segment": "audio_absent",
+        "condition": "l'enregistrement audio a été purgé"
+      },
+      {
+        "segment": "session_expiree",
+        "condition": "la session Réglages a expiré"
+      },
+      {
+        "segment": "discordance",
+        "condition": "les deux saisies du code ne correspondent pas"
+      },
+      {
+        "segment": "refuse_reste",
+        "condition": "le code saisi ne correspond pas, et des essais restent"
+      },
+      {
+        "segment": "refuse",
+        "condition": "le code saisi ne correspond pas"
+      },
+      {
+        "segment": "bloque",
+        "condition": "la saisie est bloquée après cinq essais (SEC-02)"
+      },
+      {
+        "segment": "creation.avert",
+        "condition": "à la création du code parent"
+      },
+      {
+        "segment": "paliers.atteint",
+        "condition": "le palier a été atteint"
+      },
+      {
+        "segment": "paliers.vide",
+        "condition": "aucun palier n'est défini"
+      },
+      {
+        "segment": "vide.paliers",
+        "condition": "aucun palier n'est défini"
+      },
+      {
+        "segment": "vide.audio",
+        "condition": "aucun enregistrement n'est conservé"
+      },
+      {
+        "segment": "vide.calibration",
+        "condition": "aucune analyse n'est journalisée"
+      },
+      {
+        "segment": "echec.sauvegarde",
+        "condition": "l'enregistrement du réglage a échoué"
+      },
+      {
+        "segment": "echec.export",
+        "condition": "la préparation de l'export a échoué"
+      },
+      {
+        "segment": "echec.suppression",
+        "condition": "la suppression n'a pas abouti"
+      },
+      {
+        "segment": "sans_devoir",
+        "condition": "la soirée s'est déroulée sans aucun devoir"
+      },
+      {
+        "segment": "apercu.echec",
+        "condition": "la préparation du programme a échoué"
+      }
+    ],
+    "exclusif_avec": "Clés qui décrivent le même emplacement d'écran et ne peuvent pas s'afficher ensemble. Une clé sœur peut vivre dans un autre fichier de content/ : enfant.programme.titre est porté par la banque encouragements.json.",
     "jetons": "Substitués au rendu. {prenom} vient de child.prenom (PRD-02), jamais écrit en dur. {n} et {date} sont des valeurs de session.",
     "canal": "Repris tel quel du livrable marketing. Toute information utile à l'action est en les_deux : elle est doublée à l'oral (PED-10).",
     "charge": "Une idée par phrase, 12 mots maximum par phrase, vocabulaire de CE1, comme toute parole adressée à l'enfant."
@@ -36,6 +121,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "enfant.accueil.reprise.bouton": {
@@ -46,6 +132,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Variante de reprise** (l'app a été fermée en cours de soirée, PRD-18) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "enfant.accueil.vide.bouton": {
@@ -56,6 +143,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "État vide — aucun devoir préparé ce soir** (PRD-16) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "enfant.accueil.souci.bouton": {
@@ -66,6 +154,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "État d'erreur — les devoirs n'ont pas pu être chargés** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "enfant.attente.pilou": {
@@ -76,6 +165,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "enfant.programme.carte.lecture": {
@@ -86,6 +176,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "enfant.programme.carte.maths": {
@@ -96,6 +187,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "enfant.programme.corps.lecture_maths": {
@@ -106,6 +198,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": [
         "enfant.programme.corps.maths_lecture"
       ]
@@ -118,6 +211,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": [
         "enfant.programme.corps.lecture_maths"
       ]
@@ -130,6 +224,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "enfant.programme.une.titre": {
@@ -140,6 +235,7 @@
       "role": "titre",
       "jetons": [],
       "condition": "Variante à une seule étape** (une seule matière reconnue, matière retirée par",
+      "condition_source": "intertitre",
       "exclusif_avec": [
         "enfant.programme.titre"
       ]
@@ -152,6 +248,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Variante à une seule étape** (une seule matière reconnue, matière retirée par",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "enfant.programme.souci.titre": {
@@ -162,6 +259,7 @@
       "role": "titre",
       "jetons": [],
       "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "enfant.programme.souci.corps": {
@@ -172,6 +270,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "enfant.programme.souci.bouton": {
@@ -182,6 +281,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "État d'erreur — le programme n'a pas pu être lu** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.intro.titre.premier": {
@@ -192,6 +292,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": [
         "lecture.intro.titre.apres"
       ]
@@ -204,6 +305,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": [
         "lecture.intro.titre.premier"
       ]
@@ -216,6 +318,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.modele.corps": {
@@ -226,6 +329,7 @@
       "role": "corps",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.modele.bouton": {
@@ -236,6 +340,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.modele.relire": {
@@ -246,6 +351,7 @@
       "role": "action",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.micro.consigne": {
@@ -256,6 +362,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.micro.bouton": {
@@ -266,6 +373,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.micro.bouton_stop": {
@@ -276,6 +384,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.retour.bouton": {
@@ -286,6 +395,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.hesitation.bouton": {
@@ -296,6 +406,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Hésitation détectée sur un mot** — situation `hesitation` :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.hesitation.bouton_2": {
@@ -306,6 +417,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Hésitation détectée sur un mot** — situation `hesitation` :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.pas_entendu.corps": {
@@ -316,6 +428,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.pas_entendu.corps_2": {
@@ -326,6 +439,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.pas_entendu.bouton": {
@@ -336,6 +450,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.pas_entendu.bouton_2": {
@@ -346,6 +461,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.blocage.bouton": {
@@ -356,6 +472,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.blocage.bouton_2": {
@@ -366,6 +483,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Transcription non exploitable** (PED-09) — jamais une sanction :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.question.intro": {
@@ -376,6 +494,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.question.bouton": {
@@ -386,6 +505,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.question.retour_ok": {
@@ -396,6 +516,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.question.retour_autre": {
@@ -406,6 +527,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.question.passer": {
@@ -416,6 +538,7 @@
       "role": "action",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "lecture.breton.intro": {
@@ -426,6 +549,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.breton.corps": {
@@ -436,6 +560,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.breton.consigne": {
@@ -446,6 +571,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.breton.bouton": {
@@ -456,6 +582,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.breton.bouton_2": {
@@ -466,6 +593,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Cas breton** (PED-13) — texte affiché, consigne expliquée en français, pas de",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "session.pause.bouton": {
@@ -476,6 +604,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "session.sortie_parent.titre": {
@@ -486,6 +615,7 @@
       "role": "titre",
       "jetons": [],
       "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "session.sortie_parent.corps": {
@@ -496,6 +626,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "session.sortie_parent.bouton": {
@@ -506,6 +637,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "session.sortie_parent.annuler": {
@@ -516,6 +648,7 @@
       "role": "action",
       "jetons": [],
       "condition": "Sortie anticipée, parent uniquement** (PRD-13)",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.micro_absent.corps": {
@@ -526,6 +659,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.micro_absent.corps_2": {
@@ -536,6 +670,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.micro_absent.bouton": {
@@ -546,6 +681,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "État d'erreur — micro refusé ou indisponible** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.sans_voix.corps": {
@@ -556,6 +692,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — voix de Pilou indisponible**",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.sans_voix.corps_2": {
@@ -566,6 +703,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — voix de Pilou indisponible**",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.reprise.corps": {
@@ -576,6 +714,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "lecture.reprise.corps_2": {
@@ -586,6 +725,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.intro.titre.premier": {
@@ -596,6 +736,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": [
         "maths.intro.titre.apres"
       ]
@@ -608,6 +749,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": [
         "maths.intro.titre.premier"
       ]
@@ -620,6 +762,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.concret.corps": {
@@ -630,6 +773,7 @@
       "role": "corps",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.concret.bouton": {
@@ -640,6 +784,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.consigne.titre": {
@@ -650,6 +795,7 @@
       "role": "titre",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.exo.bouton_indice": {
@@ -660,6 +806,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.exo.bouton_fini": {
@@ -670,6 +817,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.indice.epuise": {
@@ -680,6 +828,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.demande_resultat.1": {
@@ -690,6 +839,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.demande_resultat.2": {
@@ -700,6 +850,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.demande_resultat.3": {
@@ -710,6 +861,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.demande_resultat.4": {
@@ -720,6 +872,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "L'enfant demande le résultat** (PED-01) — refus constant, chaleureux, sans",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.blocage.bouton": {
@@ -730,6 +883,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Blocage détecté** (PED-08, après 3 sollicitations sans réponse exploitable) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.blocage.bouton_2": {
@@ -740,6 +894,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Blocage détecté** (PED-08, après 3 sollicitations sans réponse exploitable) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.fini.bouton": {
@@ -750,6 +905,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "transition.bouton": {
@@ -760,6 +916,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "maths.sans_indice.corps": {
@@ -770,6 +927,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.sans_indice.corps_2": {
@@ -780,6 +938,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.sans_indice.bouton": {
@@ -790,6 +949,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.sans_indice.bouton_2": {
@@ -800,6 +960,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "État d'erreur — indices indisponibles** (secours de TEC-07 en échec) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.reprise.corps": {
@@ -810,6 +971,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "maths.reprise.corps_2": {
@@ -820,6 +982,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "Reprise d'étape après fermeture** (PRD-18) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "pause.inspire": {
@@ -830,6 +993,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "pause.expire": {
@@ -840,6 +1004,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "pause.rassurance": {
@@ -850,6 +1015,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "pause.bouton": {
@@ -860,6 +1026,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.solde.valeur": {
@@ -872,6 +1039,7 @@
         "{n}"
       ],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.palier.reste": {
@@ -884,6 +1052,7 @@
         "{n}"
       ],
       "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "condition_source": "intertitre",
       "exclusif_avec": [
         "coffre.palier.atteint"
       ]
@@ -898,6 +1067,7 @@
         "{n}"
       ],
       "condition": "Cosmétiques de Pilou",
+      "condition_source": "intertitre",
       "exclusif_avec": [
         "coffre.cosmetiques.debloque"
       ]
@@ -910,6 +1080,7 @@
       "role": "titre",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.solde.label": {
@@ -920,6 +1091,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.rassurance": {
@@ -930,6 +1102,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.bouton": {
@@ -940,6 +1113,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": null,
+      "condition_source": null,
       "exclusif_avec": []
     },
     "coffre.palier.titre": {
@@ -950,6 +1124,7 @@
       "role": "titre",
       "jetons": [],
       "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.palier.atteint": {
@@ -960,6 +1135,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "condition_source": "intertitre",
       "exclusif_avec": [
         "coffre.palier.reste"
       ]
@@ -972,6 +1148,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Progression vers le palier suivant** (PRD-14, ETH-05) :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.palier.vide": {
@@ -982,6 +1159,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Aucun palier défini** — état vide :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.palier.vide_2": {
@@ -992,6 +1170,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Aucun palier défini** — état vide :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.cosmetiques.titre": {
@@ -1002,6 +1181,7 @@
       "role": "titre",
       "jetons": [],
       "condition": "Cosmétiques de Pilou",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.cosmetiques.bouton_appliquer": {
@@ -1012,6 +1192,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "Cosmétiques de Pilou",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.cosmetiques.debloque": {
@@ -1022,6 +1203,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Cosmétiques de Pilou",
+      "condition_source": "intertitre",
       "exclusif_avec": [
         "coffre.cosmetiques.verrouille"
       ]
@@ -1034,6 +1216,7 @@
       "role": "indetermine",
       "jetons": [],
       "condition": "Cosmétiques de Pilou",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.souci.corps": {
@@ -1044,6 +1227,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — solde non récupérable** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.souci.corps_2": {
@@ -1054,6 +1238,7 @@
       "role": "corps",
       "jetons": [],
       "condition": "État d'erreur — solde non récupérable** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     },
     "coffre.souci.bouton": {
@@ -1064,6 +1249,7 @@
       "role": "bouton",
       "jetons": [],
       "condition": "État d'erreur — solde non récupérable** :",
+      "condition_source": "intertitre",
       "exclusif_avec": []
     }
   }
