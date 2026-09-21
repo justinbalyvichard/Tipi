@@ -12,8 +12,8 @@ sa porte amont n'est pas verte.
 | G2 | P2 Architecture | `architecte` | `controle-architecture` | **verte** | 2026-09-21 | [verdict](P2/architecture.review.md) |
 | G3 | P3 Design system | `design-system` | `controle-design` | **verte** | 2026-09-21 | [verdict](P3/design-system.review.md) |
 | G4.V1 | P4 V1 Socle | `dev-feature` | `controle-code` | **verte** | 2026-09-21 | [verdict](P4/V1.review.md) |
-| G4.V2 | P4 V2 Capture & analyse IA | `dev-feature` | `controle-code` | en cours | 2026-09-21 | — |
-| G4.V3 | P4 V3 Moteur de session | `dev-feature` | `controle-code` | ouverte | — | — |
+| G4.V2 | P4 V2 Capture & analyse IA | `dev-feature` | `controle-code` | **verte** | 2026-09-21 | [verdict](P4/V2.review.md) |
+| G4.V3 | P4 V3 Moteur de session | `dev-feature` | `controle-code` | en cours | 2026-09-21 | — |
 | G4.V4 | P4 V4 Module Lecture | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V5 | P4 V5 Module Maths | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V6 | P4 V6 Pierres & Coffre | `dev-feature` | `controle-code` | ouverte | — | — |
@@ -85,6 +85,9 @@ tous les agents en aval.
 | 2026-09-21 | V1, tours 1 à 3 : trois `FAIL` (2 majeurs, puis 1, puis 1). Les majeurs sont tous des instruments qui ne mordent pas. TEC-13 prouvée sur le bundle réel avec 24 sentinelles. Arbitrages ARB-17 et ARB-18. |
 | 2026-09-21 | **Règle permanente adoptée par l'humain : ARB-19.** Le quatrième tour devient automatique sous trois conditions. Tour 4 de V1 lancé sans escalade. |
 | 2026-09-21 | V1, tour 4 : `PASS_AVEC_RESERVES` (3 mineurs). Le majeur levé et vérifié par le contrôleur à cinq emplacements dont deux qu'il a ajoutés. **G4.V1 verte.** Deux points portés par le contrôleur contre lui-même : trois invariants jamais mis en défaut, donc non éprouvés, et sa propre fiche calibrée sur une constante disparue. |
+| 2026-09-21 | V2, quatre tours : `FAIL` avec **le premier [BLOQUANT] du projet** — SEC-04 violée depuis un vrai point d'entrée HTTP, le prénom de l'enfant parti vers le fournisseur — puis trois `FAIL` sur des défauts nés à chaque tour, enfin `PASS_AVEC_RESERVES`. **G4.V2 verte.** Onze mutations du contrôleur, quatre exécutions de bout en bout contre une vraie base. |
+| 2026-09-21 | Les quatre tours de V2 ont produit trois leçons cumulatives, chacune née de l'échec de la précédente : contrôler une **propriété** et non un emplacement (V1) ; **quantifier** cette propriété sur tous ses sites (tour 1) ; **sceller la configuration** dont la garantie dépend (tour 2) ; appliquer la doctrine **à l'instrument** qui garde le produit (tour 3). |
+| 2026-09-21 | Traçabilité mise à jour après deux verticales de retard : 16 exigences sur 73 passent à `implémenté`. |
 | 2026-09-21 | **ESC-001 rouverte et tranchée dans l'autre sens : le fichier est renommé** (ARB-20). Le texte d'origine du prompt maître n'est pas modifié, seule sa table d'amendements. |
 | 2026-09-21 | **ESC-001 tranchée : NON.** `gwenn-scripts.json` garde son nom. Le personnage s'appelle Pilou partout, zéro occurrence de « Gwenn » comme nom dans les 767 textes. Sujet clos. |
 | 2026-09-21 | Architecture, tour 4 : `PASS_AVEC_RESERVES` (2 mineurs). Tout rejoué sur un PostgreSQL 16.13 neuf par le contrôleur : dix applications de `policies.sql`, les sept chemins d'ARB-13 en données construites par lui, neuf tests adverses refusés par la base, test de mutation reproduit. **Aucun écart sur 28 grandeurs, quatrième tour consécutif.** |
