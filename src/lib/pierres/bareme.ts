@@ -107,42 +107,80 @@ export function bonusSoireeComplete(nbEtapesProgrammees: number): number {
 export const TOTAL_SOIREE_COMPLETE = FORFAIT_SOIREE_COMPLETE;
 
 /**
- * Scellement du barème. Appelée à l'import de ce module, et par le catalogue
- * des neutralisations (`src/config/neutralisations.test.ts`).
+ * Les valeurs dont le barème dépend, réunies en un objet **pour pouvoir être
+ * neutralisées dans un test**.
+ *
+ * Sans ce paramètre, le scellement ne serait vérifiable que dans un sens : on
+ * pourrait montrer qu'il ne lève pas sur la configuration livrée, jamais qu'il
+ * lève sur une configuration éteinte. *Un instrument qui n'a jamais rougi est
+ * non éprouvé.*
+ */
+export interface ConfigBareme {
+  readonly forfait: number;
+  readonly pierresParEtape: number;
+  readonly etapesMax: number;
+  readonly deltaMin: number;
+  readonly deltaMax: number;
+  readonly raisonsEtape: readonly RaisonGem[];
+  readonly raisonBonus: RaisonGem;
+  readonly raisonsConnues: readonly RaisonGem[];
+}
+
+/** La configuration réellement livrée. Aucune valeur n'est écrite ici. */
+export const CONFIG_BAREME_LIVREE: ConfigBareme = Object.freeze({
+  forfait: FORFAIT_SOIREE_COMPLETE,
+  pierresParEtape: PIERRES_PAR_ETAPE,
+  etapesMax: ETAPES_MAX_PAR_SOIREE,
+  deltaMin: DELTA_MIN,
+  deltaMax: DELTA_MAX,
+  raisonsEtape: RAISONS_ETAPE,
+  raisonBonus: RAISON_BONUS,
+  raisonsConnues: RAISONS_GEM,
+});
+
+/**
+ * Scellement du barème. Appelée **à l'import de ce module** sur la
+ * configuration livrée, et par le catalogue des neutralisations
+ * (`src/config/neutralisations.test.ts`) sur des configurations éteintes.
  *
  * Chaque vérification porte **la phrase disant ce que sa neutralité éteindrait**
  * (ARB-18 mesure 2).
  */
-export function assertBaremeScelle(): void {
+export function assertBaremeScelle(config: ConfigBareme = CONFIG_BAREME_LIVREE): void {
   const defauts: string[] = [];
 
-  if (PIERRES_PAR_ETAPE < DELTA_MIN || PIERRES_PAR_ETAPE > DELTA_MAX) {
+  if (config.pierresParEtape < config.deltaMin || config.pierresParEtape > config.deltaMax) {
     defauts.push(
-      `PIERRES_PAR_ETAPE = ${PIERRES_PAR_ETAPE} : à zéro, une étape terminée ne crédite rien et la soirée complète ne vaut plus 3 pierres (ARB-13).`,
+      `PIERRES_PAR_ETAPE = ${config.pierresParEtape} : à zéro, une étape terminée ne crédite rien et la soirée complète ne vaut plus 3 pierres (ARB-13).`,
     );
   }
-  if (FORFAIT_SOIREE_COMPLETE <= 0) {
+  if (config.forfait <= 0) {
     defauts.push(
-      `FORFAIT_SOIREE_COMPLETE = ${FORFAIT_SOIREE_COMPLETE} : à zéro, le forfait d'ARB-13 disparaît et le Soir léger redevient détectable à une pierre près (ARB-06).`,
+      `FORFAIT_SOIREE_COMPLETE = ${config.forfait} : à zéro, le forfait d'ARB-13 disparaît et le Soir léger redevient détectable à une pierre près (ARB-06).`,
     );
   }
-  if (ETAPES_MAX_PAR_SOIREE <= 0) {
+  if (config.etapesMax <= 0) {
     defauts.push(
-      `ETAPES_MAX_PAR_SOIREE = ${ETAPES_MAX_PAR_SOIREE} : à zéro, aucune soirée ne peut être programmée et PED-06 n'a plus rien à plafonner.`,
+      `ETAPES_MAX_PAR_SOIREE = ${config.etapesMax} : à zéro, aucune soirée ne peut être programmée et PED-06 n'a plus rien à plafonner.`,
     );
   }
-  if (DELTA_MIN <= 0 || DELTA_MAX < DELTA_MIN) {
+  if (config.deltaMin <= 0 || config.deltaMax < config.deltaMin) {
     defauts.push(
-      `bornes ${DELTA_MIN}..${DELTA_MAX} : un delta nul ou négatif franchirait le code et se ferait refuser par la base (ETH-04), au milieu d'une transaction de transition.`,
+      `bornes ${config.deltaMin}..${config.deltaMax} : un delta nul ou négatif franchirait le code et se ferait refuser par la base (ETH-04), au milieu d'une transaction de transition.`,
     );
   }
-  if (RAISONS_ETAPE.length === 0) {
+  if (config.raisonsEtape.length === 0) {
     defauts.push(
       "RAISONS_ETAPE est vide : le prédicat du bonus compterait toujours zéro étape créditée, donc ne verserait jamais le bonus — l'enfant perdrait une pierre chaque soir, sans qu'aucun test d'unité ne rougisse.",
     );
   }
-  for (const raison of [...RAISONS_ETAPE, RAISON_BONUS]) {
-    if (!RAISONS_GEM.includes(raison)) {
+  if (config.raisonsEtape.includes(config.raisonBonus)) {
+    defauts.push(
+      "la raison du bonus figure parmi les raisons d'étape : le bonus se compterait lui-même, et une soirée à une étape paraîtrait complète dès qu'un bonus existe.",
+    );
+  }
+  for (const raison of [...config.raisonsEtape, config.raisonBonus]) {
+    if (!config.raisonsConnues.includes(raison)) {
       defauts.push(
         `« ${raison} » n'existe pas dans l'énumération RaisonGem : le crédit serait refusé par la base au moment de l'écriture, donc la transition entière annulée.`,
       );
@@ -151,9 +189,9 @@ export function assertBaremeScelle(): void {
   // La borne d'ARB-13 : avec un plafond de deux étapes, `3 − n` doit tomber
   // dans 1..2 pour toute soirée programmable. On l'affirme sur toutes les
   // tailles atteignables plutôt que sur un exemple.
-  for (let n = 1; n <= ETAPES_MAX_PAR_SOIREE; n += 1) {
-    const bonus = FORFAIT_SOIREE_COMPLETE - n * PIERRES_PAR_ETAPE;
-    if (bonus < DELTA_MIN || bonus > DELTA_MAX) {
+  for (let n = 1; n <= config.etapesMax; n += 1) {
+    const bonus = config.forfait - n * config.pierresParEtape;
+    if (bonus < config.deltaMin || bonus > config.deltaMax) {
       defauts.push(
         `une soirée de ${n} étape(s) donnerait un bonus de ${bonus}, hors des bornes acceptées en base : cette soirée-là ne vaudrait pas 3 pierres (ARB-13).`,
       );

@@ -29,33 +29,17 @@ import { z } from "zod";
 import { AppError, corpsErreurDe, type CorpsErreur } from "@/lib/errors/app-error";
 import { handler, versReponse } from "@/lib/errors/route";
 import { autorisationSortie } from "@/lib/parent/autorisation-sortie";
+import { estEvenementClient } from "@/lib/session/evenements-client";
 import { appliquerEvenement } from "@/lib/session/service";
-import { EVENEMENTS, Evenement, type Snapshot } from "@/lib/session/types";
+import { Evenement, type Snapshot } from "@/lib/session/types";
 import { EtatSession, Uuid } from "@/lib/validation/json";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Les événements qu'un client peut émettre : tous, **moins** ceux dont la garde
- * est une donnée que seul le serveur possède. Dérivée de `EVENEMENTS`, jamais
- * recopiée : un événement ajouté demain sera accepté par défaut, ce qui est le
- * bon défaut — et le retirer demandera d'écrire son nom ici, avec son motif.
- */
-const EVENEMENTS_SERVEUR: Readonly<Record<string, string>> = Object.freeze({
-  CLOTURE_AUTOMATIQUE:
-    "Sa garde est `session.date` antérieure à la soirée courante (ARB-09), donc l'horloge du serveur. Émise par un client, elle clôturerait la soirée en cours.",
-});
-
-const EVENEMENTS_CLIENT = EVENEMENTS.filter(
-  (e) => !Object.prototype.hasOwnProperty.call(EVENEMENTS_SERVEUR, e),
-);
-
 const Entree = z.object({
   id: Uuid,
   evenementId: Uuid,
-  evenement: Evenement.refine((e) => EVENEMENTS_CLIENT.includes(e), {
-    message: "événement réservé au serveur",
-  }),
+  evenement: Evenement.refine(estEvenementClient, { message: "événement réservé au serveur" }),
   etatAttendu: EtatSession,
 });
 

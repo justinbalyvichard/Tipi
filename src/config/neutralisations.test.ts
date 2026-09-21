@@ -21,6 +21,17 @@ import {
   reinitialiserEnvPourTest,
 } from "@/config/env";
 import { reinitialiserSeuilsPourTest, seuils } from "@/config/seuils.config";
+import { autorisationSortie } from "@/lib/parent/autorisation-sortie";
+import {
+  CONFIG_BAREME_LIVREE,
+  assertBaremeScelle,
+  type ConfigBareme,
+} from "@/lib/pierres/bareme";
+import { ROUTE_PAR_ETAT } from "@/lib/session/aiguillage";
+import { STATUTS_FINAUX } from "@/lib/session/etapes";
+import { EVENEMENTS_CLIENT, EVENEMENTS_SERVEUR } from "@/lib/session/evenements-client";
+import { TRANSITIONS } from "@/lib/session/machine";
+import { ETATS, ETATS_FINAUX, EVENEMENTS } from "@/lib/session/types";
 
 /**
  * LE CATALOGUE DES NEUTRALISATIONS — tour 3, [MAJEUR] M5 généralisé.
@@ -274,6 +285,134 @@ describe("la même faute ailleurs — un vocabulaire de transport trop large", (
       temperature: 0,
     };
     expect(defautsDeDerivabilite(corps, payload, [MODELE_TEMOIN])).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 4bis. LA MÊME FAUTE EN V3 — les listes dont dépend le moteur de session
+// ---------------------------------------------------------------------------
+//
+// AJOUTÉ PAR V3. Le catalogue est « le fichier que V3 à V9 étendront »
+// (`P4/V2.review.md`, tour 3). La verticale du moteur de session apporte cinq
+// listes dont **le vide ou l'élargissement éteint une garde sans la
+// contourner**, et aucune n'est une variable d'environnement : ce sont des
+// tables de code, exactement comme la liste d'interdits de SEC-04 l'était.
+//
+// Chaque cas est **exécuté** sur une valeur neutralisée, jamais seulement
+// affirmé sur la valeur livrée : un scellement qui n'a jamais rougi est non
+// éprouvé.
+
+describe("V3 — le barème, neutralisé valeur par valeur", () => {
+  // `assertBaremeScelle()` tourne à l'import de `bareme.ts` sur la
+  // configuration livrée. Ici, on lui passe des configurations éteintes pour
+  // montrer qu'il mord — c'est la direction que le tour 2 de V2 avait manquée.
+  const neutralisations: readonly {
+    readonly nom: string;
+    readonly config: ConfigBareme;
+    readonly eteint: string;
+  }[] = [
+    {
+      nom: "FORFAIT_SOIREE_COMPLETE = 0",
+      config: { ...CONFIG_BAREME_LIVREE, forfait: 0 },
+      eteint: "le forfait d'ARB-13 : une soirée complète ne vaudrait plus 3 pierres",
+    },
+    {
+      nom: "PIERRES_PAR_ETAPE = 0",
+      config: { ...CONFIG_BAREME_LIVREE, pierresParEtape: 0 },
+      eteint: "le crédit d'étape : terminer une étape ne donnerait plus rien",
+    },
+    {
+      nom: "ETAPES_MAX_PAR_SOIREE = 0",
+      config: { ...CONFIG_BAREME_LIVREE, etapesMax: 0 },
+      eteint: "le plafond de PED-06, qui borne le bonus à {1, 2}",
+    },
+    {
+      nom: "DELTA_MIN = 0",
+      config: { ...CONFIG_BAREME_LIVREE, deltaMin: 0 },
+      eteint: "la borne d'ETH-04 : un delta nul franchirait le code",
+    },
+    {
+      nom: "RAISONS_ETAPE = []",
+      config: { ...CONFIG_BAREME_LIVREE, raisonsEtape: [] },
+      eteint:
+        "le prédicat du bonus : il compterait toujours zéro étape créditée, donc ne verserait jamais le bonus",
+    },
+    {
+      nom: "la raison du bonus rangée parmi les raisons d'étape",
+      config: {
+        ...CONFIG_BAREME_LIVREE,
+        raisonsEtape: [...CONFIG_BAREME_LIVREE.raisonsEtape, CONFIG_BAREME_LIVREE.raisonBonus],
+      },
+      eteint: "le décompte du bonus, qui se compterait lui-même",
+    },
+  ];
+
+  for (const { nom, config, eteint } of neutralisations) {
+    it(`REFUSE ${nom} — cela éteindrait ${eteint}`, () => {
+      expect(() => assertBaremeScelle(config)).toThrow(/Barème neutralisé/u);
+    });
+  }
+
+  it("ACCEPTE la configuration livrée", () => {
+    expect(() => assertBaremeScelle(CONFIG_BAREME_LIVREE)).not.toThrow();
+  });
+});
+
+describe("V3 — les listes du moteur de session", () => {
+  it("ETATS_FINAUX n'est ni vide ni universelle", () => {
+    // Vide : aucune session ne serait jamais close, T12 ne trouverait rien à
+    // fermer et `TIPI_SESSION_DEJA_ACTIVE` bloquerait toutes les soirées
+    // suivantes. Universelle : aucune session ne serait jamais active, et la
+    // reprise de PRD-18 n'aurait plus rien à reprendre.
+    expect(ETATS_FINAUX.length).toBeGreaterThan(0);
+    expect(ETATS_FINAUX.length).toBeLessThan(ETATS.length);
+    expect([...ETATS_FINAUX].sort()).toEqual(["abandon_parent", "termine"]);
+  });
+
+  it("STATUTS_FINAUX n'est pas vide — sinon T12 ne rattraperait plus rien", () => {
+    expect(STATUTS_FINAUX.length).toBeGreaterThan(0);
+  });
+
+  it("la table des transitions n'est pas vidée — sinon aucune soirée ne se déroule", () => {
+    const peuplees = EVENEMENTS.flatMap((e) => ETATS.map((s) => TRANSITIONS[e][s])).filter(
+      (r) => r !== null,
+    );
+    expect(peuplees.length).toBeGreaterThan(0);
+  });
+
+  it("EVENEMENTS_SERVEUR retient bien CLOTURE_AUTOMATIQUE hors du client", () => {
+    // Vidée, la liste rendrait `CLOTURE_AUTOMATIQUE` émettable depuis le
+    // navigateur : un client pourrait clore sa propre soirée en cours.
+    expect(Object.keys(EVENEMENTS_SERVEUR).length).toBeGreaterThan(0);
+    expect(EVENEMENTS_CLIENT).not.toContain("CLOTURE_AUTOMATIQUE");
+    expect(EVENEMENTS_CLIENT.length).toBe(EVENEMENTS.length - Object.keys(EVENEMENTS_SERVEUR).length);
+  });
+
+  it("chaque événement réservé au serveur porte son motif (ARB-18 mesure 2)", () => {
+    for (const [nom, motif] of Object.entries(EVENEMENTS_SERVEUR)) {
+      expect(motif.trim().length, nom).toBeGreaterThanOrEqual(40);
+    }
+  });
+
+  it("la table état → route est TOTALE : aucun état ne mène nulle part", () => {
+    // Un état sans route ferait une redirection vers l'accueil, donc un enfant
+    // qui perd son étape en cours — ce que PRD-18 interdit.
+    for (const etat of ETATS) {
+      const route = ROUTE_PAR_ETAT[etat];
+      expect(route, etat).toMatch(/^\//u);
+    }
+    expect(Object.keys(ROUTE_PAR_ETAT)).toHaveLength(ETATS.length);
+  });
+
+  it("l'autorisation de sortie parent REFUSE, et dit pourquoi (ARB-09)", async () => {
+    // Bouchon structurel d'ESC-000 : V3 livre l'interface et une
+    // implémentation qui refuse toujours. Une implémentation qui autoriserait
+    // par défaut ouvrirait PRD-13 à l'enfant lui-même.
+    const motif = await autorisationSortie().autoriserSortieSession(
+      new Request("https://tipi.invalid/api/session/x/transition"),
+    );
+    expect(motif).not.toBeNull();
+    expect((motif ?? "").length).toBeGreaterThanOrEqual(40);
   });
 });
 
