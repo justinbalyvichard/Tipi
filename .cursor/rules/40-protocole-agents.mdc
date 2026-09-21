@@ -89,6 +89,30 @@ concernée, le désaccord en trois lignes, les options envisagées avec leurs
 conséquences, et **une question fermée** à l'humain. Puis il s'arrête sur cette
 phase et continue les phases indépendantes.
 
+## Le quatrième tour — règle permanente
+
+**Décision humaine du 2026-09-21**, après que les portes G2 et G4.V1 ont toutes
+deux atteint trois `FAIL` dans les mêmes circonstances.
+
+Un **quatrième aller-retour est automatique**, sans escalade, quand les **trois**
+conditions suivantes sont réunies :
+
+1. **Aucun `[BLOQUANT]`** dans le verdict ;
+2. **Aucun désaccord** entre producteur et contrôleur — le producteur n'a
+   contesté aucun constat, et le contrôleur reconnaît que le travail est fait ;
+3. Le défaut est **né au dernier tour** — il n'existait pas avant, ou n'était pas
+   visible — et le contrôleur en **spécifie la correction**.
+
+L'Orchestrateur le signale à l'humain sans bloquer, et l'inscrit au journal de
+`GATES.md`.
+
+**La règle des trois tours reste entière** dès qu'il y a un `[BLOQUANT]`, un
+désaccord réel, ou un constat qui revient d'un tour sur l'autre — c'est-à-dire
+dans tous les cas où la boucle ne converge pas. Le motif de cette règle est
+précisément là : trois `FAIL` en convergence ne sont pas un blocage, et traiter
+les deux situations de la même façon fait payer à un projet qui va bien le prix
+prévu pour un projet qui n'avance pas.
+
 ## Portes
 
 `docs/agents/GATES.md` : porte, phase, statut (`ouverte`, `en cours`, `verte`,
