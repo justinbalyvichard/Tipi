@@ -57,6 +57,7 @@ Passe courte, limitée à trois points. Le reste du livrable n'est pas rouvert.
 | T3-2b | L'accord de genre figé de « Tu y es arrivé. » est supprimé. `coffre.palier.atteint` devient « Ça y est. Tu as assez de pierres. » : aucun participe ni adjectif accordé, la phrase vaut pour n'importe quel enfant | 7.9, palier atteint |
 
 | ARB-02 | **L'énumération du canal de diffusion fait foi dans `content/`, pas dans ce document.** Les valeurs sont `tts`, `affiche` et `les_deux`. Ce livrable employait `dit`, `affiche` et `dit_affiche` pour la même notion : 107 colonnes de tableau et 6 mentions en prose sont converties. `affiche` ne change pas. La prose française « texte dit par Pilou » n'est pas l'énumération et reste telle quelle | 6.2, 6.3, les tableaux de clés de 7.1 à 7.14, item TON-4 |
+| ARB-16 | **Les deux lignes d'état des cosmétiques sont réécrites.** `coffre.cosmetiques.verrouille` devient « Pilou ne peut pas mettre ça. » et `coffre.cosmetiques.debloque` devient « Pilou peut mettre ça. ». Deux défauts y étaient cumulés : un jeton `{n}` sans source, ARB-16 ayant sorti les seuils de déblocage du code, et un démonstratif masculin faux pour l'écharpe et les lunettes. **Conséquence de traçabilité : les nombres admis devant l'enfant passent de trois à deux.** Les entrées 2 et T2-1 ci-dessus, qui en annonçaient trois, sont dépassées par celle-ci | 7.9 cosmétiques, 7.9 liste des nombres, 1.1, arbitrage A2, items TON-7, couverture PRD-07 |
 
 **Portée d'ARB-02, pour qu'un agent qui arrive après ne rouvre pas le sujet** :
 le code consomme `content/encouragements.json` et `content/gwenn-scripts.json` ;
@@ -142,7 +143,7 @@ Aucune communication Tipi, interne ou externe, ne contient les mots
 **Preuve de la promesse** : deux étapes maximum par soir quel que soit le volume
 de devoirs (PED-06), une pause toujours accessible et toujours gratuite
 (PRD-12), et aucun chiffre de performance montré à l'enfant (PED-07) — les seuls
-nombres qu'il voit sont les trois nombres d'inventaire de pierres du coffre,
+nombres qu'il voit sont les deux nombres d'inventaire de pierres du coffre,
 énumérés en 7.9, qui ne mesurent pas l'enfant et ne baissent jamais.
 
 ## 1.2 Territoire : le tipi comme abri
@@ -1200,14 +1201,13 @@ d'inventaire est un nombre qui compte des pierres possédées ou des pierres
 restant à obtenir. Il ne baisse jamais, il ne mesure pas l'enfant, il ne se
 compare pas d'un soir à l'autre.
 
-Liste exhaustive des **trois** nombres admis devant l'enfant, tous dans
+Liste exhaustive des **deux** nombres admis devant l'enfant, tous dans
 `/enfant/coffre` :
 
 | # | Clé | Texte | Ce que le nombre compte |
 | --- | --- | --- | --- |
 | 1 | `coffre.solde.valeur` | « {n} » | Les pierres possédées. Ne baisse jamais (ETH-04) |
 | 2 | `coffre.palier.reste` | « Il t'en faut encore {n}. » | Les pierres restant avant le palier. Diminue seulement parce que le solde monte |
-| 3 | `coffre.cosmetiques.verrouille` | « Il en faut {n} pour celui-là. » | Le seuil fixe d'un cosmétique. Constant |
 
 **Interdiction correspondante** : **aucun nombre, d'aucune sorte, sur les sept
 autres écrans enfant** — `/bienvenue`, `/enfant`, `/enfant/programme`,
@@ -1215,7 +1215,7 @@ autres écrans enfant** — `/bienvenue`, `/enfant`, `/enfant/programme`,
 `/enfant/bravo`. Ni durée, ni numéro d'étape, ni numéro d'indice, ni nombre
 d'essais, ni nombre de pierres du soir, ni progression en pourcentage.
 
-Ni le solde, ni aucun de ces trois nombres n'est un score de performance. L'écran
+Ni le solde, ni aucun de ces deux nombres n'est un score de performance. L'écran
 est accessible à tout moment, y compris en dehors d'une session.
 
 | Clé | Texte | Mode |
@@ -1286,9 +1286,28 @@ Aucune incitation à demander un palier au parent.
 | --- | --- | --- |
 | `coffre.cosmetiques.titre` | « Habiller Pilou » | les_deux |
 | `coffre.cosmetiques.bouton_appliquer` | « Mettre à Pilou » | affiche |
-| `coffre.cosmetiques.verrouille` | « Il en faut {n} pour celui-là. » | les_deux |
-| `coffre.cosmetiques.debloque` | « Celui-là est à toi. » | les_deux |
+| `coffre.cosmetiques.verrouille` | « Pilou ne peut pas mettre ça. » | les_deux |
+| `coffre.cosmetiques.debloque` | « Pilou peut mettre ça. » | les_deux |
 | `coffre.cosmetiques.vide` | « Il n'y a rien à mettre pour l'instant. » | les_deux |
+
+**Les deux lignes d'état ne nomment jamais l'objet** (ARB-14, ARB-16). Trois
+contraintes se croisent ici, et une seule formulation les satisfait toutes.
+
+1. **Aucun accord de genre ni de nombre.** Les cinq apparences sont Pilou toute
+   simple, l'écharpe, le bonnet, le petit nœud et les lunettes : féminin,
+   masculin et féminin pluriel. Tout démonstratif ou pronom objet — « celui-là »,
+   « le mettre » — est faux pour deux objets sur cinq. Le texte emploie donc
+   `ça`, invariable, et le libellé voisin nomme déjà l'objet.
+2. **Aucun chiffre, aucun seuil, aucun rythme.** ARB-16 a sorti du code les
+   valeurs de déblocage : un jeton `{n}` n'a plus de source ici, et un écran qui
+   affiche un jeton vide est un écran cassé. Ces deux lignes ne portent ni
+   nombre, ni « encore », ni « bientôt », ni « plus que ». **Le jour où les
+   seuils seront décidés, elles resteront justes sans être retouchées.**
+3. **Ce n'est pas une possession, c'est une apparence** (ETH-05). Les lignes
+   décrivent ce que Pilou peut faire, jamais ce que l'enfant a gagné ou mérité.
+   Elles emploient le verbe `mettre`, déjà le registre de cet écran
+   (« Habiller Pilou », « Mettre à Pilou », « rien à mettre »), et aucun nom de
+   catégorie : « habits » ne couvrirait pas les lunettes.
 
 Un cosmétique verrouillé est affiché en silhouette neutre, **jamais avec un
 cadenas rouge, jamais avec un compte à rebours, jamais avec une mention
@@ -1942,7 +1961,7 @@ Un seul « non » est bloquant.
 | TON-4 | Toute information nécessaire à l'action est en `les_deux` ? | Champ `mode` de chaque entrée de contenu | [ ] |
 | TON-5 | Aucun message de difficulté n'a « tu » pour sujet ? | États d'erreur des écrans enfant | [ ] |
 | TON-6 | Aucune référence à la Bretagne hors contenu de devoir et hors réglage parent ? Le nom de fichier `content/gwenn-scripts.json` est la seule exception connue, imposée par le prompt maître et en attente d'arbitrage (A13) : elle ne vaut pas non-conformité tant que A13 n'est pas tranché | `content/**`, visuels, sons, nom du produit, nom de la mascotte | [ ] |
-| TON-7 | Les seuls nombres affichés à l'enfant sont les trois nombres d'inventaire de `/enfant/coffre` listés en 7.9 ? | Les 8 écrans enfant, en session réelle : aucun nombre sur les sept autres | [ ] |
+| TON-7 | Les seuls nombres affichés à l'enfant sont les deux nombres d'inventaire de `/enfant/coffre` listés en 7.9 ? Aucun seuil de cosmétique n'est affiché (ARB-16) | Les 8 écrans enfant, en session réelle : aucun nombre sur les sept autres | [ ] |
 | TON-8 | Pour chacune des six configurations C1 à C6 de 7.0, Pilou ne nomme jamais une matière absente du programme du soir ? | Dérouler les six configurations : lecture puis maths, maths puis lecture, lecture seule, maths seule, et les deux Soirs légers | [ ] |
 
 ---
@@ -1954,7 +1973,7 @@ Les points que le prompt maître laissait ouverts, et la décision retenue.
 | # | Point ouvert | Décision | Justification |
 | --- | --- | --- | --- |
 | A1 | `/bienvenue` est marqué « Enfant » dans la section 3.1, mais le code parent doit bien être créé une première fois | L'onboarding reste **entièrement enfant**, 3 écrans, sans saisie. Le code parent est créé au **premier accès à `/reglages/code`**, en mode création (7.13) | Ne jamais faire passer un enfant de 6 ans par un écran de configuration |
-| A2 | Le coffre affiche des nombres, or PED-07 interdit les chiffres devant l'enfant | **Trois nombres exactement** sont admis devant l'enfant, tous dans `/enfant/coffre` : `coffre.solde.valeur`, `coffre.palier.reste` et `coffre.cosmetiques.verrouille`. Ce sont des nombres d'inventaire de pierres. **Aucun nombre, d'aucune sorte, sur les sept autres écrans enfant.** Règle générale et liste exhaustive écrites en 7.9, contrôlées par TON-7 | Un nombre d'inventaire de pierres ne baisse jamais, ne mesure pas l'enfant et ne se compare pas d'un soir à l'autre. Ce n'est pas une mesure de performance |
+| A2 | Le coffre affiche des nombres, or PED-07 interdit les chiffres devant l'enfant | **Deux nombres exactement** sont admis devant l'enfant, tous dans `/enfant/coffre` : `coffre.solde.valeur` et `coffre.palier.reste`. Le troisième, `coffre.cosmetiques.verrouille`, a été retiré : ARB-16 a sorti les seuils de déblocage du code, son jeton n'avait plus de source. Ce sont des nombres d'inventaire de pierres. **Aucun nombre, d'aucune sorte, sur les sept autres écrans enfant.** Règle générale et liste exhaustive écrites en 7.9, contrôlées par TON-7 | Un nombre d'inventaire de pierres ne baisse jamais, ne mesure pas l'enfant et ne se compare pas d'un soir à l'autre. Ce n'est pas une mesure de performance |
 | A3 | Le palier de récompense risque d'être lu comme une promesse de l'application | La description du palier saisie par le parent **n'est pas affichée à l'enfant** : elle reste dans `/reglages`. `/enfant/coffre` ne montre que la progression et la mention permanente `coffre.palier.maison`, affichée et dite | ETH-05, et refus d'une chaîne enfant échappant aux 12 mots, au vocabulaire CE1 et à DES-07 |
 | A4 | Quelle durée pour la pause | **Aucune durée.** Le bouton de retour est actif immédiatement | PRD-12, ETH-01 |
 | A5 | Faut-il annoncer le bonus de la 2e étape pour motiver | **Non.** Le bonus n'est jamais annoncé à l'avance | Ce serait un levier de pression (ETH-01) |
@@ -1985,7 +2004,7 @@ Une ligne par exigence, la section de ce document qui la traite, et la décision
 | PRD-04 | 7.11, 7.0 | L'aperçu est modifiable : retirer une étape, la faire passer en premier, modifier une consigne, et activer « Soir léger » (une seule étape, plus courte). L'ordre choisi est celui que Pilou annonce à l'enfant. Les six configurations de soirée qui en découlent (C1 à C6) ont chacune leurs textes enfant, listés en 7.0 avec leur table de sélection : aucune phrase enfant ne fige l'ordre ni la matière, et Pilou ne nomme jamais une matière absente du programme du soir |
 | PRD-05 | 7.11 | « Lancer la session » est la seule porte vers `/enfant`, sur le même appareil. L'enfant n'a ni compte, ni connexion, ni saisie. Le passage est explicite : `parent.apercu.passage_enfant` |
 | PRD-06 | 7.12, 8 | Résumé **entièrement non chiffré**, conforme à la lettre de PRD-06 : faits et observation en langage courant, aucune note, aucun pourcentage, aucun compte d'erreurs, **et ni durée de séance ni nombre de pierres**. Seule la date identifie la séance. Une notification unique, en fin de séance, adressée au parent. Aucune dérogation n'est demandée |
-| PRD-07 | 7.4, 7.9 | `/enfant/programme` affiche 2 cartes maximum, un picto et un mot par carte, dans l'ordre réel des étapes. Aucune durée, aucune numérotation, aucune liste d'exercices. Pilou annonce l'ordre à l'oral. Plus largement, aucun nombre n'est affiché sur cet écran ni sur aucun autre écran enfant, hors les trois nombres d'inventaire de `/enfant/coffre` énumérés en 7.9 |
+| PRD-07 | 7.4, 7.9 | `/enfant/programme` affiche 2 cartes maximum, un picto et un mot par carte, dans l'ordre réel des étapes. Aucune durée, aucune numérotation, aucune liste d'exercices. Pilou annonce l'ordre à l'oral. Plus largement, aucun nombre n'est affiché sur cet écran ni sur aucun autre écran enfant, hors les deux nombres d'inventaire de `/enfant/coffre` énumérés en 7.9 |
 | PRD-08 | 7.5 | Étape lecture complète : modèle lu par Pilou, réécoute illimitée, micro, retour centré sur l'effort, hésitation traitée par une proposition, transcription douteuse traitée par « je n'ai pas bien entendu », questions de compréhension avec « Je ne sais pas » toujours disponible, cas breton en mode dégradé |
 | PRD-09 | 7.6 | Étape maths complète : concret avant abstrait, bouton « Un petit indice ? » qui déroule 4 niveaux et pas un de plus, refus constant de donner le résultat avec 4 formulations, blocage traité par une proposition de pause ou de passage, aucune validation juste/faux affichée |
 | PRD-10 | 7.6 transition, 7.0 | Transition douce : félicitation courte nommant l'étape qui vient de finir (`transition.felicitation.lecture` ou `.maths`), micro-animation de 600 ms sans flash, annonce de l'étape suivante (`transition.annonce.maths` ou `.lecture`), puis un seul bouton « Continuer ». L'écran de transition n'existe pas dans une soirée à une seule étape |
