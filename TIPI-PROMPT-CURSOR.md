@@ -11,7 +11,7 @@
 > | « +1 bonus pour 2 étapes » | §5.1, fiche `tests-unitaires` | ARB-08, ARB-13 | idem. La fiche `.cursor/agents/tests-unitaires.md` porte l'amendement. |
 > | `globs: ["content/**", "src/components/gwenn/**", …]` | §5.2, règle `30-copy-enfant` | — | Le dossier `gwenn` n'existe pas : la mascotte s'appelle Pilou. Glob corrigé dans `.cursor/rules/30-copy-enfant.mdc` pour couvrir les chemins réels, `src/app/bienvenue/**` compris. |
 > | « 20 variantes par situation » pour **16 situations** | §5.1, fiche `contenu-enfant` | ARB-04, ARB-06 | Le fichier validé en G1 porte **23 situations** à 20 variantes. Une situation = un moment de la session qui a son propre sens : les quatre niveaux d'indices sont quatre situations, le blocage en lecture et en maths en font deux, la transition se décline dans les deux sens, et l'annonce du programme à une seule étape a sa propre banque. Ne jamais fusionner deux sens pour tenir un compte. |
-> | `content/gwenn-scripts.json` | §5.1, fiche `contenu-enfant` | — | **Non tranché.** Nom conservé en attendant la réponse humaine à ESC-001. |
+> | `content/gwenn-scripts.json` | §5.1, fiche `contenu-enfant` | — | **Tranché le 2026-09-21 : le nom est conservé tel quel.** Le personnage s'appelle Pilou partout, zéro occurrence de « Gwenn » comme nom dans les 767 textes. Sujet clos, aucun agent ne le rouvre. |
 >
 > **Rejouer la PHASE 0 telle quelle réécrirait les fiches d'agents sur les règles
 > révoquées.** Si la PHASE 0 est rejouée, appliquer ces amendements dans la

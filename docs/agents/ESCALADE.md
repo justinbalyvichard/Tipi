@@ -161,7 +161,22 @@ ne font référence à la Bretagne.
 > `src/components/pilou/**`, en corrigeant le prompt maître en conséquence —
 > oui ou non ?
 
-**Réponse humaine** : _(en attente)_
+**Réponse humaine (2026-09-21) : NON.** Statut : **close, tranchée**.
+
+Le fichier garde le nom `content/gwenn-scripts.json` imposé par la section 5.1 du
+prompt maître. **Aucun agent ne rouvre ce sujet.**
+
+Ce qui est acquis et n'a jamais été en cause : le personnage s'appelle **Pilou**
+partout. Vérifié le 2026-09-21 sur l'ensemble du dépôt — **zéro occurrence de
+« Gwenn » comme nom de personnage** dans les 767 textes. Toutes les occurrences
+restantes sont le nom du fichier, l'identifiant de schéma qui en dérive
+(`tipi.gwenn-scripts.v2`), ou des phrases qui expliquent précisément cet écart.
+
+Le seul point qui posait un vrai risque a été corrigé indépendamment de cette
+question : le glob de `.cursor/rules/30-copy-enfant.mdc` ciblait un dossier
+`src/components/gwenn/**` qui n'existera jamais, et la règle de rédaction pour
+l'enfant serait restée silencieusement inactive pendant tout le développement.
+Elle couvre désormais les chemins réels.
 
 ---
 
@@ -216,10 +231,12 @@ que tu n'interviens qu'ici.
 > **Autorises-tu un quatrième aller-retour sur la porte G2, par dérogation à la
 > règle des trois tours — oui ou non ?**
 
-Si oui, je relance immédiatement et je te préviens à l'ouverture de G2.
-Si non, dis-moi laquelle des options B ou C tu préfères.
+**Réponse humaine (2026-09-21) : OUI, option A.** Statut : **close, G2 relancée**.
 
-**Réponse humaine** : _(en attente)_
+Dérogation accordée pour ce tour et pour ce motif uniquement — un défaut né au
+tour 3, sans désaccord entre producteur et contrôleur, dont la correction est
+spécifiée mot pour mot. Elle ne crée pas de précédent : la règle des trois tours
+reste la règle, et un quatrième tour reste une décision humaine.
 
 ---
 
