@@ -34,6 +34,17 @@ const texteNonVide = z.string().min(1);
  * Rôle d'un texte d'interface. `indetermine` est la valeur de repli voulue par
  * `contenu-enfant` : elle s'appelle ainsi, et non `texte`, pour qu'un composant
  * ne la rende pas en corps de texte par défaut.
+ *
+ * `libelle` a été ajouté au tour 2 de G4.V1, et le motif mérite d'être écrit :
+ * `contenu-enfant` a livré les cinq libellés de cosmétiques pendant cette
+ * verticale, avec un rôle `libelle` qu'il déclare lui-même dans la règle
+ * `role` de `content/ui-enfant.json`. Le chargeur a REFUSÉ le fichier et l'a
+ * dit — c'est exactement son travail : il n'a pas lu de travers en silence.
+ *
+ * L'élargissement suit ARB-02 : le vocabulaire de `content/` est celui de son
+ * producteur, pas celui du code qui le consomme. Un schéma ne dicte pas son
+ * vocabulaire aux fichiers qu'il décrit. Il reste FERMÉ : tout rôle inconnu
+ * continue de faire échouer le démarrage.
  */
 export const RoleTexte = z.enum([
   "titre",
@@ -42,6 +53,7 @@ export const RoleTexte = z.enum([
   "action",
   "aide",
   "valeur",
+  "libelle",
   "indetermine",
 ]);
 export type RoleTexte = z.infer<typeof RoleTexte>;
