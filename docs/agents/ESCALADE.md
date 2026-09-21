@@ -180,6 +180,55 @@ Elle couvre désormais les chemins réels.
 
 ---
 
+## ESC-003 — Pilou ne ressemble pas à une loutre
+
+Ouverte le : 2026-09-21 · Par : Orchestrateur, sur recommandation de `controle-design` · Porte : G3 · Statut : **en attente**
+
+**Ne bloque rien aujourd'hui.** G3 est verte et le développement continue. Mais
+le coût de la décision croît vite, et c'est la seule raison pour laquelle je te
+la pose maintenant plutôt qu'à la recette.
+
+### Le constat
+
+La section 1.3 décrit Pilou comme **une petite loutre** : corps clair aux
+contours très arrondis, petites oreilles rondes, joues colorées, museau doux.
+
+Ces quatre traits sont respectés, DES-09 est tenue, **aucune exigence n'est
+violée**. Le contrôleur a donc refusé de prononcer un `[MAJEUR]`, en écrivant
+que le faire reviendrait à fabriquer l'exigence qui lui manque pour le
+prononcer. C'est le bon raisonnement.
+
+Mais il ajoute, franchement : **« c'est un ours en peluche, la vignette
+silhouette surtout, et aucun adulte ne répondrait loutre »**. Le producteur
+l'avait signalé de lui-même dans les mêmes termes.
+
+### Pourquoi cela t'appartient
+
+Décider si le mot « loutre » engage le dessin, c'est décider ce que la section
+1.3 **veut dire**. Ce n'est ni au producteur ni au contrôleur de le faire.
+
+Et c'est le personnage qu'Evan verra chaque soir pendant des années. Une
+mascotte n'est pas un composant : si elle change plus tard, un enfant de cet âge
+le vit comme une rupture — c'est l'argument que le prompt maître oppose
+lui-même au changement de voix, en section 8.
+
+| Option | Conséquence |
+| --- | --- |
+| **A. Le dessin doit devenir une loutre** | Museau allongé, corps fuselé, queue épaisse et aplatie, oreilles plus petites. **Aujourd'hui, tout tient dans un seul fichier.** Après V9, cela touche neuf verticales, l'icône d'application et l'écran de lancement. |
+| **B. Le dessin actuel convient** | Aucun travail. Pilou reste un animal doux et arrondi, sans espèce identifiable. Le mot « loutre » ne quitte pas la documentation : il n'apparaît nulle part devant l'enfant, qui ne connaîtra Pilou que par son dessin. |
+| **C. Changer le mot plutôt que le dessin** | Amender la section 1.3. Cohérent, sans coût de production, mais c'est ton cahier des charges. |
+
+### Question fermée
+
+> **Pilou doit-il être redessiné pour se lire comme une loutre — oui ou non ?**
+
+Si oui, je le fais traiter maintenant, tant que le coût est d'un fichier.
+Si non, je ferme le sujet et aucun agent ne le rouvrira.
+
+**Réponse humaine** : _(en attente)_
+
+---
+
 ## Escalades de désaccord producteur/contrôleur
 
 Au troisième `FAIL` sur une même porte, l'Orchestrateur ouvre ici une entrée :

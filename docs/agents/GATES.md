@@ -10,8 +10,8 @@ sa porte amont n'est pas verte.
 | --- | --- | --- | --- | --- | --- | --- |
 | G1 | P1 Produit & marketing + P1bis Contenu enfant | `produit-marketing`, `contenu-enfant` | `controle-produit` | **verte** | 2026-09-20 | [marketing](P1/produit-marketing.review.md) · [contenu](P1/contenu-enfant.review.md) |
 | G2 | P2 Architecture | `architecte` | `controle-architecture` | **verte** | 2026-09-21 | [verdict](P2/architecture.review.md) |
-| G3 | P3 Design system | `design-system` | `controle-design` | en cours | 2026-09-21 | — |
-| G4.V1 | P4 V1 Socle | `dev-feature` | `controle-code` | ouverte | — | — |
+| G3 | P3 Design system | `design-system` | `controle-design` | **verte** | 2026-09-21 | [verdict](P3/design-system.review.md) |
+| G4.V1 | P4 V1 Socle | `dev-feature` | `controle-code` | en cours | 2026-09-21 | — |
 | G4.V2 | P4 V2 Capture & analyse IA | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V3 | P4 V3 Moteur de session | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V4 | P4 V4 Module Lecture | `dev-feature` | `controle-code` | ouverte | — | — |
@@ -75,6 +75,9 @@ tous les agents en aval.
 | 2026-09-20 | Architecture, tour 1 : `FAIL` (7 majeurs, 12 mineurs). `prisma validate` rejoué et reproduit par le contrôleur : le FAIL ne porte pas sur le schéma. Fuite découverte — le cache TTS public aurait contenu 14 clips prononçant le prénom de l'enfant. Arbitrages ARB-08 à ARB-11, puis ARB-12. |
 | 2026-09-20 | Architecture, tour 2 : `FAIL` (3 majeurs, 3 mineurs). Les 19 constats du tour 1 tous fermés, vérifiés dans les fichiers ; aucun écart sur 23 grandeurs recomptées. Les trois majeurs sont nés du tour 2, tous sur le barème et la clôture automatique. Arbitrage ARB-13. |
 | 2026-09-20 | Architecture, tour 3 : `FAIL` (1 majeur, 2 mineurs), sur un défaut né au tour 3 et invisible avant l'application d'ARB-13. Aucun écart sur 26 grandeurs, troisième tour consécutif. **Troisième FAIL : G2 bloquée, ESC-002 ouverte** conformément à la règle 6.4. |
+| 2026-09-21 | Design system, tour 1 : `FAIL` (2 majeurs, 10 mineurs). Le cosmétique `lunettes` rendait Pilou à 2,05:1, et l'instrument imprimait une ligne verte pour un trait que cette variante ne dessine pas. Arbitrage ARB-16. |
+| 2026-09-21 | Design system, tour 2 : `PASS_AVEC_RESERVES` (8 mineurs). Preuve d'instrument refaite intégralement par le contrôleur sur le code d'avant correction. 46 cibles tactiles mesurées au navigateur, aucune sous 56 px. |
+| 2026-09-21 | **G3 verte.** ESC-003 ouverte sur la silhouette de Pilou, sans bloquer. P4 ouverte, verticale V1 lancée. |
 | 2026-09-21 | **ESC-001 tranchée : NON.** `gwenn-scripts.json` garde son nom. Le personnage s'appelle Pilou partout, zéro occurrence de « Gwenn » comme nom dans les 767 textes. Sujet clos. |
 | 2026-09-21 | Architecture, tour 4 : `PASS_AVEC_RESERVES` (2 mineurs). Tout rejoué sur un PostgreSQL 16.13 neuf par le contrôleur : dix applications de `policies.sql`, les sept chemins d'ARB-13 en données construites par lui, neuf tests adverses refusés par la base, test de mutation reproduit. **Aucun écart sur 28 grandeurs, quatrième tour consécutif.** |
 | 2026-09-21 | **G2 verte.** Les deux réserves sont versées au dossier de P5 : elles ne changent ni schéma, ni route, ni contrainte, ni un chiffre. P3 ouverte, `design-system` lancé. |
