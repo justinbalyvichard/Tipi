@@ -15,6 +15,10 @@ import { Icon } from "./Icon";
  *   textes éditoriaux. Tous les libellés rédigés — « Effacer », le nom
  *   accessible du bandeau — sont **des propriétés**, alimentées depuis
  *   `content/ui-parent.json`.
+ * - La touche d'effacement est désactivée tant que rien n'est saisi, donc dès
+ *   l'ouverture de l'écran. Son opacité est celle de `Button` (60 %), et non
+ *   40 % : WCAG exempte les composants inactifs, mais une touche qu'on ne voit
+ *   pas à l'ouverture n'est pas une bonne façon d'accueillir un parent.
  * - Le bouton de validation n'appartient pas au clavier : DES-06 veut une
  *   seule action principale par écran, placée en bas, donc composée par
  *   l'écran lui-même.
@@ -88,7 +92,7 @@ export function Keypad({
           type="button"
           onClick={effacer}
           disabled={valeur.length === 0}
-          className={cx(toucheClasses, "disabled:opacity-40")}
+          className={cx(toucheClasses, "disabled:opacity-60")}
         >
           <Icon nom="effacer" etiquette={etiquetteEffacer} taille={28} />
         </button>

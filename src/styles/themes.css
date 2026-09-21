@@ -5,11 +5,20 @@
 /* =============================================================================
    TIPI — les deux thèmes (DES-01, DES-02, DES-03, DES-05, DES-08)
    -----------------------------------------------------------------------------
-   CE FICHIER EST LE SEUL DU DÉPÔT QUI CONTIENT UNE VALEUR DE COULEUR.
-   Partout ailleurs — composants, page de contrôle, configuration Tailwind,
-   configuration de la mascotte — une couleur se désigne par son jeton.
+   AUCUN CODE APPLICATIF NE PORTE DE COULEUR : ce fichier est le seul de `src/`
+   et de `tailwind.config.ts` qui en contienne une. Partout ailleurs —
+   composants, page de contrôle, configuration Tailwind, configuration de la
+   mascotte — une couleur se désigne par son jeton.
+
+   Le périmètre est énoncé exactement, parce que le tour 1 l'avait annoncé trop
+   large : `scripts/verifier-design-system.sh` recopie les 26 valeurs de 3.8, et
+   `.cursor/rules/20-themes.mdc` les porte aussi. Ces deux-là sont des tables de
+   référence, pas du code rendu — c'est la seule façon de contrôler une
+   spécification écrite en prose. Les deux sont nommés par le contrôle 1.
+
    Invariant vérifiable :
-     grep -rEn '#[0-9a-fA-F]{3,8}' src tailwind.config.ts | grep -v styles/themes.css
+     grep -rEn '#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\(' src tailwind.config.ts \
+       | grep -v '^src/styles/themes.css'
    doit ne rien retourner.
 
    Les deux thèmes sont DEUX JEUX DE VARIABLES sur le même arbre de composants

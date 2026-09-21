@@ -14,15 +14,31 @@ cd "$(dirname "$0")/.."
 echec=0
 titre() { printf '\n=== %s ===\n' "$1"; }
 
-titre "1. Couleurs en dur hors de src/styles/themes.css (DES-01, DES-02)"
-echo "Motif : #hex, rgb(), rgba(), hsl(), hsla()"
-echo "-- occurrences DANS themes.css (attendu : > 0, c'est le seul fichier autorisé) --"
+titre "1. Couleurs en dur (DES-01, DES-02)"
+echo "Motif : #hex (avec ou sans dièse pour la table de référence), rgb(), rgba(), hsl(), hsla()"
+echo "-- occurrences DANS themes.css (attendu : > 0, c'est le seul fichier de code autorisé) --"
 grep -rEc '#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(' src/styles/themes.css
-echo "-- occurrences AILLEURS (attendu : 0) --"
+echo "-- occurrences dans le CODE APPLICATIF, ailleurs (attendu : 0) --"
 hors=$(grep -rEn '#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(' src tailwind.config.ts 2>/dev/null \
   | grep -v '^src/styles/themes.css' || true)
 if [ -n "$hors" ]; then echo "$hors"; echec=1; else echo "(aucune)"; fi
 printf 'compte : %s\n' "$(printf '%s' "$hors" | grep -c . || true)"
+echo "-- BALAYAGE DU DÉPÔT ENTIER, y compris sans dièse : les porteurs de couleur"
+echo "   hors themes.css doivent être des TABLES DE RÉFÉRENCE nommées ci-dessous,"
+echo "   jamais du code rendu. Le tour 1 annonçait un périmètre trop large et ce"
+echo "   contrôle était aveugle à sa propre table (constat 6) --"
+LEGITIMES="scripts/verifier-design-system.sh .cursor/rules/20-themes.mdc src/styles/themes.css"
+echo "   porteurs légitimes déclarés : $LEGITIMES"
+porteurs=$(grep -rlEi '#?(fff8ee|2e2a26|6b6459|8a8074|ede6d8|d8ccb8|6fb8e8|ff8b7b|8fe3c0|ffd166|e8f4fc|ffefe0|fff3d6|e9f9f0|f5f5f7|1d1d1f|86868b|e5e5ea|c7c7cc|007aff|ff9500|34c759|ff3b30|8e8e93|eaf3ff)\b' \
+  --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=.git --exclude-dir=docs \
+  --exclude='pnpm-lock.yaml' --exclude='TIPI-PROMPT-CURSOR.md' . 2>/dev/null | sed 's|^\./||' | sort || true)
+echo "   porteurs trouvés :"
+echo "$porteurs" | sed 's/^/     /'
+inattendus=""
+for f in $porteurs; do
+  case " $LEGITIMES " in *" $f "*) ;; *) inattendus="$inattendus $f" ;; esac
+done
+if [ -n "$inattendus" ]; then echo "   INATTENDU :$inattendus"; echec=1; else echo "   aucun porteur inattendu"; fi
 
 titre "2. Interdits de code TEC-15 (any, @ts-ignore, console.log)"
 for motif in ': any\b|<any>|as any' '@ts-ignore' 'console\.log'; do

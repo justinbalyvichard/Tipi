@@ -52,8 +52,10 @@ const tracés: Readonly<Record<IconeNom, ReactElement>> = {
   chevron: <path d="m9 5 7 7-7 7" />,
   engrenage: (
     <>
-      <circle cx="12" cy="12" r="3.2" />
-      <path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7 17 17M7 7 5.3 5.3" />
+      <circle cx="12" cy="12" r="3.3" />
+      {/* Des DENTS, pas des rayons : une couronne crénelée, sinon le tracé se
+          lit comme un pictogramme de luminosité (constat 9 du tour 1). */}
+      <path d="M10.3 2.8h3.4l.4 2.3 2 1.2 2.1-1 1.7 2.9-1.7 1.6v2.4l1.7 1.6-1.7 2.9-2.1-1-2 1.2-.4 2.3h-3.4l-.4-2.3-2-1.2-2.1 1-1.7-2.9L5.8 12V9.6L4.1 8l1.7-2.9 2.1 1 2-1.2z" />
     </>
   ),
   retour: (

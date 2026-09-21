@@ -207,6 +207,27 @@ function Galerie(): ReactElement {
             <code className="font-texte text-appui text-texte-appui">silhouette</code>
           </div>
         </div>
+        {/* Les quatre paliers VERROUILLÉS : Pilou normale, le cosmétique seul
+            en silhouette neutre. Sans ces vignettes, le contrôle visuel ne
+            verrait pas que les quatre paliers sont bien distincts — c'est le
+            défaut exact du tour 1. */}
+        {/* Le jeton {n} s'affiche non rendu : le rendu des jetons est serveur
+            (`src/content/jetons.ts`, architecture §2) et n'appartient pas au
+            design system. Une galerie montre la chaîne telle qu'elle est
+            stockée. */}
+        <p className="font-titre text-corps font-semibold">
+          {t("coffre.cosmetiques.verrouille")}
+        </p>
+        <div className="flex flex-wrap items-end gap-6">
+          {mascotConfig.cosmetiques
+            .filter((c) => c.id !== "aucun")
+            .map((c) => (
+              <div key={`verrouille-${c.id}`} className="flex flex-col items-center gap-1">
+                <Pilou taille="moyenne" cosmetique={c.id} cosmetiqueVerrouille />
+                <code className="font-texte text-appui text-texte-appui">{c.id}</code>
+              </div>
+            ))}
+        </div>
       </Bloc>
 
       <Bloc titre="PilouReflechit">

@@ -10,11 +10,25 @@ import {
  * DES-09 — **un seul** SVG de Pilou pour toute l'application.
  *
  * Tout ce qui varie est un paramètre : la taille (héros, moyenne, icône), la
- * variante cosmétique, et l'état silhouette d'un cosmétique encore verrouillé.
- * Aucune couleur n'est écrite ici : chaque remplissage pointe vers un jeton
- * déclaré dans `mascot.config.ts` et résolu par le thème actif — c'est ainsi
- * que le trait devient fin dans le thème Apple (`--pilou-trait` vaut 2,5 côté
- * Pilou et 1,5 côté Apple) sans qu'un second dessin existe.
+ * variante cosmétique, l'état silhouette de la mascotte, et — depuis le tour 2
+ * — l'état silhouette du **cosmétique seul**. Aucune couleur n'est écrite ici :
+ * chaque remplissage pointe vers un jeton déclaré dans `mascot.config.ts` et
+ * résolu par le thème actif — c'est ainsi que le trait devient fin dans le
+ * thème Apple (`--pilou-trait` vaut 2,5 côté Pilou et 1,5 côté Apple) sans
+ * qu'un second dessin existe.
+ *
+ * **Règle de tracé, opposable à toute variante future** : toute forme colorée
+ * est *cernée* par le trait d'encre du groupe parent. Une variante ne redéfinit
+ * jamais `stroke` : c'est le trait, et non le remplissage, qui rend la forme
+ * perceptible sur le fond. Le tour 1 a livré `lunettes` en violation de cette
+ * règle — la monture était tracée en `--pilou-cosmetique`, mesurée à 2,05:1 —
+ * et l'instrument de couples écrits à la main ne l'a pas vu. C'est
+ * `scripts/verifier-contraste-rendu.mjs` qui tient désormais cette règle, en
+ * mesurant la couleur calculée de chaque tracé contre son fond effectif.
+ *
+ * Exception unique et marquée : les joues, qui portent `data-tipi-decor`.
+ * L'instrument de rendu n'exempte que ce qui porte cet attribut ; toute forme
+ * nouvelle est mesurée par défaut.
  *
  * Accessibilité : Pilou est décorative par défaut. Les écrans où elle porte
  * seule une information lui passent `etiquette`, issue de `content/`.
@@ -30,16 +44,35 @@ const P = mascotConfig.palette;
 interface PilouProps {
   readonly taille?: TaillePilou;
   readonly cosmetique?: CosmetiqueId;
-  /** Rendu en aplat neutre, pour un cosmétique encore verrouillé (ETH-01). */
+  /** La **mascotte entière** en aplat neutre. */
   readonly silhouette?: boolean;
+  /**
+   * Le **cosmétique seul** en aplat neutre, Pilou restant normale : c'est le
+   * « cosmétique verrouillé affiché en silhouette neutre » du livrable
+   * marketing (§7.9), employé par `/enfant/coffre` (PRD-14). Chaque palier
+   * verrouillé montre ainsi la *forme* de ce qui l'attend, et non quatre fois
+   * la même ombre.
+   */
+  readonly cosmetiqueVerrouille?: boolean;
   readonly anime?: boolean;
   readonly etiquette?: string;
   readonly className?: string;
 }
 
-function Cosmetique({ id }: { readonly id: CosmetiqueId }): ReactElement | null {
-  const couleur = jeton(P.cosmetique);
-  const couleur2 = jeton(P.cosmetiqueSecondaire);
+interface CouleursCosmetique {
+  readonly principale: string;
+  readonly secondaire: string;
+}
+
+function Cosmetique({
+  id,
+  couleurs,
+}: {
+  readonly id: CosmetiqueId;
+  readonly couleurs: CouleursCosmetique;
+}): ReactElement | null {
+  const couleur = couleurs.principale;
+  const couleur2 = couleurs.secondaire;
 
   switch (id) {
     case "aucun":
@@ -57,26 +90,37 @@ function Cosmetique({ id }: { readonly id: CosmetiqueId }): ReactElement | null 
     case "bonnet":
       return (
         <g>
-          <path d="M44 38c6-19 20-29 36-29s30 10 36 29c-11-6-23-9-36-9s-25 3-36 9z" fill={couleur} />
-          <path d="M42 38h76v11H42z" fill={couleur2} />
-          <circle cx="80" cy="6" r="7" fill={couleur2} />
+          <path d="M46 34c6-18 19-27 34-27s28 9 34 27c-10-6-21-9-34-9s-24 3-34 9z" fill={couleur} />
+          <path d="M44 34h72v11H44z" fill={couleur2} />
+          <circle cx="80" cy="9" r="6.5" fill={couleur2} />
         </g>
       );
     case "noeud":
       return (
         <g>
-          <path d="M100 26c-6-5-13-6-15-2s2 10 9 12z" fill={couleur} />
-          <path d="M124 26c6-5 13-6 15-2s-2 10-9 12z" fill={couleur} />
-          <circle cx="112" cy="31" r="5" fill={couleur2} />
+          <path d="M96 24c-6-5-13-6-15-2s2 10 9 12z" fill={couleur} />
+          <path d="M118 24c6-5 13-6 15-2s-2 10-9 12z" fill={couleur} />
+          <circle cx="106" cy="29" r="5" fill={couleur2} />
         </g>
       );
     case "lunettes":
+      // Monture dessinée comme un ANNEAU PLEIN en `fill`, cerné par le trait
+      // d'encre du groupe parent — jamais un `stroke` de la couleur du
+      // cosmétique. Le `fill-rule` évidé laisse les yeux visibles.
       return (
-        <g fill="none" stroke={couleur} strokeLinecap="round">
-          <circle cx="66" cy="58" r="13" />
-          <circle cx="94" cy="58" r="13" />
-          <path d="M79 58h2" />
-          <path d="M53 55 44 51M107 55l9-4" />
+        <g>
+          <path
+            fillRule="evenodd"
+            fill={couleur}
+            d="M53 58a13 13 0 1 0 26 0 13 13 0 1 0-26 0zM56.5 58a9.5 9.5 0 1 0 19 0 9.5 9.5 0 1 0-19 0z"
+          />
+          <path
+            fillRule="evenodd"
+            fill={couleur}
+            d="M81 58a13 13 0 1 0 26 0 13 13 0 1 0-26 0zM84.5 58a9.5 9.5 0 1 0 19 0 9.5 9.5 0 1 0-19 0z"
+          />
+          <path d="M75.5 56h9v4h-9z" fill={couleur2} />
+          <path d="M53.5 54 45 50M106.5 54l8.5-4" />
         </g>
       );
     default:
@@ -88,17 +132,26 @@ export function Pilou({
   taille = "moyenne",
   cosmetique = mascotConfig.cosmetiqueParDefaut,
   silhouette = false,
+  cosmetiqueVerrouille = false,
   anime = false,
   etiquette,
   className,
 }: PilouProps): ReactElement {
   const px = mascotConfig.tailles[taille];
+  const neutre = jeton(P.silhouette);
 
-  const corps = silhouette ? jeton(P.silhouette) : jeton(P.corps);
-  const ventre = silhouette ? jeton(P.silhouette) : jeton(P.ventre);
+  const corps = silhouette ? neutre : jeton(P.corps);
+  const ventre = silhouette ? neutre : jeton(P.ventre);
   const joue = silhouette ? "none" : jeton(P.joue);
-  const museau = silhouette ? jeton(P.silhouette) : jeton(P.museau);
-  const trait = silhouette ? jeton(P.silhouette) : jeton(P.trait);
+  const museau = silhouette ? neutre : jeton(P.museau);
+  const trait = silhouette ? neutre : jeton(P.trait);
+
+  // Le cosmétique passe en neutre soit parce que toute la mascotte l'est, soit
+  // parce que ce palier n'est pas encore atteint.
+  const cosmetiqueNeutre = silhouette || cosmetiqueVerrouille;
+  const couleursCosmetique: CouleursCosmetique = cosmetiqueNeutre
+    ? { principale: neutre, secondaire: neutre }
+    : { principale: jeton(P.cosmetique), secondaire: jeton(P.cosmetiqueSecondaire) };
 
   return (
     <svg
@@ -112,8 +165,8 @@ export function Pilou({
         : { role: "img", "aria-label": etiquette })}
     >
       <g stroke={trait} strokeLinecap="round" strokeLinejoin="round" fill="none">
-        {/* Queue : une forme pleine qui s'affine, attachée au corps */}
-        <path d="M52 120c-14 3-27 11-34 22-2 4 2 8 6 6 13-6 24-15 32-24z" fill={corps} />
+        {/* Queue : longue et effilée, attachée au corps */}
+        <path d="M54 116c-16 5-31 15-40 28-3 4 1 9 6 7 16-7 29-18 38-29z" fill={corps} />
 
         {/* Corps */}
         <path
@@ -126,30 +179,31 @@ export function Pilou({
         <ellipse cx="66" cy="145" rx="10" ry="6" fill={corps} />
         <ellipse cx="94" cy="145" rx="10" ry="6" fill={corps} />
 
-        {/* Oreilles */}
-        <circle cx="48" cy="32" r="12" fill={corps} />
-        <circle cx="112" cy="32" r="12" fill={corps} />
-        <circle cx="48" cy="32" r="5" fill={ventre} />
-        <circle cx="112" cy="32" r="5" fill={ventre} />
+        {/* Oreilles : petites et posées sur la tête, comme chez une loutre */}
+        <circle cx="55" cy="29" r="9" fill={corps} />
+        <circle cx="105" cy="29" r="9" fill={corps} />
+        <circle cx="55" cy="29" r="3.5" fill={ventre} />
+        <circle cx="105" cy="29" r="3.5" fill={ventre} />
 
         {/* Tête */}
         <circle cx="80" cy="60" r="39" fill={corps} />
 
-        {/* Joues */}
-        <circle cx="50" cy="76" r="8" fill={joue} stroke="none" />
-        <circle cx="110" cy="76" r="8" fill={joue} stroke="none" />
+        {/* Joues — SEULE forme décorative de la mascotte : aucun contour,
+            aucune information portée. L'attribut ci-dessous est ce qui
+            l'exempte de la mesure de contraste ; rien d'autre ne l'exempte. */}
+        <circle cx="50" cy="76" r="8" fill={joue} stroke="none" data-tipi-decor="joue" />
+        <circle cx="110" cy="76" r="8" fill={joue} stroke="none" data-tipi-decor="joue" />
 
         {/* Yeux */}
         <circle cx="66" cy="56" r="4.5" fill={museau} stroke="none" />
         <circle cx="94" cy="56" r="4.5" fill={museau} stroke="none" />
 
-        {/* Museau */}
-        <path d="M80 66c11 0 20 6 20 13s-9 12-20 12-20-5-20-12 9-13 20-13z" fill={ventre} />
-        <path d="M80 70c3 0 5 2 5 4s-2 4-5 4-5-2-5-4 2-4 5-4z" fill={museau} stroke="none" />
-        <path d="M80 78v4M80 82c-3 3-7 3-9 1M80 82c3 3 7 3 9 1" />
+        {/* Museau large et bas */}
+        <path d="M80 66c12 0 21 6 21 13s-9 13-21 13-21-6-21-13 9-13 21-13z" fill={ventre} />
+        <path d="M80 70c3.5 0 6 2 6 4.5s-2.5 4.5-6 4.5-6-2-6-4.5 2.5-4.5 6-4.5z" fill={museau} stroke="none" />
+        <path d="M80 79v4M80 83c-3 3-7 3-9 1M80 83c3 3 7 3 9 1" />
 
-
-        <Cosmetique id={silhouette ? "aucun" : cosmetique} />
+        <Cosmetique id={cosmetique} couleurs={couleursCosmetique} />
       </g>
     </svg>
   );

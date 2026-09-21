@@ -41,9 +41,18 @@ export interface Cosmetique {
    * Seuil fixe, en pierres, au-delà duquel la variante est débloquée. Alimente
    * `coffre.cosmetiques.verrouille` — « Il en faut {n} pour celui-là. » Un
    * seuil est constant : il ne monte jamais, et rien ne se reverrouille
-   * (ETH-04).
+   * (ETH-04). Le *mécanisme* est tracé par le livrable marketing validé en G1
+   * (§7.9, « le seuil fixe d'un cosmétique. Constant »).
+   *
+   * **`null` = valeur non fixée (ARB-16).** Les valeurs 0/15/30/45/60 livrées
+   * au tour 1 étaient de moi, sans source : combinées à ARB-13 (une soirée
+   * complète vaut toujours 3 pierres) elles fixaient le rythme de récompense
+   * d'un enfant — 5 soirées pour le premier cosmétique, 20 pour le dernier.
+   * C'est une décision produit, pas une décision de design system. Elle se
+   * prend avant l'ouverture de V6. Tant qu'un seuil vaut `null`, rien ne
+   * décide d'un déverrouillage à partir de ce fichier.
    */
-  readonly pierresRequises: number;
+  readonly pierresRequises: number | null;
 }
 
 export interface VoixPilou {
@@ -98,12 +107,16 @@ export const mascotConfig = {
     icone: 56,
   },
 
+  // ARB-16 : la STRUCTURE est livrée, les VALEURS ne le sont pas.
+  // `cleLibelle` pointe vers des clés que `contenu-enfant` doit produire
+  // (ARB-10) ; `pierresRequises` attend une décision produit. Les deux
+  // manques sont inscrits, jamais comblés en silence par le design system.
   cosmetiques: [
-    { id: "aucun", cleLibelle: "coffre.cosmetiques.aucun", pierresRequises: 0 },
-    { id: "echarpe", cleLibelle: "coffre.cosmetiques.echarpe", pierresRequises: 15 },
-    { id: "bonnet", cleLibelle: "coffre.cosmetiques.bonnet", pierresRequises: 30 },
-    { id: "noeud", cleLibelle: "coffre.cosmetiques.noeud", pierresRequises: 45 },
-    { id: "lunettes", cleLibelle: "coffre.cosmetiques.lunettes", pierresRequises: 60 },
+    { id: "aucun", cleLibelle: "coffre.cosmetiques.aucun", pierresRequises: null },
+    { id: "echarpe", cleLibelle: "coffre.cosmetiques.echarpe", pierresRequises: null },
+    { id: "bonnet", cleLibelle: "coffre.cosmetiques.bonnet", pierresRequises: null },
+    { id: "noeud", cleLibelle: "coffre.cosmetiques.noeud", pierresRequises: null },
+    { id: "lunettes", cleLibelle: "coffre.cosmetiques.lunettes", pierresRequises: null },
   ],
 
   cosmetiqueParDefaut: "aucun",
@@ -121,7 +134,8 @@ export const mascotConfig = {
   },
 } as const satisfies MascotConfig;
 
-/** Les cosmétiques débloqués par un solde de pierres donné. */
-export function cosmetiquesDebloques(solde: number): readonly Cosmetique[] {
-  return mascotConfig.cosmetiques.filter((c) => solde >= c.pierresRequises);
-}
+// `cosmetiquesDebloques(solde)` a été RETIRÉE au tour 2. C'était de la logique
+// de déverrouillage, pas du design : DES-09 réserve ce fichier au « nom, aux
+// couleurs et aux variantes cosmétiques ». Elle appartient à la verticale V6,
+// avec le service des pierres, et elle n'a de sens qu'une fois les seuils
+// d'ARB-16 fixés.

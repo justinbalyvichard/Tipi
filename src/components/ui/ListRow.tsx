@@ -90,7 +90,12 @@ export function ListRow(props: ListRowProps): ReactElement {
         <span className="font-texte text-appui text-texte-appui">{valeur}</span>
       )}
       {cliquable ? (
-        <Icon nom="chevron" decorative taille={20} className="text-pointille" />
+        // Le chevron ne porte aucune information : la ligne entière est un
+        // `button` ou un `a` doté d'un nom accessible. `data-tipi-decor` est ce
+        // qui l'exempte de la mesure de contraste du rendu, et rien d'autre.
+        <span data-tipi-decor="chevron" className="flex text-pointille">
+          <Icon nom="chevron" decorative taille={20} />
+        </span>
       ) : null}
     </>
   );

@@ -51,10 +51,9 @@ function variablesDuTheme(theme) {
   const vars = {};
   for (const b of tousBlocs) {
     const s = b.selecteur;
-    const concerne =
-      s.includes(":root") ||
-      s.includes(`[data-theme="${theme}"]`) ||
-      (theme === "pilou" && s.includes(':root,\n[data-theme="pilou"]'));
+    // `:root` couvre déjà le bloc « :root, [data-theme="pilou"] » : une
+    // troisième branche pour ce cas était morte (constat 11 du tour 1).
+    const concerne = s.includes(":root") || s.includes(`[data-theme="${theme}"]`);
     // Un bloc qui cible l'AUTRE thème est ignoré.
     const autre = theme === "pilou" ? "apple" : "pilou";
     if (s.includes(`[data-theme="${autre}"]`) && !s.includes(`[data-theme="${theme}"]`)) continue;
@@ -64,14 +63,31 @@ function variablesDuTheme(theme) {
   return vars;
 }
 
-/** Résout `var(--x)` en cascade jusqu'à une valeur littérale. */
+/**
+ * Résout `var(--x)` en cascade jusqu'à une valeur littérale.
+ * Un `var(--x, repli)` est REJETÉ bruyamment : au tour 1 il aurait traversé
+ * jusqu'au calcul de luminance et produit un `NaN:1` affiché, c'est-à-dire un
+ * instrument qui imprime une absurdité sans la voir.
+ */
 function resoudre(vars, nom, profondeur = 0) {
   if (profondeur > 12) throw new Error(`Cycle de var() sur ${nom}`);
   const brut = vars[nom];
   if (brut === undefined) return undefined;
-  const m = /^var\((--[a-z0-9-]+)\)$/i.exec(brut.trim());
+  const t = brut.trim();
+  const m = /^var\((--[a-z0-9-]+)\)$/i.exec(t);
   if (m) return resoudre(vars, m[1], profondeur + 1);
-  return brut.trim();
+  // Un `var()` SEUL dont la forme n'est pas `var(--x)` — donc `var(--x, repli)`
+  // — est rejeté. Une pile de polices comme `var(--police-baloo), "Baloo 2",
+  // system-ui` n'est PAS un var() seul : elle traverse sans bruit, et c'est
+  // voulu, ce n'est pas une couleur. Le durcissement demandé visait le repli
+  // qui aurait produit un `NaN:1` affiché sans être vu ; il ne vise pas les
+  // valeurs composées.
+  if (/^var\([^)]*\)$/.test(t)) {
+    throw new Error(
+      `Forme de var() non gérée sur ${nom} : ${t}. Un repli masquerait la valeur réellement rendue.`
+    );
+  }
+  return t;
 }
 
 // ---------------------------------------------------------------- WCAG 2.1
@@ -101,6 +117,11 @@ const COUPLES = [
   ["texte de page", "--tipi-encre", "--tipi-fond", "petit", "toutes les pages"],
   ["texte sur carte", "--tipi-encre", "--tipi-surface", "petit", "Card, SpeechBubble, ListRow"],
   ["sous-titre de liste", "--tipi-texte-appui", "--tipi-surface", "petit", "ListRow, ThemeSwitch"],
+  // Constat 3 du tour 1 : ce couple est rendu par l'option RETENUE de
+  // ThemeSwitch, dont le fond passe en teinte bleue. Il manquait à la liste —
+  // la démonstration que cette liste dérive du rendu. C'est ce défaut de
+  // conception que `verifier-contraste-rendu.mjs` supprime.
+  ["sous-titre ThemeSwitch, option retenue", "--tipi-texte-appui", "--tipi-teinte-bleu", "petit", "ThemeSwitch"],
   ["légende sur fond", "--tipi-texte-appui", "--tipi-fond", "petit", "Bloc de /dev/design-system"],
   ["Button primaire", "--tipi-accent-primaire-encre", "--tipi-accent-primaire", "grand", "Button"],
   ["Button secondaire", "--tipi-encre", "--tipi-teinte-bleu", "petit", "Button"],
@@ -226,6 +247,31 @@ console.log(`Couples sous leur seuil : ${echecs}.`);
 console.log(`I1 — rôles déclarés côté Pilou : ${rolesDeclares.length} ; non résolus côté Apple : ${manquantsApple.length}${manquantsApple.length ? " -> " + manquantsApple.join(", ") : ""}`);
 console.log(`I2 — rôles de couleur : ${rolesCouleur.length} ; jamais mesurés : ${jamaisEmployes.length}${jamaisEmployes.length ? " -> " + jamaisEmployes.join(", ") : ""}`);
 
-const total = echecs + manquantsApple.length + jamaisEmployes.length;
+// -------- I3 : toute entrée de palette est soit reliée à un rôle, soit
+// déclarée ici comme présente pour la seule conformité à DES-01/DES-02.
+// Constat 10 du tour 1 : I2 porte sur les RÔLES et ne voyait pas les entrées
+// de palette orphelines. Le rapport présentait pourtant I2 comme la garantie
+// qu'aucune couleur n'échappe à la mesure. I3 comble exactement cet écart.
+const PALETTE_SANS_ROLE_ASSUMEE = [
+  "--palette-apple-accent-rouge",
+  "--palette-apple-accent-gris",
+];
+const entreesPalette = Object.keys(varsPilou)
+  .concat(Object.keys(varsApple))
+  .filter((k) => k.startsWith("--palette-"));
+const entreesUniques = [...new Set(entreesPalette)];
+const valeursDeRole = new Set(
+  rolesDeclares.map((k) => (varsPilou[k] ?? "").trim()).concat(rolesDeclares.map((k) => (varsApple[k] ?? "").trim()))
+);
+const orphelines = entreesUniques.filter((k) => !valeursDeRole.has(`var(${k})`));
+const orphelinesNonDeclarees = orphelines.filter((k) => !PALETTE_SANS_ROLE_ASSUMEE.includes(k));
+console.log(
+  `I3 — entrées de palette : ${entreesUniques.length} ; sans rôle : ${orphelines.length} (${orphelines.join(", ") || "aucune"}) ; sans rôle ET non déclarées : ${orphelinesNonDeclarees.length}`
+);
+console.log(
+  "     Les entrées sans rôle sont présentes parce que DES-01/DES-02 exigent les tokens EXACTS de 3.8 ; aucun composant ne peut les atteindre, et c'est écrit plutôt que subi."
+);
+
+const total = echecs + manquantsApple.length + jamaisEmployes.length + orphelinesNonDeclarees.length;
 console.log(`\n=== VERDICT DE L INSTRUMENT : ${total === 0 ? "OK" : "ECHEC"} ===`);
 process.exit(total === 0 ? 0 : 1);
