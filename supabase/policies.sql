@@ -356,8 +356,11 @@ CREATE POLICY "tts_cache_lecture_publique"
 -- =============================================================================
 -- PARTIE D — Vérifications exécutables
 -- =============================================================================
--- Ce ne sont plus des commentaires : chaque bloc S'EXÉCUTE à l'application du
--- fichier et LÈVE UNE EXCEPTION si l'invariant est faux. Appliquer ce fichier
+-- DIX vérifications. Ce ne sont plus des commentaires : chaque bloc S'EXÉCUTE à
+-- l'application du fichier et LÈVE UNE EXCEPTION si l'invariant est faux.
+-- Aucune ne laisse quoi que ce soit en base, et aucune n'annule la transaction
+-- courante quand elle réussit : le fichier peut être appliqué atomiquement
+-- (`psql -1`) sans que les vérifications fassent échouer les parties A, B et C. Appliquer ce fichier
 -- sur une base non conforme échoue donc bruyamment, au lieu de laisser une
 -- consigne que personne ne joue.
 -- `securite-rgpd` en fera en P7 des tests d'intégration avec un client anonyme
@@ -424,37 +427,105 @@ BEGIN
   RAISE NOTICE 'V4 OK — les 8 contraintes de la partie B sont en place.';
 END $$;
 
--- V5 — ETH-04, preuve destructive : un delta négatif DOIT être refusé.
--- Le bloc tente l'insertion interdite et échoue si elle passe.
+-- V5 — ETH-04 et ARB-13, preuves destructives sur les deux bornes du delta.
+-- Trois cas : sous la borne basse (-1, refusé), au-dessus de la borne haute
+-- (3, refusé), et PILE AU SEUIL (2, qui doit être ACCEPTÉ) — la règle 3 de
+-- `40-protocole-agents.mdc` exige qu'un seuil soit éprouvé à sa valeur exacte,
+-- sans quoi une borne accidentellement retombée à `<= 1` passerait sans bruit.
+--
+-- RIEN N'EST LAISSÉ EN BASE, et sans exception finale : en PL/pgSQL, chaque
+-- BEGIN … EXCEPTION ouvre une sous-transaction, annulée dès qu'une exception y
+-- est levée. Les deux insertions interdites sont rattrapées par leur propre
+-- gestionnaire ; l'insertion autorisée est annulée par une exception que l'on
+-- lève soi-même et que l'on rattrape. Le bloc peut donc être joué dans la même
+-- transaction que le reste du fichier — c'était le défaut du tour 3 : une
+-- `RAISE EXCEPTION` finale inconditionnelle annulait, sous `psql -1`, TOUT le
+-- fichier, RLS comprise, en laissant croire qu'il avait été appliqué.
 DO $$
-DECLARE un_child uuid; un_session uuid;
+DECLARE
+  un_child uuid;
+  sess_sans_etape uuid;   -- session ayant au moins une raison encore libre
+  raison_libre "RaisonGem";
+  sess_sans_bonus uuid;   -- session dépourvue de ligne bonus_soiree_complete
 BEGIN
   SELECT id INTO un_child FROM public.child LIMIT 1;
-  SELECT id INTO un_session FROM public.session LIMIT 1;
-  IF un_child IS NULL OR un_session IS NULL THEN
+  IF un_child IS NULL THEN
     RAISE NOTICE 'V5 ignorée — base vide, rejouer après le seed.';
     RETURN;
   END IF;
-  BEGIN
-    INSERT INTO public.gem_ledger (id, child_id, session_id, delta, raison)
-    VALUES (gen_random_uuid(), un_child, un_session, -1, 'etape_lecture_terminee');
-    RAISE EXCEPTION 'ETH-04 VIOLÉE : un delta négatif a été accepté.';
-  EXCEPTION WHEN check_violation THEN
-    RAISE NOTICE 'V5 OK — delta négatif refusé par la base.';
-  END;
-  -- Borne haute (ARB-13) : le bonus vaut au plus 2 ; 3 doit être refusé.
-  BEGIN
-    INSERT INTO public.gem_ledger (id, child_id, session_id, delta, raison)
-    VALUES (gen_random_uuid(), un_child, un_session, 3, 'bonus_soiree_complete');
-    RAISE EXCEPTION 'ARB-13 VIOLÉE : un delta de 3 a été accepté.';
-  EXCEPTION WHEN check_violation THEN
-    RAISE NOTICE 'V5 OK — delta de 3 refusé par la base (borne 1..2).';
-  END;
-  RAISE EXCEPTION 'V5 : annulation volontaire de la transaction de test.';
+
+  -- Le choix de la session n'est pas indifférent : l'unique (session_id, raison)
+  -- lèverait une unique_violation AVANT que l'on puisse observer la borne, et le
+  -- contrôle conclurait « non concluant » sur une base pourtant conforme — ou,
+  -- pire, remonterait une erreur sans rapport si le CHECK manquait vraiment.
+  -- On choisit donc, pour chaque cas, une session où la raison testée est libre.
+  -- Pour la borne basse, n'importe quel couple (session, raison) libre convient :
+  -- on ne fige pas la raison, sans quoi une base où toutes les sessions ont déjà
+  -- leur ligne de lecture rendrait le contrôle non concluant sans nécessité.
+  SELECT s.id, r.raison INTO sess_sans_etape, raison_libre
+    FROM public.session s
+    CROSS JOIN (VALUES ('etape_lecture_terminee'::"RaisonGem"),
+                       ('etape_maths_terminee'::"RaisonGem"),
+                       ('bonus_soiree_complete'::"RaisonGem")) AS r(raison)
+   WHERE NOT EXISTS (SELECT 1 FROM public.gem_ledger g
+                      WHERE g.session_id = s.id AND g.raison = r.raison)
+   LIMIT 1;
+  SELECT s.id INTO sess_sans_bonus FROM public.session s
+   WHERE NOT EXISTS (SELECT 1 FROM public.gem_ledger g
+                      WHERE g.session_id = s.id AND g.raison = 'bonus_soiree_complete')
+   LIMIT 1;
+
+  -- (a) Borne basse, ETH-04 : un delta négatif doit être refusé.
+  IF sess_sans_etape IS NULL THEN
+    RAISE NOTICE 'V5a non concluante — aucun couple (session, raison) libre.';
+  ELSE
+    BEGIN
+      INSERT INTO public.gem_ledger (id, child_id, session_id, delta, raison)
+      VALUES (gen_random_uuid(), un_child, sess_sans_etape, -1, raison_libre);
+      RAISE EXCEPTION 'ETH-04 VIOLÉE : un delta négatif a été accepté.';
+    EXCEPTION
+      WHEN check_violation THEN
+        RAISE NOTICE 'V5a OK — delta négatif refusé par la base.';
+      WHEN unique_violation THEN
+        RAISE NOTICE 'V5a non concluante — collision d''unicité, la borne n''a pas pu être observée.';
+    END;
+  END IF;
+
+  -- (b) Borne haute + 1, ARB-13 : le bonus vaut au plus 2 ; 3 doit être refusé.
+  IF sess_sans_bonus IS NULL THEN
+    RAISE NOTICE 'V5b non concluante — aucune session sans ligne bonus_soiree_complete.';
+  ELSE
+    BEGIN
+      INSERT INTO public.gem_ledger (id, child_id, session_id, delta, raison)
+      VALUES (gen_random_uuid(), un_child, sess_sans_bonus, 3, 'bonus_soiree_complete');
+      RAISE EXCEPTION 'ARB-13 VIOLÉE : un delta de 3 a été accepté.';
+    EXCEPTION
+      WHEN check_violation THEN
+        RAISE NOTICE 'V5b OK — delta de 3 refusé par la base (borne 1..2).';
+      WHEN unique_violation THEN
+        RAISE NOTICE 'V5b non concluante — collision d''unicité.';
+    END;
+  END IF;
+
+  -- (c) PILE AU SEUIL, ARB-13 : le bonus d'un Soir léger vaut 2 et doit PASSER.
+  -- L'insertion réussit, puis une exception maison annule la sous-transaction.
+  IF sess_sans_bonus IS NULL THEN
+    RAISE NOTICE 'V5c non concluante — aucune session sans ligne bonus_soiree_complete.';
+  ELSE
+    BEGIN
+      INSERT INTO public.gem_ledger (id, child_id, session_id, delta, raison)
+      VALUES (gen_random_uuid(), un_child, sess_sans_bonus, 2, 'bonus_soiree_complete');
+      RAISE EXCEPTION 'V5C_ANNULATION_VOLONTAIRE';
+    EXCEPTION
+      WHEN check_violation THEN
+        RAISE EXCEPTION 'ARB-13 VIOLÉE : un delta de 2 a été REFUSÉ. La borne haute est trop basse — le bonus d''un Soir léger serait rejeté et la transition entière annulée.';
+      WHEN unique_violation THEN
+        RAISE NOTICE 'V5c non concluante — collision d''unicité.';
+      WHEN raise_exception THEN
+        RAISE NOTICE 'V5c OK — delta de 2 accepté (pile au seuil), insertion annulée.';
+    END;
+  END IF;
 END $$;
--- NOTE : V5 se termine par une exception volontaire pour ne rien laisser en
--- base. Jouez-la donc SÉPARÉMENT (psql -c), pas dans la même transaction que le
--- reste du fichier. Commentez ce bloc pour une application non interactive.
 
 -- V6 — invariant du solde (3.7) : gem_balance == SUM(gem_ledger.delta).
 DO $$
@@ -499,6 +570,67 @@ END $$;
 
 
 -- =============================================================================
+-- V9 — ARB-13, INVARIANT DU FORFAIT. C'est la vérification la plus importante
+-- de ce fichier pour le barème, et c'est un invariant, pas une re-dérivation :
+-- elle ne recalcule jamais `3 − nombre d'étapes`, elle affirme le RÉSULTAT
+-- qu'ARB-13 promet. Une re-dérivation partagerait la règle qu'elle vérifie et
+-- confirmerait une règle fausse (`40-protocole-agents.mdc`, « Invariant plutôt
+-- que re-dérivation »).
+--
+--   Toute session parvenue à un état final, dont TOUTES les étapes programmées
+--   ont été créditées et qui en a au moins une, porte EXACTEMENT 3 pierres.
+--
+-- Elle attrape : un bonus jamais versé (somme = 2, c'est le constat 26 du
+-- tour 3), un bonus du mauvais montant, un double crédit (somme ≥ 4), et une
+-- règle de barème fausse mais uniformément appliquée.
+DO $$
+DECLARE fautives text;
+BEGIN
+  SELECT string_agg(x.id::text || ' (' || x.total || ' pierres pour '
+                    || x.nb_etapes || ' étape(s))', ', ')
+    INTO fautives
+    FROM (
+      SELECT s.id,
+             COALESCE(SUM(g.delta), 0) AS total,
+             jsonb_array_length(s.etapes_prevues) AS nb_etapes,
+             COUNT(*) FILTER (
+               WHERE g.raison IN ('etape_lecture_terminee', 'etape_maths_terminee')
+             ) AS nb_creditees
+        FROM public.session s
+        LEFT JOIN public.gem_ledger g ON g.session_id = s.id
+       WHERE s.etat IN ('termine', 'abandon_parent')
+       GROUP BY s.id, s.etapes_prevues
+    ) x
+   WHERE x.nb_etapes > 0
+     AND x.nb_creditees = x.nb_etapes   -- soirée complète du point de vue du ledger
+     AND x.total <> 3;                  -- … alors elle vaut 3 pierres, sans exception
+  IF fautives IS NOT NULL THEN
+    RAISE EXCEPTION 'ARB-13 VIOLÉE — soirée(s) complète(s) ne valant pas 3 pierres : %', fautives;
+  END IF;
+  RAISE NOTICE 'V9 OK — toute soirée complète vaut exactement 3 pierres.';
+END $$;
+
+-- V10 — corollaire d'ARB-13, la forme la plus courte du constat 26 : la somme
+-- des pierres d'une session appartient toujours à {0, 1, 3}. JAMAIS 2. Une
+-- session à 2 est par construction une soirée complète dont le bonus manque.
+DO $$
+DECLARE fautives text;
+BEGIN
+  SELECT string_agg(x.id::text || ' = ' || x.total, ', ') INTO fautives
+    FROM (
+      SELECT s.id, COALESCE(SUM(g.delta), 0) AS total
+        FROM public.session s
+        LEFT JOIN public.gem_ledger g ON g.session_id = s.id
+       WHERE s.etat IN ('termine', 'abandon_parent')
+       GROUP BY s.id
+    ) x
+   WHERE x.total NOT IN (0, 1, 3);
+  IF fautives IS NOT NULL THEN
+    RAISE EXCEPTION 'ARB-13 VIOLÉE — total de pierres hors {0,1,3} : %', fautives;
+  END IF;
+  RAISE NOTICE 'V10 OK — aucune session close hors {0, 1, 3} pierres.';
+END $$;
+
 -- PARTIE E — Ce que ce fichier deviendra, et ce qu'il ne fait pas aujourd'hui
 -- =============================================================================
 -- TEC-18 : il n'y a pas de synchronisation multi-appareils en V1, donc pas

@@ -1,10 +1,10 @@
 # P2 — Architecture technique de Tipi
 
-Livrable de l'agent `architecte`. Porte G2. **Version 3**, reprise du
-`VERDICT: FAIL` du tour 2 (3 [MAJEUR], 3 [MINEUR], 0 [BLOQUANT]) et de
-l'arbitrage **ARB-13**. La version 2 avait fermé les 19 constats du tour 1,
-tous vérifiés dans les fichiers par le contrôleur ; les trois [MAJEUR] du tour 2
-sont nés du tour 2 lui-même, sur le barème réécrit et la transition T12.
+Livrable de l'agent `architecte`. Porte G2. **Version 4**, reprise du
+`VERDICT: FAIL` du tour 3 (1 [MAJEUR], 2 [MINEUR], 0 [BLOQUANT]). Quatrième
+aller-retour autorisé par dérogation humaine (ESC-002), pour ce seul motif.
+Les 25 constats des tours 1 et 2 sont fermés ; le constat 26 porte sur la
+définition d'un prédicat créé au tour 2 et modifié au tour 3.
 
 Sources lues en entier avant de concevoir : `TIPI-PROMPT-CURSOR.md` (2.3, 2.4,
 3.1 à 3.8, 4.3), `docs/agents/P1/produit-marketing.out.md`,
@@ -119,6 +119,50 @@ glob de `30-copy-enfant.mdc` a reçu `src/app/bienvenue/**` — l'onboarding est
 écran enfant, joué une seule fois à vie, donc le seul qu'on ne reverra jamais
 pour le corriger : c'était la bonne prise. Et ARB-12 est désormais inscrit dans
 `GATES.md`.
+
+## 0.6 Reprise après verdict du tour 3
+
+Trois constats, numérotés 26 à 28. **Les trois sont traités.**
+
+| # | Constat | Ce que j'ai changé | Où le vérifier |
+| --- | --- | --- | --- |
+| **26** | [MAJEUR] `estTerminee` était défini sur les lignes `attempt`, écrites par une route distincte sans ordre garanti, alors que le `+1` d'étape vient de l'événement. Sur le chemin **nominal** T5 → T9, l'enfant pouvait finir sa soirée et recevoir 2 pierres au lieu de 3 | **Deux prédicats, nommés distinctement.** `etapeCreditee()` — fondé sur le **ledger** — décide du bonus et **ne lit plus jamais `attempt`** ; `etapeAchevee()` — fondé sur les `attempt` — ne sert plus qu'à T10 et T12, pour savoir quelles étapes rattraper. Les sept chemins sont re-déroulés sur le nouveau prédicat | 9.4 point 3, 9.5 « Le bonus a trois créditeurs » et « Les quatre cas d'ARB-13 » |
+| **27** | [MINEUR] La `RAISE EXCEPTION` finale de V5 était inutile et faisait échouer l'application nominale du fichier — sous `psql -1`, elle annulait **tout**, RLS comprise | **Supprimée.** Les deux gestionnaires internes suffisaient, et le contrôle avait raison de dire que c'était prouvable. J'en ai profité pour ajouter le **cas pile au seuil** qu'il signalait sans en faire un constat : une insertion de `2` qui doit **réussir**, annulée par une exception maison rattrapée | `policies.sql` V5, trois cas (a) (b) (c) |
+| **28** | [MINEUR] Le sixième endroit du barème était déclaré « traité » ; il ne l'est pas | **« À TRAITER »**, avec la citation de ce qui y figure encore et la mention que la phrase suivante est **doublement** fausse sous ARB-13 | 9.5, tableau des six endroits |
+
+**L'invariant, et non la convention d'appel.** L'Orchestrateur me demande, au
+titre de la règle « Invariant plutôt que re-dérivation » ajoutée depuis mon
+dernier tour, d'exprimer la garantie du bonus comme un invariant si c'est
+possible. Ça l'est, et c'est plus solide que la correction du prédicat seule :
+
+> Toute session parvenue à un état final, dont toutes les étapes programmées ont
+> été créditées et qui en a au moins une, porte **exactement 3 pierres**.
+
+Jamais `3 − n` n'y est recalculé : c'est l'énoncé d'ARB-13 transformé en
+propriété. Une re-dérivation aurait comparé deux calculs de `3 − n` et les aurait
+trouvés d'accord — le défaut du constat 26 n'était pas dans le montant mais dans
+la **condition de versement**. L'invariant est porté par **V9** dans
+`supabase/policies.sql`, doublé de son corollaire **V10** : la somme d'une
+session close appartient toujours à `{0, 1, 3}`, **jamais 2**. Une session à 2
+est, par construction, une soirée complète dont le bonus manque : c'est la forme
+la plus courte du constat 26, et elle est désormais vérifiée en base.
+
+**Ce qui n'a pas bougé** : aucun chiffre, aucune route, aucune table, aucune
+contrainte, aucune variable d'environnement. Le schéma n'est pas modifié au
+tour 4 — `prisma validate` est rejoué en 17.1 pour le prouver, pas parce qu'il a
+changé.
+
+**Et une chose qui change la nature de la preuve : `supabase/policies.sql` a été
+exécuté.** Trois tours durant, ce fichier a été lu et jamais joué. PostgreSQL 16
+étant disponible dans mon environnement, je l'ai appliqué sur une vraie base
+(section 17.6) : le fichier passe en un seul `psql -1 -v ON_ERROR_STOP=1`, ce qui
+est la preuve directe du constat 27 ; les dix vérifications s'exécutent ; les
+trois cas d'ARB-13 sont réalisés en données, Soir léger compris, à 3 pierres ;
+**V9 et V10 rougissent sur une mutation qui reproduit le constat 26**, nomment la
+session fautive et reverdissent après restauration ; et cinq attaques du rôle
+`anon` sont refusées. L'exécution a par ailleurs révélé deux défauts de mes
+propres instruments, que la lecture n'aurait pas montrés — V5c ne s'exécutait
+pas du tout (17.6.5).
 
 ---
 
@@ -473,15 +517,34 @@ sont injoignables sans URL signée émise côté serveur. `tts-cache` est public
 sans aucun jeton. Aucun bucket n'a de policy d'écriture.
 
 **Les preuves sont devenues exécutables** (constat 14). La partie D ne contient
-plus des requêtes en commentaire mais **huit blocs `DO $$` qui lèvent une
+plus des requêtes en commentaire mais **dix blocs `DO $$` qui lèvent une
 exception** si l'invariant est faux : RLS sur toutes les tables sans liste en dur
 (V1), aucune policy (V2), aucun privilège `anon` (V3), les huit contraintes
-présentes (V4), un delta négatif réellement refusé (V5), l'invariant du solde
-(V6), les tailles de Storage (V7), et l'existence d'un `tts-prive` privé (V8).
-Appliquer `policies.sql` sur une base non conforme échoue bruyamment. Limite
-assumée et écrite dans le fichier : ces vérifications prouvent l'état du
-catalogue, pas le comportement de PostgREST face à une vraie clé anonyme —
-c'est le travail de `securite-rgpd` en P7.
+présentes (V4), les **trois bornes du delta** — `-1` refusé, `3` refusé, `2`
+accepté (V5) —, l'invariant du solde (V6), les tailles de Storage (V7),
+l'existence d'un `tts-prive` privé (V8), **l'invariant du forfait d'ARB-13**
+(V9) et son corollaire « jamais 2 pierres » (V10).
+
+Appliquer `policies.sql` sur une base non conforme échoue bruyamment. **Et
+l'appliquer sur une base conforme réussit entièrement** : c'était le défaut du
+tour 3 (constat 27), où V5 se terminait par une `RAISE EXCEPTION`
+inconditionnelle. Elle était prouvablement inutile — les insertions interdites
+sont déjà rattrapées par leur propre gestionnaire — et son coût était réel :
+sous `psql -1`, elle annulait **tout le fichier, RLS comprise**, sur une base qui
+semblait pourtant l'avoir reçu. Aucune vérification ne laisse désormais de
+trace en base ni n'annule la transaction courante.
+
+**Ces dix vérifications ne sont plus une promesse : elles ont été exécutées**
+sur un PostgreSQL 16 réel, et la section 17.6 en donne la sortie. Le fichier
+s'applique en un seul `psql -1`, et un test de mutation prouve que V9 et V10
+savent rougir. Cinq attaques du rôle `anon` — lecture de `child`, lecture et
+écriture de `gem_ledger`, modification du solde, lecture de `code_hash` — sont
+toutes refusées, et le solde reste inchangé (17.6.4).
+
+Limite assumée, et elle demeure : cette base est un Postgres nu avec une
+émulation minimale de Supabase. Ce qui est prouvé vaut pour le SQL et les
+données, **pas** pour PostgREST ni pour l'API Storage — c'est le travail de
+`securite-rgpd` en P7, sur le vrai projet.
 
 ---
 
@@ -1028,15 +1091,24 @@ tard. Elles sont à toi. Elles ne se perdent pas. » — et réessaie avec **le 
 **3. Le rattrapage a un porteur nommé, y compris si l'application est fermée.**
 `src/lib/session/cloture-automatique.ts`, appelé par `GET /api/etat` et
 `POST /api/session`, ferme toute session non finale dont la date est passée
-(T12) **et crédite à ce moment-là tout ce qui était dû : les étapes terminées et
-non créditées, puis le bonus de soirée complète**. Il les identifie sans
-ambiguïté : une étape est terminée quand toutes les lignes `attempt` de ses
-exercices portent un statut final, et non créditée quand il n'existe pas de
-ligne `gem_ledger` pour `(session_id, raison)` ; le bonus est dû quand toutes
-les étapes programmées le sont, et il passe par
-`crediterBonusSiSoireeComplete()` (9.5). Les deux crédits passent par le même
-unique `(session_id, raison)` : un rattrapage ne peut pas créditer deux fois.
-Aucune route n'accepte pour autant un montant (7.1).
+(T12) **et crédite à ce moment-là tout ce qui était dû : d'abord les étapes
+achevées et non créditées, ensuite le bonus de soirée complète**. Les deux
+questions ne se posent pas sur la même donnée, et les confondre était le défaut
+du tour 3 (constat 26) :
+
+- **quelles étapes rattraper** — `etapeAchevee()`, fondé sur les `attempt` :
+  une étape est achevée quand toutes les lignes `attempt` de ses exercices
+  portent un statut final. C'est le seul usage légitime des `attempt` ici, et il
+  est fiable parce que T12 s'exécute le lendemain, une fois que plus aucune
+  requête n'est en vol ;
+- **si le bonus est dû** — `crediterBonusSiSoireeComplete()` (9.5), fondé sur le
+  **ledger** : toutes les étapes programmées ont-elles une ligne `gem_ledger` ?
+  Le bonus ne lit jamais les `attempt`.
+
+L'ordre importe et il est interne à la transaction : les crédits d'étape
+s'écrivent **avant** l'appel au bonus, dans les trois créditeurs. Tous passent
+par le même unique `(session_id, raison)` : un rattrapage ne peut pas créditer
+deux fois. Aucune route n'accepte pour autant un montant (7.1).
 
 **Le bonus fait partie du rattrapage, et ce n'était pas le cas au tour 2.** Sans
 cela, l'enfant qui termine tout mais dont l'appareil s'éteint avant le dernier
@@ -1100,41 +1172,139 @@ puisque c'est une décision de barème, donc de produit.
    par une seule.** C'est le défaut du tour 2, et il coûtait une pierre à un
    enfant : voir ci-dessous.
 
-### Le bonus a trois créditeurs, et un seul point de décision
+### Le bonus a trois créditeurs, et **un prédicat fondé sur le ledger**
 
-Le tour 2 ne créditait le bonus qu'en T5. Un enfant qui finissait son dernier
-exercice mais dont la tablette s'éteignait avant le dernier appui voyait T12
-créditer l'étape le lendemain… et **perdre le bonus définitivement**, puisque
-aucune route n'accepte de montant et qu'aucune transition n'est possible depuis
-un état final. C'est exactement la perte qu'ARB-08 avait été rendu pour empêcher,
-déplacée de l'analyse vers le réseau — et PRD-18 existe précisément parce qu'une
-session du soir est interrompue de temps en temps.
+Le tour 2 ne créditait le bonus qu'en T5 : un enfant qui finissait tout mais dont
+la tablette s'éteignait avant le dernier appui perdait le bonus définitivement.
+Trois créditeurs ont réparé cela (constat 20). Le tour 3 a montré que la
+réparation n'allait pas jusqu'au bout : **le prédicat commun aux trois n'était
+pas défini au bon endroit** (constat 26).
 
-Correction : **une seule fonction, appelée par les trois transitions
-terminales.**
+**Le défaut, en une phrase.** Le `+1` d'une étape est déclenché par
+l'**événement** `ETAPE_TERMINEE` ; le bonus, lui, était conditionné aux lignes
+`attempt`, écrites par une **route distincte** (`POST …/tentative`) dont l'ordre
+n'est garanti nulle part. Sur le chemin nominal, la même transaction pouvait donc
+créditer l'étape sur l'événement et refuser le bonus sur les `attempt` : la
+session partait en `cloture` puis `termine` par T9, qui ne crédite rien, et plus
+aucun rattrapage n'existait. L'enfant recevait 2 pierres au lieu de 3, et le Soir
+léger redevenait détectable. Le versement reposait sur l'ordre d'émission de deux
+requêtes par le client — exactement ce que je m'interdisais deux paragraphes plus
+bas pour l'idempotence.
+
+**La correction : deux prédicats distincts, nommés distinctement.** La confusion
+venait d'un seul nom, `estTerminee`, employé pour deux questions différentes.
+
+| Prédicat | Question | Fondé sur | Employé par |
+| --- | --- | --- | --- |
+| `etapeCreditee(tx, session, matiere)` | Cette étape a-t-elle **déjà donné sa pierre** ? | **Le ledger** : existe-t-il une ligne `gem_ledger` pour `(session_id, raison_de_cette_matiere)` ? | **Le bonus**, et lui seul |
+| `etapeAchevee(session, etape)` | L'enfant a-t-il **fini le travail** de cette étape ? | Les lignes `attempt` : toutes celles de ses exercices portent un statut final | **T10 et T12 uniquement**, pour décider quelles étapes rattraper |
+
+**Le bonus ne lit plus jamais `attempt`.** Il ne regarde que ce qui est déjà
+écrit dans le ledger, c'est-à-dire un fait produit par la même mécanique que
+lui-même, dans la même transaction.
 
 ```ts
 // src/lib/pierres/service.ts — appelée par T5, T10 et T12, dans LEUR transaction
 async function crediterBonusSiSoireeComplete(tx, session): Promise<number> {
-  const etapes = session.etapesPrevues;               // jamais vide hors sansDevoir
-  if (etapes.length === 0) return 0;                  // propriété 2
-  if (!etapes.every(estTerminee)) return 0;           // toutes terminées ?
+  const etapes = session.etapesPrevues;
+  if (etapes.length === 0) return 0;          // sansDevoir : jamais de bonus (propriété 2)
+
+  // PRÉDICAT FONDÉ SUR LE LEDGER, et non sur les lignes `attempt` (constat 26).
+  // Une seule requête : combien d'étapes de cette session ont déjà donné leur pierre ?
+  const creditees = await tx.gemLedger.count({
+    where: { sessionId: session.id,
+             raison: { in: ['etape_lecture_terminee', 'etape_maths_terminee'] } },
+  });
+  if (creditees !== etapes.length) return 0;  // toutes les étapes ont-elles été créditées ?
+
   // L'unique (session_id, 'bonus_soiree_complete') rend l'appel idempotent :
   // un rejeu, ou deux transitions terminales successives, ne créditent qu'une fois.
   return crediter(tx, session, 'bonus_soiree_complete', 3 - etapes.length);
 }
 ```
 
-| Transition | Pourquoi elle doit pouvoir créditer le bonus |
-| --- | --- |
-| **T5** `ETAPE_TERMINEE`, dernière étape | Le cas nominal : l'enfant va au bout et appuie |
-| **T10** `ABANDON_PARENT` | Le parent peut arrêter une séance dont l'enfant a déjà tout fini — l'arrêt ne doit rien lui retirer (ETH-04) |
-| **T12** `CLOTURE_AUTOMATIQUE` | Le cas du constat 20 : tout est terminé en base, le dernier appui n'est jamais arrivé |
+**Pourquoi cette définition tient sur les trois créditeurs**, vérifié un par un :
 
-L'idempotence ne repose pas sur la discipline d'appel mais sur l'unique
-`(session_id, raison)` : appeler la fonction trois fois de suite est sans effet
-au-delà du premier crédit, et le `CHECK` de borne refuserait de toute façon un
-delta hors de 1..2.
+| Transition | Le ledger au moment de l'appel | Pourquoi elle doit pouvoir créditer |
+| --- | --- | --- |
+| **T5** `ETAPE_TERMINEE`, dernière étape | Les étapes précédentes ont été créditées par T4 ; celle-ci vient de l'être **dans la même transaction, juste avant** (« crédit +1, **puis** … ») | Le cas nominal : l'enfant va au bout et appuie |
+| **T10** `ABANDON_PARENT` | Le rattrapage écrit d'abord les étapes achevées et non créditées, **puis** appelle le bonus | Le parent peut arrêter une séance dont l'enfant a déjà tout fini — l'arrêt ne doit rien lui retirer (ETH-04) |
+| **T12** `CLOTURE_AUTOMATIQUE` | Idem | Le cas du constat 20 : tout est fini en base, le dernier appui n'est jamais arrivé |
+
+Dans les trois cas, les lignes d'étape **précèdent** l'appel, à l'intérieur de la
+même transaction. La dépendance à l'ordre des requêtes du client disparaît : il
+ne reste qu'une dépendance à un ordre **interne à une transaction**, écrit dans
+une seule fonction.
+
+L'idempotence, elle, ne repose toujours pas sur la discipline d'appel mais sur
+l'unique `(session_id, raison)` : appeler la fonction trois fois de suite est
+sans effet au-delà du premier crédit, et le `CHECK` de borne refuserait de toute
+façon un delta hors de 1..2.
+
+### L'invariant du forfait, et pourquoi il vaut mieux qu'une re-dérivation
+
+`40-protocole-agents.mdc` demande de **préférer un invariant à une
+re-dérivation** quand les deux sont possibles, parce qu'une re-dérivation
+partage la règle qu'elle vérifie : deux implémentations correctes d'une règle
+fausse sont d'accord entre elles. Le barème s'y prête, et c'est précisément le
+genre de défaut qu'un test de re-dérivation aurait manqué — un test qui aurait
+recalculé `3 − n` et l'aurait comparé au code aurait trouvé les deux d'accord,
+puisque le défaut n'était pas dans le calcul du montant mais dans la condition
+de versement.
+
+**Invariant du forfait (ARB-13)**, affirmé sans jamais recalculer `3 − n` :
+
+> Pour toute session parvenue à un état final, si **toutes** ses étapes
+> programmées ont été créditées et qu'il y en a au moins une, alors la somme des
+> pierres de cette session vaut **exactement 3** — quel que soit le nombre
+> d'étapes, quel que soit le chemin emprunté, quel que soit l'ordre des requêtes.
+
+C'est l'énoncé d'ARB-13 lui-même, transformé en propriété vérifiable. Il attrape,
+sans rien savoir du code :
+
+- un bonus **jamais versé** — la somme vaut 2 au lieu de 3 : c'est exactement le
+  constat 26, et cet invariant l'aurait fait tomber ;
+- un bonus versé **du mauvais montant** — 2 au lieu de 1, ou l'inverse ;
+- un **double crédit**, qui porterait la somme à 4 ou plus ;
+- une règle de barème **fausse** mais uniformément appliquée, qu'une
+  re-dérivation aurait au contraire confirmée.
+
+Il est porté à deux endroits, l'un en base et l'autre en test :
+
+1. **`supabase/policies.sql`, vérification V9** — une requête SQL sur toutes les
+   sessions finales, qui lève une exception en nommant les sessions fautives.
+   Elle ne connaît ni la fonction, ni le nombre d'étapes : elle compare un
+   décompte de lignes à un total.
+2. **P5, tests unitaires** — le même énoncé sur les sept chemins du tableau
+   ci-dessous, dont celui du constat 26. Un test qui vérifierait « la fonction
+   renvoie `3 − n` » ne serait pas cet invariant, et ne protégerait de rien.
+
+**Corollaire utile** : la somme des pierres d'une session appartient toujours à
+`{0, 1, 3}`. Jamais 2. Une session à 2 est, par construction, une soirée
+complète dont le bonus manque. V9 le vérifie aussi, et c'est la forme la plus
+courte du constat 26.
+
+### Les quatre cas d'ARB-13, et les trois chemins d'interruption
+
+Vérifiés **sur le nouveau prédicat**, un par un.
+
+| # | Cas | Étapes programmées | Lignes d'étape au ledger | Bonus | Total |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Deux étapes, tout terminé (T4 puis T5) | 2 | 2 | `3 − 2 = 1` | **3** |
+| 2 | Soir léger ou une seule matière, terminé (T5) | 1 | 1 | `3 − 1 = 2` | **3** |
+| 3 | Deux étapes, une seule terminée | 2 | 1 | aucun (`1 ≠ 2`) | **1** |
+| 4 | Aucune étape programmée (`sansDevoir`, T3) | 0 | 0 | aucun (garde `length === 0`) | **0** |
+| 5 | **Le cas du constat 26** : tout terminé, dernier `attempt` resté `en_cours` | 2 | 2 — le ledger ne dépend pas des `attempt` | `3 − 2 = 1` | **3** ✔ corrigé |
+| 6 | Clôture automatique T12, tout achevé en base la veille | 2 | 1, puis le rattrapage écrit la 2ᵉ, **puis** le bonus | `1` | **3** |
+| 7 | Soirée abandonnée puis reprise le soir même (PRD-18) | 2 | écrites par T4/T5 comme d'habitude ; l'unique empêche tout doublon à la reprise | `1` si tout est fini | **3** ou **1** selon l'avancement réel |
+
+**La limite de la garantie, énoncée franchement.** Si **ni** l'événement de fin
+d'étape **ni** la finalisation des `attempt` n'atteignent le serveur — l'appareil
+s'éteint au milieu de la dernière étape —, alors rien en base n'atteste que
+l'étape a été faite, et T12 ne la créditera pas : la soirée vaudra 1 pierre au
+lieu de 3. Ce n'est pas un défaut qu'une définition de prédicat peut réparer : le
+serveur n'a aucune preuve. Le cas 5 ci-dessus, lui, est réparé parce qu'il reste
+**une** trace — l'événement —, et c'est celle que le bonus lit désormais.
 
 ### Les six endroits qui énoncent le barème
 
@@ -1149,7 +1319,7 @@ liste réelle, avec ce qui relève de moi et ce qui n'en relève pas.**
 | 3 | `supabase/policies.sql`, commentaire de `gem_ledger_delta_borne` | **À moi.** Mis à jour, contrainte renommée |
 | 4 | `architecture.out.md` § 16.2 — lignes de `TRACEABILITY.md` | **À moi.** Réécrites |
 | 5 | `.cursor/agents/tests-unitaires.md`, liste de couverture obligatoire | **Pas à moi.** Corrigé par l'Orchestrateur — voir ci-dessous |
-| 6 | `docs/agents/P1/produit-marketing.out.md` ligne 1148 | **Pas à moi.** Traité séparément par l'Orchestrateur |
+| 6 | `docs/agents/P1/produit-marketing.out.md`, « Barème rappelé » en 7.8 | **Pas à moi — et À TRAITER.** Au contrôle du tour 3, puis à ma propre relecture du tour 4, la ligne porte encore « +1 bonus si les 2 étapes du soir sont terminées ». La phrase suivante, « Cas d'une seule étape terminée : … une pierre de moins affichée », est **doublement fausse** sous ARB-13 : un Soir léger vaut 3 pierres, donc rien n'y est « une pierre de moins » |
 
 **Le cinquième endroit était le plus dangereux, et je le dis franchement parce
 que je ne l'avais pas vu.** La fiche de `tests-unitaires` prescrivait « +1 bonus
@@ -1718,8 +1888,12 @@ travail (PED-05), et parce qu'un écart d'une pierre rendait le Soir léger
 détectable dans le coffre, contre ARB-06. Le bonus vaut 1 ou 2, jamais 0 ni
 négatif (PED-06 plafonne les étapes à deux), et une soirée sans étape
 programmée ne crédite rien. Il est crédité par les TROIS transitions terminales
-— T5, T10 et T12 — via crediterBonusSiSoireeComplete() : un enfant qui termine
-tout mais perd le dernier appui ne perd pas sa pierre (PRD-18). |
+— T5, T10 et T12 — via crediterBonusSiSoireeComplete(), dont le prédicat est
+fondé sur les lignes gem_ledger déjà écrites pour chaque étape et JAMAIS sur le
+statut des lignes attempt : un enfant qui termine tout mais perd le dernier
+appui, ou dont le POST /tentative n'est pas parti, ne perd pas sa pierre
+(PRD-18). Invariant vérifié en base par policies.sql V9 et V10 : toute soirée
+complète vaut exactement 3 pierres, et aucune session close ne vaut 2 pierres. |
 
 | TEC-11 | Service pierres côté serveur | src/lib/pierres/service.ts
 (crediterEtape + crediterBonusSiSoireeComplete), src/lib/session/service.ts,
@@ -1812,8 +1986,11 @@ contactée** et le dépôt n'a reçu aucun fichier de cette installation.
 **Limite de ce contrôle, énoncée franchement** : `prisma validate` vérifie la
 grammaire et la cohérence du schéma. Il ne vérifie **ni** la conformité à la
 section 3.7, **ni** l'existence des contraintes SQL de `policies.sql`. Ces deux
-points se contrôlent à la lecture (section 3.1) et par les vérifications V1 à V8
-de `policies.sql`, sur une vraie base.
+points se contrôlent à la lecture (section 3.1) et par les vérifications V1 à
+V10 de `policies.sql` — **qui ont désormais été exécutées sur une vraie base,
+section 17.6**, ce qui n'était le cas à aucun des trois tours précédents. Le
+schéma a d'ailleurs été appliqué pour de bon par `prisma db push` : il ne se
+contente plus d'être valide, il crée réellement ses 11 tables.
 
 Commande à rejouer par `controle-architecture`, vérifiée telle quelle :
 
@@ -2024,42 +2201,210 @@ sont écrites pour cela :
 C'est le maximum de preuve atteignable sans base, et je le dis comme tel plutôt
 que de fabriquer une sortie `psql`.
 
+## 17.6 Le fichier SQL appliqué sur une vraie base Postgres, et le test de mutation
+
+**Nouveauté du tour 4, et je la mets en avant parce qu'elle change la nature de
+la preuve.** Jusqu'ici, `supabase/policies.sql` n'avait jamais été exécuté : je
+le donnais à lire, pas à jouer. PostgreSQL 16 étant disponible dans mon
+environnement, je l'ai appliqué pour de bon.
+
+**Ce que c'est, et ce que ce n'est pas.** C'est un PostgreSQL 16.13 nu, démarré
+dans mon répertoire de travail, où j'ai créé le schéma avec `prisma db push`
+puis une **émulation minimale** de Supabase : les rôles `anon` et
+`authenticated`, un schéma `storage` avec `buckets` et `objects`, et la table
+`public._prisma_migrations` que `db push` ne crée pas — fabriquée exprès pour
+exercer réellement le bloc du constat 3. **Ce n'est pas un projet Supabase** :
+ni PostgREST, ni l'API Storage, ni les rôles réels de la plateforme. Ce qui est
+prouvé ci-dessous vaut donc pour le SQL et les données, pas pour le
+comportement de la plateforme — cette limite-là reste celle de `securite-rgpd`
+en P7.
+
+### 17.6.1 Application atomique — la preuve du constat 27
+
+L'invocation exacte que le contrôle désignait comme catastrophique au tour 3 :
+`psql -1 -v ON_ERROR_STOP=1`, c'est-à-dire tout le fichier dans une seule
+transaction, avec arrêt à la première erreur.
+
+```
+$ psql -h $SP/run -U postgres -d tipi -1 -v ON_ERROR_STOP=1 -f policies.sql
+NOTICE:  ALTER DEFAULT PRIVILEGES posé pour le rôle postgres. Ce rôle doit être celui de DIRECT_URL.
+NOTICE:  constraint "gem_ledger_delta_max_un" of relation "gem_ledger" does not exist, skipping
+NOTICE:  relation "session_une_active_par_enfant" already exists, skipping
+NOTICE:  V1 OK — RLS activée sur toutes les tables de public.
+NOTICE:  V2 OK — aucune policy sur les tables métier.
+NOTICE:  V3 OK — aucun privilège de table pour anon ni authenticated.
+NOTICE:  V4 OK — les 8 contraintes de la partie B sont en place.
+NOTICE:  V5a OK — delta négatif refusé par la base.
+NOTICE:  V5b OK — delta de 3 refusé par la base (borne 1..2).
+NOTICE:  V5c OK — delta de 2 accepté (pile au seuil), insertion annulée.
+NOTICE:  V6 OK — solde == somme du ledger pour tous les enfants.
+NOTICE:  V7 — devoirs: 8388608 octets, audios: 10485760 octets (doivent égaler UPLOAD_MAX_PHOTO_OCTETS et UPLOAD_MAX_AUDIO_OCTETS).
+NOTICE:  V8 OK — tts-prive existe et est privé.
+NOTICE:  V9 OK — toute soirée complète vaut exactement 3 pierres.
+NOTICE:  V10 OK — aucune session close hors {0, 1, 3} pierres.
+---exit:0---
+```
+
+Le fichier est **rejouable** : cette sortie est celle de la troisième
+application consécutive sur la même base, d'où les deux `skipping`. Et
+`prisma db push` a créé le schéma sans un mot :
+
+```
+$ prisma db push --schema prisma/schema.prisma --skip-generate
+🚀  Your database is now in sync with your Prisma schema. Done in 165ms
+$ psql -tAc "select count(*) from pg_tables where schemaname='public'"
+11
+```
+
+11 tables : les 10 du schéma plus `_prisma_migrations`. C'est le chiffre que
+j'annonce en section 4.
+
+### 17.6.2 Les trois cas d'ARB-13, en données réelles
+
+Trois soirées insérées à la main, puis relevées :
+
+```
+                  id                  |      etat      | etapes | pierres
+--------------------------------------+----------------+--------+---------
+ aaaaaaaa-…-000000000001              | termine        |      2 |       3
+ aaaaaaaa-…-000000000002              | termine        |      1 |       3
+ aaaaaaaa-…-000000000003              | abandon_parent |      2 |       1
+```
+
+La deuxième est un **Soir léger** : une seule étape, et **3 pierres comme la
+soirée à deux étapes**. C'est ARB-13 vérifié en données, et ARB-06 avec — le
+Soir léger est indiscernable dans le coffre. La troisième, interrompue avec une
+seule étape faite, vaut 1 pierre : le bonus ne tombe pas.
+
+### 17.6.3 Test de mutation : l'invariant peut-il rougir ?
+
+`40-protocole-agents.mdc` pose qu'« un instrument qui affiche le défaut sans le
+voir est pire qu'un instrument muet ». Un V9 qui dirait toujours OK serait
+exactement cela. **Je l'ai donc cassé exprès**, en reproduisant le constat 26 :
+supprimer le bonus d'une soirée complète, et rien d'autre.
+
+```
+$ DELETE FROM gem_ledger WHERE session_id = '…0001' AND raison = 'bonus_soiree_complete';
+$ SELECT … la session porte maintenant 2 pierres pour 2 étapes
+
+$ psql -1 -v ON_ERROR_STOP=1 -f policies.sql
+ERROR:  ARB-13 VIOLÉE — soirée(s) complète(s) ne valant pas 3 pierres : aaaaaaaa-…-000000000001 (2 pierres pour 2 étape(s))
+---exit:3---
+
+$ psql -v ON_ERROR_STOP=1 -f v10.sql        (V10 seule, V9 ayant déjà arrêté le fichier)
+ERROR:  ARB-13 VIOLÉE — total de pierres hors {0,1,3} : aaaaaaaa-…-000000000001 = 2
+---exit:3---
+
+$ INSERT … le bonus est restauré
+$ psql -1 -v ON_ERROR_STOP=1 -f policies.sql
+NOTICE:  V9 OK — toute soirée complète vaut exactement 3 pierres.
+NOTICE:  V10 OK — aucune session close hors {0, 1, 3} pierres.
+---exit:0---
+```
+
+**Les deux invariants rougissent sur la mutation, nomment la session fautive, et
+reverdissent après restauration.** C'est la preuve que le constat 26 aurait été
+attrapé par cet instrument-là, et qu'il ne s'agit pas d'une requête décorative.
+
+**Une honnêteté sur ce test.** Ma première tentative n'a rien prouvé du tout :
+j'avais ouvert la mutation par `BEGIN;` sans `COMMIT`, la suppression a été
+annulée à la déconnexion, et V9 a répondu « OK » sur une base intacte. J'ai
+failli en conclure que l'instrument ne voyait pas le défaut. C'est précisément
+le piège de la règle 5, à un cran de recul près : ce n'était pas l'instrument
+qui était aveugle, c'était ma mutation qui n'avait pas eu lieu. La leçon que
+j'en tire et que je laisse ici : **vérifier que l'état muté est réellement
+persisté avant de conclure quoi que ce soit sur l'instrument** — la sortie
+ci-dessus le fait, avec le `SELECT` de contrôle entre la mutation et le test.
+
+### 17.6.4 RLS : cinq attaques réelles par le rôle `anon`
+
+Les vérifications V1 à V3 sont des contrôles de catalogue. Voici la preuve
+**comportementale**, qui leur manquait : `SET ROLE anon`, puis cinq requêtes qui
+correspondent aux attaques n° 3, 4 et 7 de la fiche `red-team`.
+
+```
+--- tentative de LECTURE de child par anon ---
+ERROR:  permission denied for table child
+--- tentative de LECTURE de gem_ledger par anon ---
+ERROR:  permission denied for table gem_ledger
+--- tentative d ECRITURE de pierres par anon (attaque n.3 de red-team) ---
+ERROR:  permission denied for table gem_ledger
+--- tentative de MODIFICATION du solde par anon (SEC-06) ---
+ERROR:  permission denied for table child
+--- tentative de LECTURE du hash du code parent par anon (SEC-01) ---
+ERROR:  permission denied for table settings_access
+--- solde reel apres les tentatives ---
+ gem_balance
+           7
+```
+
+Cinq refus, et le solde inchangé. Le refus survient au niveau des privilèges,
+**avant même l'évaluation de RLS** : c'est la couche 3 du modèle de la section 4,
+et elle rend les autres redondantes plutôt qu'inutiles. Ce que ceci ne prouve
+pas, et que je ne prétends pas : le comportement de PostgREST et de l'API
+Storage de Supabase, qui n'existent pas dans cette émulation.
+
+### 17.6.5 Ce qui a été corrigé grâce à cette exécution
+
+Deux défauts que la seule lecture n'aurait pas montrés :
+
+1. **V5c ne s'exécutait pas.** Le bloc choisissait `SELECT id FROM session
+   LIMIT 1` ; si cette session portait déjà une ligne de bonus, l'unique
+   `(session_id, raison)` levait une `unique_violation` et le contrôle
+   concluait « non concluante ». Le cas pile au seuil — un delta de 2 qui doit
+   **réussir** — n'était donc jamais éprouvé. V5 choisit maintenant, pour
+   chacun de ses trois cas, une session où la raison testée est libre, et V5a ne
+   fige plus la raison.
+2. **V5a avait le même défaut**, avec une conséquence plus vicieuse : si le
+   `CHECK` avait réellement manqué, l'insertion aurait levé une
+   `unique_violation` non rattrapée, et le fichier aurait échoué sur un message
+   sans rapport avec ETH-04. Un gestionnaire `WHEN unique_violation` est ajouté
+   aux trois cas.
+
+La base d'essai a été détruite après ces contrôles ; rien n'en subsiste et
+aucun fichier n'a été déposé dans le dépôt.
+
 ---
 
 # 18. Points que je veux voir tranchés
 
-Les cinq points du tour 1 sont tranchés (0.3), les deux du tour 2 le sont par
-ARB-12 (0.4), et le barème l'est par ARB-13 (0.5). Le glob a reçu
-`src/app/bienvenue/**`. **Il ne reste qu'un seul point, et il ne m'appartient
-pas non plus.**
+Les cinq points du tour 1 sont tranchés (0.3), les deux du tour 2 par ARB-12
+(0.4), le barème par ARB-13 (0.5), et les trois constats du tour 3 sont corrigés
+(0.6). Le glob a reçu `src/app/bienvenue/**` et ESC-001 est tranchée : le nom
+`content/gwenn-scripts.json` est conservé, le sujet est clos et je ne le rouvre
+pas. **Deux points restent, aucun dans mes livrables.**
 
-**Le prompt maître prescrit encore la règle révoquée à l'agent qui écrira les
-tests.** `TIPI-PROMPT-CURSOR.md` §5.1, ligne 667, contient la copie de la fiche
-de `tests-unitaires`, et cette copie dit toujours :
-
-> « Service pierres : +1 par étape, **+1 bonus pour 2 étapes**, jamais de delta
-> négatif, solde toujours égal à la somme du ledger, écriture impossible depuis
-> le client. »
-
-La fiche opérationnelle, `.cursor/agents/tests-unitaires.md`, a bien été amendée
-par l'Orchestrateur — je l'ai vérifié, l'amendement citant ARB-08 et ARB-13 y
-figure sous la ligne d'origine. **C'est la fiche que l'agent lit, donc le risque
-immédiat est levé.** Je signale le prompt maître pour deux raisons, et je ne
-propose pas de le modifier — aucun agent n'en a le droit, et il est la source du
-référentiel :
-
-1. La section 5 du prompt maître est la **consigne de recréation** de
-   `.cursor/agents/` : quiconque rejoue la PHASE 0 dans un dépôt neuf
-   réécrirait la fiche avec la règle révoquée, et l'amendement serait perdu.
-2. `recette-finale` doit vérifier « pour CHAQUE identifiant REQ-xxx » contre ce
-   fichier. Un écart entre le prompt maître et le dépôt doit être **connu d'elle
-   à l'avance**, sans quoi elle le découvrira comme un défaut.
+**1. Le prompt maître prescrit encore la règle révoquée du barème.**
+`TIPI-PROMPT-CURSOR.md` §5.1 contient la copie de la fiche de `tests-unitaires`,
+et cette copie dit toujours « +1 bonus pour 2 étapes ». La fiche opérationnelle,
+`.cursor/agents/tests-unitaires.md`, est amendée au point d'usage — je l'ai
+vérifié, l'amendement citant ARB-08 et ARB-13 figure sous la ligne d'origine
+conservée —, donc **le risque immédiat est levé**. Ce qui reste est un risque de
+recréation : la §5 est la consigne d'écriture de `.cursor/agents/`, et elle
+ordonne « avec le contenu **exact** donné ci-dessous ». Un agent qui rejoue la
+PHASE 0 dans un dépôt neuf réécrirait la fiche fausse et perdrait l'amendement.
+Je ne propose pas de modifier le prompt maître : aucun agent n'en a le droit.
 
 **Question fermée : l'écart de barème entre `TIPI-PROMPT-CURSOR.md` (§3.7 et
-§5.1) et le dépôt est-il consigné une fois pour toutes dans `GATES.md` comme
-écart connu au prompt maître, ou faut-il ouvrir une escalade humaine pour
-corriger le cahier des charges lui-même ?** Ma recommandation : le consigner
-dans `GATES.md` sous ARB-13, qui le porte déjà, en y ajoutant explicitement les
-deux lignes du prompt maître concernées. Modifier le cahier des charges en cours
-de projet coûterait plus cher que de tracer l'écart, et ARB-13 le trace déjà
-pour tout le reste de la chaîne.
+§5.1) et le dépôt est-il consigné une fois pour toutes dans `GATES.md` sous
+ARB-13, ou faut-il une escalade humaine pour corriger le cahier des charges
+lui-même ?** Ma recommandation reste la première : tracer coûte moins cher que
+modifier un référentiel en cours de projet, et ARB-13 porte déjà l'écart pour
+tout le reste de la chaîne.
+
+**2. Le sixième endroit du barème n'est toujours pas corrigé, et il commande une
+extraction que j'ai moi-même planifiée.** La « Barème rappelé » de 7.8 du
+livrable marketing porte encore l'ancienne règle, et sa phrase suivante — « une
+pierre de moins affichée » — est doublement fausse sous ARB-13. Ce n'est pas mon
+fichier, et mon tableau de 9.5 le dit désormais « à traiter » au lieu de
+« traité ». Je le remonte parce que **ARB-10 fait extraire `ui-enfant.json` de
+ce livrable avant G3** : la correction doit précéder l'extraction, pas la suivre.
+
+**Et une observation qui n'est pas de moi, que je relaie parce qu'elle touche
+une verticale que j'ordonnance.** Le contrôle a relevé (G.1 de son verdict) que
+`.cursor/agents/contenu-enfant.md` énumère 16 situations là où ARB-04 en impose
+23, sans amendement au point d'usage. C'est la fiche que lira `contenu-enfant`
+pour produire `ui-enfant.json` et `ui-parent.json` — la ligne **V1-contenu** de
+ma section 14, à livrer avant G3. Si elle n'est pas amendée comme l'a été celle
+de `tests-unitaires`, le prochain agent lancé sur cette porte travaillera sur
+une liste périmée.
