@@ -25,22 +25,12 @@ import { AppError } from "@/lib/errors/app-error";
 import { enfantCourant } from "@/lib/enfant/courant";
 import { garderServeur } from "@/lib/runtime/garde-serveur";
 import { cloreSessionsPerimees } from "@/lib/session/cloture-automatique";
+import { ROUTE_PAR_ETAT } from "@/lib/session/routes";
 import { ETATS_FINAUX, type EtatSession } from "@/lib/session/types";
 
-garderServeur("src/lib/session/aiguillage.ts");
+export { ROUTE_PAR_ETAT };
 
-/** Section 3.1 — l'écran de chaque état (P2 §9.1). */
-export const ROUTE_PAR_ETAT: Readonly<Record<EtatSession, string>> = Object.freeze({
-  idle: "/enfant",
-  annonce: "/enfant/programme",
-  etape_lecture: "/enfant/session/lecture",
-  transition: "/enfant/session/transition",
-  etape_maths: "/enfant/session/maths",
-  cloture: "/enfant/bravo",
-  termine: "/enfant/coffre",
-  pause: "/enfant/pause",
-  abandon_parent: "/enfant/bravo",
-});
+garderServeur("src/lib/session/aiguillage.ts");
 
 export interface EtatAiguillage {
   readonly onboardingFait: boolean;

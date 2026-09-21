@@ -27,7 +27,7 @@ import {
   assertBaremeScelle,
   type ConfigBareme,
 } from "@/lib/pierres/bareme";
-import { ROUTE_PAR_ETAT } from "@/lib/session/aiguillage";
+import { ROUTE_PAR_ETAT } from "@/lib/session/routes";
 import { STATUTS_FINAUX } from "@/lib/session/etapes";
 import { EVENEMENTS_CLIENT, EVENEMENTS_SERVEUR } from "@/lib/session/evenements-client";
 import { TRANSITIONS } from "@/lib/session/machine";
