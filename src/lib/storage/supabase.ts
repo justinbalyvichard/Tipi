@@ -28,7 +28,7 @@ import { garderServeur } from "@/lib/runtime/garde-serveur";
 
 garderServeur("src/lib/storage/supabase.ts");
 
-/** Les trois buckets du projet (P2, §12.2 et supabase/policies.sql, partie C). */
+/** Les quatre buckets du projet (P2, §12.2 et supabase/policies.sql, partie C). */
 export const BUCKETS = Object.freeze({
   /** Privé — photos de devoirs. URL signées uniquement. */
   devoirs: "devoirs",
@@ -46,7 +46,7 @@ let cache: SupabaseClient | undefined;
  * Le client de service. `SUPABASE_SERVICE_ROLE_KEY` donne un accès total au
  * projet : elle ne doit apparaître dans aucun composant, aucun hook, aucun
  * fichier importé par le client. La garde de ce module le rend exécutable ;
- * l'invariant I1 de `scripts/verifier-socle.mjs` le vérifie sur l'artefact.
+ * l'invariant I1 de `scripts/verifier-socle.ts` le vérifie sur l'artefact.
  *
  * `persistSession: false` : il n'y a pas d'utilisateur Supabase dans Tipi, et
  * aucune session à conserver entre deux requêtes serveur.

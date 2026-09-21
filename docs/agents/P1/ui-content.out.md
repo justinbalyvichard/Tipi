@@ -4,13 +4,15 @@ Livrable de l'agent `contenu-enfant`, mission ARB-10 et ARB-12, après la
 fermeture de G1. **Version 3** : reprise du `VERDICT: FAIL` du tour 1
 (1 [MAJEUR], 4 [MINEUR]), application d'ARB-14, puis reprise du
 `VERDICT: FAIL` du tour 2 (1 [MAJEUR], 3 [MINEUR]), puis la réserve du
-`VERDICT: PASS_AVEC_RESERVES` du tour 3. Sources : `docs/agents/P1/produit-marketing.out.md`,
+`VERDICT: PASS_AVEC_RESERVES` du tour 3. **Version 4** : les cinq libellés
+d'apparence de Pilou, ajoutés pour lever la dépendance de porte G4.V6
+(ARB-10, ARB-17 b). Sources : `docs/agents/P1/produit-marketing.out.md`,
 `docs/agents/GATES.md` (ARB-08, ARB-10, ARB-12, ARB-13), et le bloc
 **AMENDEMENTS** en tête de `TIPI-PROMPT-CURSOR.md`.
 
 | Fichier | Rôle | Volume |
 | --- | --- | --- |
-| `content/ui-enfant.json` | Textes **fixes** des écrans enfant | 101 entrées, 6 écrans |
+| `content/ui-enfant.json` | Textes **fixes** des écrans enfant | 106 entrées, 6 écrans |
 | `content/ui-parent.json` | Textes **fixes** des écrans parent et Réglages | 187 entrées, 6 écrans |
 | `content/encouragements.json` | Banque de variantes (inchangée, sauf retrait ARB-12) | 23 situations, 460 variantes |
 | `content/gwenn-scripts.json` | Rituels fixes (inchangé) | 19 lignes |
@@ -25,6 +27,7 @@ Aucun emoji, aucun prénom en dur, aucun commit git.
 0. Reprise après verdict du tour 1
 0 bis. Reprise après verdict du tour 2
 0 ter. Réserve du tour 3
+0 quater. Les cinq libellés d'apparence de Pilou
 1. Ce que portent les deux fichiers neufs, et ce qu'ils ne portent pas
 2. Schéma des `ui-*.json`
 3. Répartition enfant / parent
@@ -231,6 +234,122 @@ Deux choses que je n'avais pas vues et que j'inscris ici pour la suite :
    puisque le bon segment était masqué donc inutilisé. **Préférer un invariant à
    une re-dérivation chaque fois que les deux sont possibles** — la règle est
    désormais au protocole, et mes contrôles portent les deux.
+
+---
+
+# 0 quater. Les cinq libellés d'apparence de Pilou
+
+Mission courte, ARB-10 et ARB-17 (b) : le design system livre cinq variantes,
+leurs libellés affichés n'existaient dans aucun fichier de `content/`, et G4.V6
+ne ferme pas sans eux.
+
+## Les cinq libellés
+
+| Clé, imposée par le code | Libellé | Ce qu'il nomme dans le SVG |
+| --- | --- | --- |
+| `coffre.cosmetiques.aucun` | **Pilou toute simple** | Pilou sans rien, variante par défaut |
+| `coffre.cosmetiques.echarpe` | **L'écharpe** | l'écharpe autour du cou, avec le pan qui retombe |
+| `coffre.cosmetiques.bonnet` | **Le bonnet à pompon** | le bonnet et son pompon, qui le rend reconnaissable en silhouette |
+| `coffre.cosmetiques.noeud` | **Le petit nœud** | le nœud posé sur le côté de la tête |
+| `coffre.cosmetiques.lunettes` | **Les lunettes rondes** | les deux anneaux de la monture |
+
+**Les clés ne sont pas de mon invention** : `src/config/mascot.config.ts` les
+référence déjà une par une, en `cleLibelle`. Je me suis aligné sur elles au
+caractère près — une nomenclature différente aurait cassé V6 au lieu de la
+débloquer. Un **garde-fou** est posé dans les deux sens : le générateur refuse de
+produire si `mascot.config.ts` référence une clé que le fichier ne porte pas, et
+le contrôle 5 sexies rejoue l'invariant à chaque exécution (5 clés référencées,
+**0 orpheline côté code**).
+
+## Le mot retenu à la place de « cosmétique »
+
+**Aucun mot. Un verbe : « mettre ».**
+
+« Cosmétique » est un mot d'adulte et de jeu vidéo, et il n'a rien à faire devant
+un CE1. Mais je n'ai pas cherché à le remplacer par un autre nom, parce que
+l'écran n'en a pas besoin et qu'un nom de catégorie aurait coûté cher :
+
+1. **Le registre existe déjà et il est verbal.** Le marketing a écrit
+   `coffre.cosmetiques.titre` = « Habiller Pilou »,
+   `.bouton_appliquer` = « Mettre à Pilou », `.vide` = « Il n'y a rien à mettre
+   pour l'instant. » Trois textes, trois fois un verbe, jamais un nom. Ajouter
+   « les accessoires » ou « les habits » aurait introduit une quatrième façon de
+   parler de la même chose.
+2. **Un nom de catégorie est un piège ARB-14.** « Les habits » ne couvre pas les
+   lunettes ; « les accessoires » est un mot d'adulte ; et surtout toute phrase
+   générique construite sur ce nom devrait s'accorder avec l'objet désigné —
+   écharpe féminin, bonnet et nœud masculins, lunettes féminin pluriel. C'est
+   exactement le mécanisme qui a produit « On s'occupe de les maths ».
+3. **Les libellés se suffisent.** Chacun est un groupe nominal autonome qui porte
+   son propre article. Aucune phrase de l'écran n'a à s'accorder avec eux.
+
+Le mot « cosmétique » reste dans les **clés** et dans le code
+(`CosmetiqueId`) : c'est du vocabulaire de développeur, jamais affiché. La règle
+est écrite dans `mascot.config.ts` lui-même : « Identifiant technique, jamais
+affiché à l'enfant. »
+
+## Comment ils fonctionnent en état verrouillé
+
+Un libellé **nomme l'objet, jamais ce qu'il faut pour l'avoir**. C'est ce qui le
+rend valable dans les deux états, sans dédoublement :
+
+| Ce que voit l'enfant | Verrouillé | Débloqué |
+| --- | --- | --- |
+| La vignette | silhouette neutre, forme reconnaissable (validée par le contrôle du design system) | Pilou portant l'objet |
+| Le libellé | **le même** : « Le bonnet à pompon » | **le même** |
+| La ligne d'état | `coffre.cosmetiques.verrouille` | `coffre.cosmetiques.debloque` |
+
+L'enfant voit donc la forme de ce qui l'attend **et** son nom. C'est le contraire
+d'un teaser : rien n'est caché, rien n'est promis. Les libellés le permettent
+parce qu'ils sont vides de toute mécanique — **aucun chiffre, aucun jeton, aucun
+« encore », aucun « bientôt »**, ce que le contrôle vérifie sur les cinq.
+
+**ARB-16 est respecté par construction** : un libellé qui ne mentionne jamais de
+pierres ne peut pas annoncer un seuil, et il reste juste le jour où les cinq
+seuils seront décidés — comme le jour où ils ne le seront pas encore.
+**ETH-05** : aucun des cinq ne présente l'objet comme un prix gagné ; ce sont des
+noms de choses, pas des récompenses.
+
+## Deux défauts que ces libellés font apparaître, dans des clés voisines
+
+Ils ne sont pas de mon fait et je ne les corrige pas — le texte appartient à
+`produit-marketing` — mais ils bloqueront V6, donc je les nomme précisément.
+
+1. **`coffre.cosmetiques.verrouille` = « Il en faut {n} pour celui-là. »**
+   ARB-16 a retiré les valeurs de seuil : `pierresRequises` vaut `null` pour les
+   cinq variantes. Le `{n}` de ce texte **n'a plus de source**. La ligne d'état
+   verrouillé n'est pas rendable aujourd'hui, et c'est l'autre moitié de la
+   dépendance de porte que vous avez posée.
+2. **ARB-14 sur les deux lignes d'état.** « Il en faut {n} pour **celui-là** » et
+   « **Celui-là** est à toi » sont au masculin singulier, alors que les cinq
+   objets ne le sont pas tous : avec « L'écharpe » il faudrait « celle-là », avec
+   « Les lunettes rondes » « celles-là ». Le démonstratif s'accorde avec une
+   chose variable — c'est la famille exacte d'ARB-14.
+   Formulations neutres possibles, à trancher par le producteur du texte :
+   « **Ce n'est pas encore à toi.** » et « **C'est à toi.** » — invariables en
+   genre comme en nombre, et la première ne mentionne aucun seuil.
+
+## Schéma des cinq entrées
+
+Elles suivent les conventions du fichier, sans exception :
+
+- `ecran` : `/enfant/coffre` ;
+- `canal` : **`les_deux`**. Le libellé identifie ce que l'enfant choisit : PED-10
+  demande qu'une information utile à l'action soit doublée à l'oral. Pilou le dit
+  quand l'enfant se pose sur une vignette, et non les cinq à la suite ;
+- `condition` : **`null`**, et c'est voulu. Les cinq vignettes s'affichent
+  toujours, ensemble ; l'état verrouillé ou débloqué ne conditionne pas le
+  libellé, il conditionne la ligne d'état voisine ;
+- `exclusif_avec` : **vide**, et c'est voulu aussi. Les cinq libellés coexistent à
+  l'écran ; ce qui est exclusif, c'est l'apparence *portée*, qui est un état de
+  `child.cosmetique_active`, pas un emplacement de texte. Déclarer une
+  exclusivité ici aurait dit une chose fausse sur l'écran ;
+- `role` : **`libelle`**, valeur ajoutée au vocabulaire pour ce cas et **publiée
+  dans la règle** du fichier. Elle se déclenche sur un dernier segment qui est un
+  identifiant de variante, miroir de `CosmetiqueId`. Sans elle, ces cinq entrées
+  seraient tombées sur `indetermine`, et le design system les aurait rendues en
+  corps de texte — exactement le défaut que le contrôle du tour 1 a relevé sur
+  les commandes.
 
 ---
 
@@ -445,13 +564,14 @@ lui dit jamais combien rapporte une étape.
 ## 7.1 Validité JSON des quatre fichiers
 
 ```
-content/ui-enfant.json : JSON VALIDE, schema=tipi.ui-enfant.v1, entrees=101
+content/ui-enfant.json : JSON VALIDE, schema=tipi.ui-enfant.v1, entrees=106
 content/ui-parent.json : JSON VALIDE, schema=tipi.ui-parent.v1, entrees=187
 content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, entrees=460
 content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, entrees=19
-regle d_appariement publiee dans les deux fichiers : true
-table de segments publiee : 26 entrees
-conditions renseignees : 137 / 288
+entrees UI : 293  (enfant 106, parent 187)
+conditions renseignees : 137
+libelles d apparence : 5
+roles : {"bouton":62,"indetermine":111,"titre":39,"corps":42,"action":23,"valeur":2,"libelle":5,"aide":9}
 ---exit:0---
 ```
 
@@ -482,7 +602,12 @@ cles ORPHELINES (aucun fichier) : 0
 2. PROPRIETE UNIQUE : aucune cle declaree deux fois
 ========================================================================
 cles portees par plus d'un fichier : 0
-cles portees par content/ mais absentes du marketing : 9
+cles portees par content/ mais absentes du marketing : 14
+   HORS SOURCE coffre.cosmetiques.aucun -> ['ui-enfant.json']
+   HORS SOURCE coffre.cosmetiques.echarpe -> ['ui-enfant.json']
+   HORS SOURCE coffre.cosmetiques.bonnet -> ['ui-enfant.json']
+   HORS SOURCE coffre.cosmetiques.noeud -> ['ui-enfant.json']
+   HORS SOURCE coffre.cosmetiques.lunettes -> ['ui-enfant.json']
    HORS SOURCE parent.resume.observation.lecture_fluide -> ['ui-parent.json']
    HORS SOURCE parent.resume.observation.hesitations -> ['ui-parent.json']
    HORS SOURCE parent.resume.observation.maths_indices -> ['ui-parent.json']
@@ -494,6 +619,8 @@ cles portees par content/ mais absentes du marketing : 9
    HORS SOURCE parent.resume.observation.arret_avant_fin -> ['ui-parent.json']
    (les 9 observations du resume parent sont creees par ce livrable :
     le marketing les donne en texte, sans cle nommee)
+   (les 5 libelles d'apparence de Pilou sont crees par ce livrable :
+    le design system livre les variantes, le marketing ne les nomme pas)
 
 ========================================================================
 3. ARB-12 : les six cles mortes ont disparu des trois fichiers
@@ -510,13 +637,13 @@ mentions restantes de « lecture.vide.* » / « maths.vide.* » dans le marketin
 ========================================================================
 4. FIDELITE : le texte de content/ est celui du marketing
 ========================================================================
-entrees comparees : 288, ecarts : 0
+entrees comparees : 293, ecarts : 0
 
 ========================================================================
 5. SCHEMA DES DEUX FICHIERS UI
 ========================================================================
-ui-enfant.json   101 entrees, 64 avec condition, canaux {'affiche': 47, 'les_deux': 54}, roles {'bouton': 38, 'indetermine': 33, 'titre': 7, 'corps': 19, 'action': 3, 'valeur': 1}
-                 ecrans : {'/enfant': 5, '/enfant/programme': 10, '/enfant/session/lecture': 40, '/enfant/session/maths': 23, '/enfant/pause': 4, '/enfant/coffre': 19}
+ui-enfant.json   106 entrees, 64 avec condition, canaux {'affiche': 47, 'les_deux': 59}, roles {'bouton': 38, 'indetermine': 33, 'titre': 7, 'corps': 19, 'action': 3, 'valeur': 1, 'libelle': 5}
+                 ecrans : {'/enfant': 5, '/enfant/programme': 10, '/enfant/session/lecture': 40, '/enfant/session/maths': 23, '/enfant/pause': 4, '/enfant/coffre': 24}
 ui-parent.json   187 entrees, 73 avec condition, canaux {'affiche': 187}, roles {'indetermine': 78, 'titre': 32, 'corps': 23, 'bouton': 24, 'action': 20, 'aide': 9, 'valeur': 1}
                  ecrans : {'/parent': 31, '/parent/programme': 28, '/parent/resume': 23, '/reglages/code': 19, '/reglages': 82, 'notification': 4}
 
@@ -525,7 +652,7 @@ ui-parent.json   187 entrees, 73 avec condition, canaux {'affiche': 187}, roles 
 ========================================================================
 liste de marqueurs employee (publiee avec le chiffre) : vide, souci, echec, illisible, absent, sans_, refus, expiree, breton, reprise, plus_tard, actif, regroupe, reporte, verrouille, atteint, bloque, pas_entendu, discordance, avert, sans_voix, sans_indice, camera_, basse_energie, attente, epuise, indispo
 entrees portant un marqueur d'etat : 98
-entrees avec une condition : 137 / 288
+entrees avec une condition : 137 / 293
 origine : {'intertitre': 72, 'definie_ici': 22, 'segment_de_cle': 43}
 conditions distinctes d'origine intertitre : 27, pour 72 entrees
 entrees a marqueur d'etat SANS condition : 0
@@ -568,7 +695,7 @@ entrees portant une exclusivite : 21, liens : 33
 ========================================================================
 5 quater. ROLES ET JETONS DECLARES
 ========================================================================
-roles : {'bouton': 62, 'indetermine': 111, 'titre': 39, 'corps': 42, 'action': 23, 'valeur': 2, 'aide': 9}
+roles : {'bouton': 62, 'indetermine': 111, 'titre': 39, 'corps': 42, 'action': 23, 'valeur': 2, 'libelle': 5, 'aide': 9}
 commandes citees par le controle encore typees corps de texte : 0
 ui-enfant.json   jetons declares ['{n}']
                  jetons employes ['{n}']
@@ -609,9 +736,23 @@ instrument, version LARGE puis version RETENUE, sur les 288 entrees.
          verdict manuel : accord sur un nom du texte (la séance, le prénom et les photos), pas sur le jeton. Correct.
 
 ========================================================================
+5 sexies. ARB-17 b — les cinq libelles d'apparence de Pilou
+========================================================================
+cles referencees par mascot.config.ts (cleLibelle) : 5
+cles du code SANS texte dans content/ : 0
+invariant : le code ne peut pas referencer un libelle que content/ ne porte pas
+   coffre.cosmetiques.aucun         « Pilou toute simple »  canal les_deux, role libelle
+   coffre.cosmetiques.echarpe       « L'écharpe »  canal les_deux, role libelle
+   coffre.cosmetiques.bonnet        « Le bonnet à pompon »  canal les_deux, role libelle
+   coffre.cosmetiques.noeud         « Le petit nœud »  canal les_deux, role libelle
+   coffre.cosmetiques.lunettes      « Les lunettes rondes »  canal les_deux, role libelle
+libelles portant un chiffre, un jeton, un seuil ou une recompense : 0
+identifiants de variante declares par le code : aucun, echarpe, bonnet, noeud, lunettes
+
+========================================================================
 6. CHARTE SUR LES TEXTES ENFANT (ui-enfant.json)
 ========================================================================
-entrees enfant : 101, phrase la plus longue : lecture.sans_voix.corps (10 mots) : Je ne peux pas lire à voix haute ce soir
+entrees enfant : 106, phrase la plus longue : lecture.sans_voix.corps (10 mots) : Je ne peux pas lire à voix haute ce soir
 depassements de 12 mots : 0
 
 ========================================================================

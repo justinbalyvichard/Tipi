@@ -120,6 +120,37 @@ printf 'règle retenue -> %s occurrence(s)\n' "$(printf '%s' "$anim" | grep -c .
 [ -n "$anim" ] && { echo "$anim"; echec=1; }
 echo "-- durées déclarées --"
 grep -nE 'duree-(douce|posee):|respire 4s|pense-1 1.8s' src/styles/themes.css tailwind.config.ts
+echo "-- valeurs RECOPIÉES dans src/config/ui.config.ts : comparées, pas seulement imprimées --"
+echo "   Ajouté au tour 2 de G4.V1. Avant, ce bloc n'ouvrait jamais ui.config.ts :"
+echo "   il imprimait la source et laissait croire qu'il surveillait la copie."
+echo "   Le contrôle de code l'a prouvé en faisant diverger 160ms en 999ms sans"
+echo "   qu'aucun instrument ne rougisse (V1.review.md, MAJEUR 1)."
+comparer_jeton() {
+  # $1 = nom du jeton CSS, $2 = unité, $3 = constante TypeScript
+  local css ts
+  # `--` avant le motif : sans lui, un jeton CSS commençant par « -- » est pris
+  # pour une option de grep, et la comparaison échoue au lieu de comparer.
+  # C'est arrivé à la première version de ce bloc ; elle échouait FERMÉE
+  # (verdict ECHEC), jamais verte — c'est le seul mode de panne acceptable
+  # pour un instrument.
+  css=$(grep -oE -- "$1:[[:space:]]*[0-9]+$2" src/styles/themes.css | grep -oE '[0-9]+' | head -1)
+  ts=$(grep -oE -- "$3[[:space:]]*=[[:space:]]*[0-9]+" src/config/ui.config.ts | grep -oE '[0-9]+$' | head -1)
+  if [ -z "$css" ] || [ -z "$ts" ]; then
+    printf '   ECART : %s ou %s introuvable (css=%s ts=%s) — la comparaison ne peut pas se faire\n' \
+      "$1" "$3" "${css:-?}" "${ts:-?}"
+    echec=1
+    return
+  fi
+  if [ "$css" != "$ts" ]; then
+    printf '   ECART : themes.css %s = %s%s  MAIS  ui.config.ts %s = %s\n' "$1" "$css" "$2" "$3" "$ts"
+    echec=1
+  else
+    printf '   egal : themes.css %s = %s%s  ==  ui.config.ts %s = %s\n' "$1" "$css" "$2" "$3" "$ts"
+  fi
+}
+comparer_jeton '--tipi-duree-douce' 'ms' 'DUREE_DOUCE_MS'
+comparer_jeton '--tipi-duree-posee' 'ms' 'DUREE_POSEE_MS'
+comparer_jeton '--tipi-cible-min' 'px' 'CIBLE_TACTILE_MIN_PX'
 echo "-- prise en compte de prefers-reduced-motion --"
 grep -n 'prefers-reduced-motion' src/styles/themes.css || { echo "MANQUANT"; echec=1; }
 

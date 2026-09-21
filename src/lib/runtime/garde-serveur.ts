@@ -14,7 +14,7 @@
  *
  * Ce que cette garde NE prouve PAS : qu'aucun secret ne se trouve dans le
  * bundle. Seul l'artefact construit le prouve — c'est l'invariant I1 de
- * `scripts/verifier-socle.mjs`, qui lit `.next/static`.
+ * `scripts/verifier-socle.ts`, qui lit `.next/static`.
  */
 export function garderServeur(module: string): void {
   if (typeof window !== "undefined") {

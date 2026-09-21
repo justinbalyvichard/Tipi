@@ -40,6 +40,21 @@ const RACINE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
  */
 type Etat = "OK" | "PARTIEL" | "ÉCHEC";
 
+/**
+ * La porte que cet invariant garde. Un invariant peut voir un défaut réel qui
+ * n'appartient pas à la verticale courante : il le dit haut et fort à chaque
+ * passage, mais il ne fait échouer que SA porte.
+ *
+ * Introduit au tour 2 de G4.V1, sur l'arbitrage de l'Orchestrateur qui fait des
+ * cinq libellés de cosmétiques et des cinq seuils d'ARB-16 une **dépendance de
+ * la porte G4.V6**. Sans ce mécanisme, il n'y avait que deux issues, mauvaises
+ * toutes les deux : un instrument rouge en permanence, qu'on finit par ignorer,
+ * ou un défaut réel passé sous silence.
+ */
+type Porte = "V1" | "V6";
+
+const PORTES: readonly Porte[] = ["V1", "V6"];
+
 interface Resultat {
   readonly nom: string;
   readonly etat: Etat;
@@ -47,6 +62,7 @@ interface Resultat {
   readonly defauts: readonly string[];
   /** Ce que ce passage n'a pas pu mesurer. Vide si la couverture est entière. */
   readonly nonMesure: string | null;
+  readonly porte: Porte;
 }
 
 const resultats: Resultat[] = [];
@@ -55,7 +71,7 @@ function enregistrer(
   nom: string,
   examine: string,
   defauts: readonly string[],
-  options: { executable?: boolean; nonMesure?: string } = {},
+  options: { executable?: boolean; nonMesure?: string; porte?: Porte } = {},
 ): void {
   const executable = options.executable ?? true;
   const nonMesure = options.nonMesure ?? null;
@@ -64,7 +80,19 @@ function enregistrer(
     : nonMesure === null
       ? "OK"
       : "PARTIEL";
-  resultats.push({ nom, etat, examine, defauts, nonMesure });
+  resultats.push({ nom, etat, examine, defauts, nonMesure, porte: options.porte ?? "V1" });
+}
+
+/** Porte contrôlée par ce passage : `--porte=V1` (défaut) ou `--porte=V6`. */
+function porteCourante(): Porte {
+  const arg = process.argv.find((a) => a.startsWith("--porte="));
+  const valeur = arg?.slice("--porte=".length);
+  if (valeur === undefined) return "V1";
+  const trouvee = PORTES.find((p) => p === valeur);
+  if (trouvee === undefined) {
+    throw new Error(`Porte inconnue : ${valeur}. Portes possibles : ${PORTES.join(", ")}.`);
+  }
+  return trouvee;
 }
 
 // ---------------------------------------------------------------------------
@@ -218,34 +246,167 @@ function i1(): void {
 }
 
 // ---------------------------------------------------------------------------
-// I2 — PRD-02 : l'âge n'est stocké nulle part
+// I2 — PRD-02 : aucun âge n'est stockable, quel que soit le nom qu'on lui donne
 // ---------------------------------------------------------------------------
-// Invariant STRUCTUREL, et c'est ce qui le rend fort : il ne vérifie pas que
-// le calcul d'âge est juste (c'est le rôle du test), il vérifie qu'aucun
-// endroit où loger un âge n'existe. Une colonne `age` rendrait possible la
-// faute que PRD-02 nomme, et serait fausse chaque 29 novembre au soir.
+// RÉÉCRIT AU TOUR 2 DE G4.V1, après le MAJEUR 2 de `controle-code`.
+//
+// La version du tour 1 cherchait un NOM (`/^age|[Aa]ge$/`). Le contrôleur l'a
+// mise en défaut en une ligne : `anneesRevolues Int @default(6)` — le même âge
+// figé, sous un autre nom — passait vert, dans le schéma comme dans le seed. Un
+// invariant qui cherche cinq lettres se contourne en renommant, et le rapport
+// le présentait pourtant comme « structurel ». Le motif produisait en outre des
+// faux positifs sur `stockage`, `langage`, `message`.
+//
+// La version ci-dessous cherche la PROPRIÉTÉ, pas l'étiquette. Trois
+// sous-invariants, dont deux totalement indépendants du nom des champs :
+//
+//   I2a — AUCUN champ scalaire de `child` n'est numérique, hormis `gemBalance`.
+//         Un âge est un nombre. Sous n'importe quel nom, il tombe ici.
+//         `gemBalance` est la seule exception, et elle est nommée : c'est un
+//         solde, recalculable depuis `gem_ledger` (TEC-11), pas une donnée
+//         dérivable de `date_naissance`.
+//
+//   I2b — L'ensemble des champs scalaires de `child` est EXACTEMENT l'ensemble
+//         déclaré ci-dessous. Invariant de réciprocité, dans les deux sens :
+//         un champ ajouté au schéma et absent de la liste rougit, un champ
+//         déclaré ici et disparu du schéma aussi. Il attrape un âge même
+//         stocké en `String` (« 6 ans »), que I2a laisserait passer.
+//         Le prix à payer est assumé : toute évolution de `child` doit passer
+//         par cette liste. C'est voulu — `child` est fixée par la section 3.7
+//         du prompt maître, une colonne de plus y est une décision
+//         d'architecture, pas un détail d'implémentation.
+//
+//   I2c — Aucun champ, dans AUCUN modèle, ne porte le segment « age ». C'est
+//         l'ancien contrôle, conservé comme troisième filet parce qu'il couvre
+//         les neuf autres modèles, corrigé de ses faux positifs par découpage
+//         en segments camelCase (`stockage` n'est plus signalé, `ageAnnees`
+//         l'est toujours). Il est déclaré pour ce qu'il est : une heuristique
+//         de nommage, jamais la garantie.
+//
+// Ce que I2 ne fait toujours pas, et il faut le dire : il ne prouve pas que
+// `ageEnAnnees()` calcule juste. C'est le rôle des 16 tests de
+// `src/lib/dates/age.test.ts`, et notamment de leur §4.
+
+/** Les 12 champs scalaires de `child`, section 3.7 + `prisma/schema.prisma`. */
+const CHAMPS_CHILD_DECLARES: readonly string[] = [
+  "id",
+  "familyId",
+  "prenom",
+  "dateNaissance",
+  "niveauScolaire",
+  "classeBilingue",
+  "gemBalance",
+  "themePrefere",
+  "cosmetiqueActive",
+  "onboardingTermineLe",
+  "createdAt",
+  "updatedAt",
+];
+
+/**
+ * Le seul champ numérique autorisé sur `child`, et son motif : c'est un solde
+ * recalculable depuis `gem_ledger` (TEC-11, SEC-06), pas une valeur dérivable
+ * de `date_naissance`.
+ */
+const CHAMPS_CHILD_NUMERIQUES_AUTORISES: readonly string[] = ["gemBalance"];
+
+const TYPES_NUMERIQUES = ["Int", "BigInt", "Float", "Decimal"];
+
+interface ChampPrisma {
+  readonly nom: string;
+  readonly type: string;
+  readonly relation: boolean;
+}
+
+function champsDuModele(corps: string): readonly ChampPrisma[] {
+  const champs: ChampPrisma[] = [];
+  for (const ligne of corps.split("\n")) {
+    const nu = ligne.trim();
+    if (nu === "" || nu.startsWith("//") || nu.startsWith("///") || nu.startsWith("@@")) continue;
+    const m = /^(\w+)\s+(\w+)(\[\])?(\?)?/u.exec(nu);
+    if (m?.[1] === undefined || m[2] === undefined) continue;
+    champs.push({
+      nom: m[1],
+      type: m[2],
+      // Une relation porte `@relation` ou est un tableau de modèle.
+      relation: nu.includes("@relation") || m[3] === "[]",
+    });
+  }
+  return champs;
+}
+
+/** Découpe un nom camelCase ou snake_case en segments minuscules. */
+function segments(nom: string): readonly string[] {
+  return nom
+    .replace(/([a-z0-9])([A-Z])/gu, "$1_$2")
+    .split("_")
+    .map((s) => s.toLowerCase())
+    .filter((s) => s !== "");
+}
 
 function i2(): void {
   const schema = readFileSync(join(RACINE, "prisma", "schema.prisma"), "utf8");
   const defauts: string[] = [];
 
   const modeles = [...schema.matchAll(/model\s+(\w+)\s*\{([^}]*)\}/gu)];
+  const child = modeles.find((m) => m[1] === "Child");
+  if (child === undefined) {
+    enregistrer(
+      "I2 — PRD-02 : aucun âge stockable, quel que soit son nom",
+      "modèle Child : INTROUVABLE",
+      ["Le modèle `Child` est absent de prisma/schema.prisma : l'instrument ne mesure rien."],
+      { executable: false },
+    );
+    return;
+  }
+
+  const champsChild = champsDuModele(child[2] ?? "").filter((c) => !c.relation);
+
+  // --- I2a : aucun champ numérique hors gemBalance ------------------------
+  for (const champ of champsChild) {
+    if (
+      TYPES_NUMERIQUES.includes(champ.type) &&
+      !CHAMPS_CHILD_NUMERIQUES_AUTORISES.includes(champ.nom)
+    ) {
+      defauts.push(
+        `I2a — Child.${champ.nom} est de type ${champ.type} : un champ numérique sur child peut porter un âge (PRD-02). Seul ${CHAMPS_CHILD_NUMERIQUES_AUTORISES.join(", ")} est autorisé.`,
+      );
+    }
+  }
+
+  // --- I2b : réciprocité de l'ensemble déclaré ----------------------------
+  const reels = new Set(champsChild.map((c) => c.nom));
+  for (const nom of reels) {
+    if (!CHAMPS_CHILD_DECLARES.includes(nom)) {
+      defauts.push(
+        `I2b — Child.${nom} existe dans le schéma mais n'est pas déclaré dans CHAMPS_CHILD_DECLARES. Toute colonne ajoutée à child doit être examinée : c'est là qu'un âge se loge.`,
+      );
+    }
+  }
+  for (const nom of CHAMPS_CHILD_DECLARES) {
+    if (!reels.has(nom)) {
+      defauts.push(
+        `I2b — Child.${nom} est déclaré ici mais absent du schéma : la liste a dérivé, l'invariant ne protège plus ce qu'il croit protéger.`,
+      );
+    }
+  }
+
+  // --- I2c : heuristique de nommage, sur les dix modèles ------------------
   let champsExamines = 0;
   for (const modele of modeles) {
-    const nom = modele[1] ?? "";
-    const corps = modele[2] ?? "";
-    for (const ligne of corps.split("\n")) {
-      const champ = /^\s*(\w+)\s+\w/u.exec(ligne);
-      if (champ?.[1] === undefined) continue;
+    const nomModele = modele[1] ?? "";
+    for (const champ of champsDuModele(modele[2] ?? "")) {
       champsExamines += 1;
-      if (/^age|[Aa]ge$/u.test(champ[1])) {
-        defauts.push(`${nom}.${champ[1]} : le modèle expose un champ d'âge (PRD-02).`);
+      if (segments(champ.nom).includes("age")) {
+        defauts.push(
+          `I2c — ${nomModele}.${champ.nom} porte le segment « age » (PRD-02).`,
+        );
       }
     }
   }
   if (champsExamines === 0) {
     enregistrer(
-      "I2 — PRD-02 : aucun âge stocké",
+      "I2 — PRD-02 : aucun âge stockable, quel que soit son nom",
       "schema.prisma : AUCUN champ lu",
       ["Le schéma n'a produit aucun champ : l'instrument ne mesure rien."],
       { executable: false },
@@ -253,14 +414,34 @@ function i2(): void {
     return;
   }
 
+  // --- le seed : mêmes trois filets, appliqués à ce qu'il écrit -----------
+  // Un champ écrit par le seed et absent du schéma ne compile pas (Prisma le
+  // type), donc I2b couvre déjà le seed par transitivité. Ce contrôle-ci
+  // attrape le cas restant : une valeur numérique littérale posée sur child.
   const seed = readFileSync(join(RACINE, "prisma", "seed.ts"), "utf8");
-  if (/\bage\s*:/iu.test(seed)) {
-    defauts.push("prisma/seed.ts écrit un champ `age` (PRD-02).");
+  const bloc = /const EVAN = \{([\s\S]*?)\} as const;/u.exec(seed);
+  if (bloc?.[1] === undefined) {
+    defauts.push(
+      "I2 — le bloc `const EVAN = { … } as const;` est introuvable dans prisma/seed.ts : l'instrument ne peut plus lire ce que le seed écrit.",
+    );
+  } else {
+    for (const ligne of bloc[1].split("\n")) {
+      const m = /^\s*(\w+)\s*:\s*(.+?),?\s*(\/\/.*)?$/u.exec(ligne);
+      if (m?.[1] === undefined || m[2] === undefined) continue;
+      if (/^-?\d+(\.\d+)?$/u.test(m[2].trim())) {
+        defauts.push(
+          `I2 — prisma/seed.ts écrit la valeur numérique littérale ${m[2].trim()} sur child.${m[1]} : un âge figé se loge exactement là (PRD-02).`,
+        );
+      }
+      if (segments(m[1]).includes("age")) {
+        defauts.push(`I2 — prisma/seed.ts écrit child.${m[1]} (PRD-02).`);
+      }
+    }
   }
 
   enregistrer(
-    "I2 — PRD-02 : aucun âge stocké",
-    `${modeles.length} modèles, ${champsExamines} champs de prisma/schema.prisma + prisma/seed.ts`,
+    "I2 — PRD-02 : aucun âge stockable, quel que soit son nom",
+    `I2a ${champsChild.length} champs scalaires de child, ${CHAMPS_CHILD_NUMERIQUES_AUTORISES.length} numérique autorisé · I2b réciprocité sur ${CHAMPS_CHILD_DECLARES.length} champs déclarés · I2c ${champsExamines} champs sur ${modeles.length} modèles · plus le bloc EVAN de prisma/seed.ts`,
     defauts,
   );
 }
@@ -404,25 +585,109 @@ function i5(): void {
 }
 
 // ---------------------------------------------------------------------------
+// I6 — dépendance de la porte G4.V6 : les cosmétiques sans libellé ni seuil
+// ---------------------------------------------------------------------------
+// AJOUTÉ AU TOUR 2 DE G4.V1, sur arbitrage de l'Orchestrateur.
+//
+// Deux manques portent sur les mêmes cinq lignes de `src/config/mascot.config.ts` :
+//
+//   1. les cinq `cleLibelle` (`coffre.cosmetiques.aucun`, `.echarpe`, `.bonnet`,
+//      `.noeud`, `.lunettes`) sont ABSENTES de `content/` — relevé par
+//      `controle-design` en P3 (§8, point 5) et jamais refermé. Or
+//      `src/content/loader.ts` LÈVE sur une clé absente, volontairement : la
+//      première verticale qui câble `cleLibelle` fait donc tomber l'écran du
+//      coffre. C'est V6 ;
+//   2. les cinq `pierresRequises` sont à `null` depuis ARB-16, qui a sorti les
+//      seuils 0/15/30/45/60 du code en attendant une décision produit.
+//
+// Aucun des deux n'appartient à V1 : les textes sont réservés à `contenu-enfant`
+// (ARB-10), les seuils à une décision produit (ARB-16). Cet invariant les VOIT et
+// les NOMME à chaque passage, et il fait échouer la porte **V6**, pas V1.
+//
+// Il est donc rouge aujourd'hui, et c'est son état attendu. Le jour où les cinq
+// libellés et les cinq seuils arrivent, il passe vert sans qu'on y touche — la
+// preuve dans les deux sens est en §0.3 de docs/agents/P4/V1.out.md.
+
+function i6(): void {
+  const mascot = readFileSync(join(RACINE, "src", "config", "mascot.config.ts"), "utf8");
+  const lignes = [
+    ...mascot.matchAll(
+      /\{\s*id:\s*"([^"]+)",\s*cleLibelle:\s*"([^"]+)",\s*pierresRequises:\s*([^\s,}]+)/gu,
+    ),
+  ];
+
+  if (lignes.length === 0) {
+    enregistrer(
+      "I6 — G4.V6 : chaque cosmétique a son libellé et son seuil",
+      "mascot.config.ts : AUCUNE cosmétique lue",
+      ["Aucune cosmétique trouvée dans mascot.config.ts : l'instrument ne mesure rien."],
+      { executable: false, porte: "V6" },
+    );
+    return;
+  }
+
+  const toutes = new Set([...clesUiFixes(), ...clesBanque()]);
+  const defauts: string[] = [];
+  for (const ligne of lignes) {
+    const id = ligne[1] ?? "";
+    const cle = ligne[2] ?? "";
+    const seuil = ligne[3] ?? "";
+    if (!toutes.has(cle)) {
+      defauts.push(
+        `${id} : la clé ${cle} est absente de content/ — loader.texteUi() lèvera, et l'écran du coffre tombera (ARB-10, à produire par contenu-enfant).`,
+      );
+    }
+    if (seuil === "null") {
+      defauts.push(`${id} : pierresRequises est null — décision produit attendue (ARB-16).`);
+    }
+  }
+
+  enregistrer(
+    "I6 — G4.V6 : chaque cosmétique a son libellé et son seuil",
+    `${lignes.length} cosmétiques de mascot.config.ts, contre ${toutes.size} clés portées par content/`,
+    defauts,
+    { porte: "V6" },
+  );
+}
+
+// ---------------------------------------------------------------------------
 
 i1();
 i2();
 i3();
 i4();
 i5();
+i6();
 
-let echecs = 0;
+const porte = porteCourante();
+
+let echecsPorte = 0;
+let echecsAutrePorte = 0;
 let partiels = 0;
 for (const r of resultats) {
-  console.info(`[${r.etat.padEnd(7)}] ${r.nom}`);
+  const marque = r.porte === porte ? r.etat : `${r.etat}/${r.porte}`;
+  console.info(`[${marque.padEnd(10)}] ${r.nom}`);
   console.info(`          examiné : ${r.examine}`);
   for (const d of r.defauts) console.info(`          DÉFAUT : ${d}`);
   if (r.nonMesure !== null) console.info(`          NON MESURÉ : ${r.nonMesure}`);
-  if (r.etat === "ÉCHEC") echecs += 1;
-  if (r.etat === "PARTIEL") partiels += 1;
+  if (r.etat === "ÉCHEC") {
+    if (r.porte === porte) echecsPorte += 1;
+    else echecsAutrePorte += 1;
+  }
+  if (r.etat === "PARTIEL" && r.porte === porte) partiels += 1;
 }
-const couverts = resultats.length - partiels - echecs;
+
+const couverts = resultats.length - partiels - echecsPorte - echecsAutrePorte;
 console.info(
-  `\n${resultats.length} invariants : ${couverts} vérifiés entièrement, ${partiels} partiels, ${echecs} en échec.`,
+  `\nPorte contrôlée : ${porte}. ${resultats.length} invariants : ${couverts} vérifiés entièrement, ${partiels} partiels, ${echecsPorte} en échec pour ${porte}, ${echecsAutrePorte} en échec pour une porte ultérieure.`,
 );
-process.exitCode = echecs === 0 ? 0 : 1;
+
+// Codes de sortie, corrigés au tour 2 après le MINEUR 6 de `controle-code` :
+// `PARTIEL` ne doit PAS rendre 0. Une chaîne automatisée ne lit que ce nombre,
+// et un contrôle qui n'a rien mesuré ne doit pas y passer pour vert.
+//   0 = tout vérifié entièrement pour la porte contrôlée
+//   1 = au moins un invariant en échec pour la porte contrôlée
+//   2 = aucun échec, mais au moins un invariant PARTIEL
+// Un échec sur une porte ULTÉRIEURE est imprimé et n'affecte pas ce code : il
+// est opposable à sa porte, contrôlée par `--porte=V6`.
+process.exitCode = echecsPorte > 0 ? 1 : partiels > 0 ? 2 : 0;

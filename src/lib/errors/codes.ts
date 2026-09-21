@@ -15,7 +15,7 @@
  * `cleContenu` peut être une clé exacte ou une FAMILLE, suffixée `.*` : la
  * famille désigne le groupe titre/corps/bouton d'un même état, dont le tableau
  * de P2 §10.1 ne nomme pas les membres un par un. L'invariant I3 de
- * `scripts/verifier-socle.mjs` vérifie que chaque clé et chaque famille est
+ * `scripts/verifier-socle.ts` vérifie que chaque clé et chaque famille est
  * réellement portée par `content/`.
  */
 

@@ -113,7 +113,7 @@ export const CLE_FIN_TRAVAIL: CleEffective = Object.freeze({
 /**
  * Les treize clés effectives de la table 7.0, à plat.
  *
- * Existe pour être vérifiée : l'invariant I5 de `scripts/verifier-socle.mjs`
+ * Existe pour être vérifiée : l'invariant I5 de `scripts/verifier-socle.ts`
  * contrôle que chacune est portée par la source déclarée, et par elle seule.
  * Une clé annoncée « banque » mais rangée dans `ui-enfant.json` serait jouée
  * sans variantes, et le Soir léger redeviendrait détectable.

@@ -80,7 +80,7 @@ export type FichierUi = z.infer<typeof FichierUi>;
  * Une partie d'une variante : le morceau de phrase qui va dans une clé
  * d'écran donnée. La règle `raccordement` du fichier pose que le champ `texte`
  * de la variante est toujours la jointure de ses parties, dans l'ordre : c'est
- * ce que lit le TTS. L'invariant I4 de `scripts/verifier-socle.mjs` le vérifie
+ * ce que lit le TTS. L'invariant I4 de `scripts/verifier-socle.ts` le vérifie
  * sur les 460 variantes plutôt que de le supposer.
  */
 export const PartieVariante = z
