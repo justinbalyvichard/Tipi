@@ -1,9 +1,872 @@
-VERDICT: FAIL
+VERDICT: PASS_AVEC_RESERVES
 
-# P3 — Contrôle du design system
+# P3 — Contrôle du design system — TOUR 2
 
 Contrôleur : `controle-design` (lecture seule). Producteur : `design-system`.
-Porte : G3. Date : 2026-09-21. Livrable contrôlé :
+Porte : G3. Tour 2 sur 3. Date : 2026-09-21.
+
+**Les deux [MAJEUR] du tour 1 sont levés. Aucun [BLOQUANT], aucun [MAJEUR] au
+tour 2. Huit [MINEUR], dont aucun n'empêche la porte de s'ouvrir.**
+
+J'ai tout rejoué : la chaîne de construction, les trois instruments, la mesure
+navigateur des cibles tactiles, l'arbre d'accessibilité, et surtout **ma propre
+mesure de contraste, indépendante de la sienne**. J'ai refait moi-même la
+manipulation qui compte — son nouvel instrument relancé sur le code du tour 1 —
+et je la reproduis exactement.
+
+Le point aveugle que j'avais nommé au tour 1 est réellement comblé : l'invariant
+« toute couleur calculée contre son fond effectif est mesurée » est implémenté,
+sans liste, et il trouve tout seul le défaut qu'il était censé trouver sur du
+code qui lui est antérieur. C'est la bonne façon de prouver un instrument, et
+c'est rare.
+
+---
+
+# TOUR 2
+
+## 1. Sort des douze constats du tour 1
+
+| # | Gravité T1 | Constat | Sort, vérifié par moi |
+| --- | --- | --- | --- |
+| 1 | [MAJEUR] | `lunettes` à 2,05:1, instrument aveugle | **LEVÉ** — §2.1 |
+| 2 | [MAJEUR] | `silhouette` écrase le cosmétique | **LEVÉ** — §2.2 |
+| 3 | [MINEUR] | Couple `texte-appui` / `teinte-bleu` absent de la liste | **Corrigé** — couple ajouté (70 au lieu de 68), **5,22:1** publié, identique au centième à ma mesure navigateur du tour 1. La cause est surtout supprimée : il n'y a plus de liste à tenir. |
+| 4 | [MINEUR] | États désactivés non mesurés | **Corrigé et dépassé** — l'instrument de rendu compose l'alpha ; les 6 états désactivés sont mesurés et publiés. La touche « Effacer », désactivée dès l'ouverture, passe de 40 % à 60 % d'opacité : **2,32 → 4,44:1** en thème Apple *(et 3,97:1 en thème Pilou, chiffre que le rapport ne donne pas)*. |
+| 5 | [MINEUR] | `#6E6E73` annoncé à 5,15:1 | **Corrigé** en 5,07:1. Recalculé par moi : 5,0713. |
+| 6 | [MINEUR] | « Seul fichier du dépôt » inexact | **Corrigé aux deux endroits**, et le contrôle 1 balaie désormais le dépôt entier, valeurs sans dièse comprises, nomme ses trois porteurs légitimes et échoue sur tout porteur inattendu. Rejoué : 3 porteurs trouvés, 3 déclarés, 0 inattendu. |
+| 7 | [MINEUR] | Cinq clés de contenu pendantes | **Hors périmètre** par ARB-10. Le manque est inscrit dans `mascot.config.ts`. Reste à produire avant V6 — voir §5. |
+| 8 | [MINEUR] | Seuils 0/15/30/45/60 sans source | **Corrigé par ARB-16** — §2.4 |
+| 9 | [MINEUR] | Défauts de dessin | **2 corrigés sur 4**, 2 portés en question ouverte — §2.5 |
+| 10 | [MINEUR] | Deux jetons de palette sans rôle, invisibles d'I2 | **Corrigé** — invariant **I3** ajouté. Rejoué : `entrées de palette : 27 ; sans rôle : 2 ; sans rôle ET non déclarées : 0`. |
+| 11 | [MINEUR] | Branche morte + `var(--x, repli)` silencieux | **Corrigés.** Il publie en plus une régression qu'il s'est infligée en corrigeant — un rejet trop large qui faisait échouer l'instrument sur les piles de polices — trouvée en rejouant, corrigée. Vérifié : `var(--x, repli)` lève, `var(--police-baloo), "Baloo 2", …` passe. |
+| 12 | [MINEUR] | §8.2 « aucun commit git » devenu faux | **Corrigé.** |
+
+**Douze constats sur douze traités.** Aucun n'est resté sans réponse, aucun
+n'a été refermé en silence.
+
+---
+
+## 2. Vérification des deux [MAJEUR]
+
+### 2.1 [MAJEUR] 1 — LEVÉ
+
+Le code, d'abord. `src/components/pilou/Pilou.tsx` :
+
+```tsx
+    case "lunettes":
+      // Monture dessinée comme un ANNEAU PLEIN en `fill`, cerné par le trait
+      // d'encre du groupe parent — jamais un `stroke` de la couleur du
+      // cosmétique. Le `fill-rule` évidé laisse les yeux visibles.
+      return (
+        <g>
+          <path fillRule="evenodd" fill={couleur} d="M53 58a13 13 0 1 0 26 0 13 13 0 1 0-26 0zM56.5 58a9.5 9.5 0 1 0 19 0 9.5 9.5 0 1 0-19 0z" />
+```
+
+Le `<g fill="none" stroke={couleur}>` qui annulait le trait d'encre a disparu.
+
+**Ma mesure, indépendante de son instrument** (styles calculés du navigateur,
+implémentation WCAG recodée par moi) :
+
+| Thème | Forme | Trait | r(trait) | Remplissage | r(rempl.) | Meilleur |
+| --- | --- | --- | --- | --- | --- | --- |
+| pilou | monture `lunettes` | `rgb(46,42,38)` | **13,49** | `rgb(111,184,232)` | 2,05 | **13,49:1** |
+| apple | monture `lunettes` | `rgb(29,29,31)` | **15,45** | `rgb(0,122,255)` | 3,68 | **15,45:1** |
+
+Plus aucun `<g>` ne porte un `stroke` de couleur cosmétique. Contrôlé au rendu :
+2,05:1 → 13,49:1. **Les chiffres annoncés sont exacts.**
+
+**J'ai cherché une autre variante qui échapperait à la règle**, sur les trois
+axes demandés :
+
+```
+=== toute redéfinition de stroke / fill / opacity dans Pilou.tsx ===
+  stroke=  : ligne 167 (le groupe parent, qui le POSE) ;
+             lignes 194, 195 (joues), 198, 199 (yeux), 203 (truffe) → stroke="none"
+  opacity  : aucune occurrence
+  fill=    : 27 occurrences, toutes des remplissages sous le trait du groupe parent
+```
+
+Les trois formes à `stroke="none"` sans `data-tipi-decor` sont les **yeux** et
+la **truffe** : elles ne s'appuient que sur leur remplissage, qui vaut l'encre —
+13,49:1 et 15,45:1 mesurés. Aucune ne s'échappe. Les deux seules formes
+exemptées sont les joues, marquées.
+
+**La règle est-elle inscrite dans le composant ?** Oui, `Pilou.tsx` lignes
+20-31, en toutes lettres : « toute forme colorée est *cernée* par le trait
+d'encre du groupe parent. Une variante ne redéfinit jamais `stroke` ». Mais je
+dois être exact sur la nature de cette garantie : **c'est de la prose, aucun
+contrôle statique ne la fait respecter.** Ce qui la fait respecter, c'est
+l'instrument de rendu, qui en mesure la *conséquence* — et c'est la garantie la
+plus forte des deux, puisqu'elle attrape aussi les violations que personne
+n'avait prévu de nommer. La preuve en est faite au §3. Sa limite est au §4,
+constat 13.
+
+### 2.2 [MAJEUR] 2 — LEVÉ
+
+`silhouette` et `cosmetiqueVerrouille` sont deux propriétés distinctes, et le
+forçage `silhouette ? "aucun" : cosmetique` a disparu :
+
+```tsx
+  const cosmetiqueNeutre = silhouette || cosmetiqueVerrouille;
+  const couleursCosmetique: CouleursCosmetique = cosmetiqueNeutre
+    ? { principale: neutre, secondaire: neutre }
+    : { principale: jeton(P.cosmetique), secondaire: jeton(P.cosmetiqueSecondaire) };
+  …
+        <Cosmetique id={cosmetique} couleurs={couleursCosmetique} />
+```
+
+**J'ai regardé le rendu, dans les deux thèmes.** Les quatre vignettes
+verrouillées sont là et elles sont **franchement distinctes** : l'écharpe
+grise autour du cou, le bonnet gris avec son bandeau et son pompon, le nœud
+gris sur l'oreille, les lunettes grises sur les yeux. Un enfant voit la
+*forme* de ce qui l'attend, et les quatre ne se confondent pas. C'est
+exactement ce que demande le livrable marketing §7.9 et ce que le tour 1 ne
+rendait pas.
+
+Mesuré, le cosmétique verrouillé porte **deux** contrastes et non un :
+
+| Thème | Cosmétique verrouillé | Trait d'encre | Remplissage neutre |
+| --- | --- | --- | --- |
+| pilou | `--pilou-silhouette` cerné | **13,49:1** | **3,67:1** |
+| apple | idem | **15,45:1** | **3,32:1** |
+
+Les deux dépassent 3:1. Les chiffres annoncés (3,67 / 3,32) sont les
+remplissages : annonce conservatrice, le trait est bien meilleur.
+
+Je note au crédit du producteur qu'il a **ajouté les vignettes à la page pour
+que le contrôle visuel puisse les voir**, et l'a écrit dans le code. C'est la
+bonne leçon du tour 1 : un défaut que seul l'œil attrape n'est attrapé que si
+quelque chose est rendu à l'écran.
+
+---
+
+## 3. L'instrument de rendu : conception, et sa preuve refaite par moi
+
+### 3.1 Ce que je valide dans la conception
+
+`scripts/verifier-contraste-rendu.mjs` tient l'invariant que j'avais nommé, et
+le tient vraiment. J'ai lu les 359 lignes :
+
+- **Aucune liste.** `document.querySelectorAll("body *")` pour le texte,
+  `svg path, svg circle, svg rect, svg ellipse, svg line, svg polygon, svg polyline`
+  pour les tracés. Une forme nouvelle est couverte sans que personne y pense.
+- **Le fond est calculé**, en remontant les ancêtres jusqu'au premier fond non
+  transparent, et l'alpha est composé, opacité des ancêtres comprise
+  (`opaciteCumulee`). C'est ce qui lui permet de voir les états désactivés que
+  l'instrument de couples ne pouvait pas voir.
+- **La règle « trait OU remplissage ≥ 3:1 »** est la bonne traduction mesurable
+  du dessin de Pilou : un remplissage faible est acceptable *parce qu'il est
+  cerné*, et cesse de l'être quand le trait disparaît. C'est précisément ce qui
+  attrape `lunettes` sans qu'on la nomme.
+- **Une seule porte de sortie, `data-tipi-decor`**, et les exemptés sont
+  **mesurés et publiés quand même**, avec leur ratio et leur motif. L'exemption
+  est visible, jamais silencieuse. Vérifié dans la sortie : section C, 10
+  lignes, chacune avec son chiffre.
+- **Les limites sont déclarées dans la sortie elle-même**, pas seulement dans
+  le rapport : bordures CSS non couvertes, et fond d'une forme SVG = fond CSS
+  du conteneur, jamais la forme dessinée dessous.
+
+### 3.2 La preuve, refaite intégralement par moi
+
+C'est le point que l'Orchestrateur me demandait de ne pas croire. Je l'ai refait
+de bout en bout, sans réutiliser quoi que ce soit du producteur :
+
+```
+$ git archive dad1524 | tar -x -C <scratch>/tour1     # le code du TOUR 1
+$ sed -n '73,82p' <scratch>/tour1/src/components/pilou/Pilou.tsx
+    case "lunettes":
+      return (
+        <g fill="none" stroke={couleur} strokeLinecap="round">
+          <circle cx="66" cy="58" r="13" />
+          …
+$ cd <scratch>/tour1 && npx next build && npx next start -p 3219
+$ cd /home/user/Tipi && TIPI_URL=http://127.0.0.1:3219/dev/design-system \
+    node scripts/verifier-contraste-rendu.mjs
+```
+
+Sortie réelle, instrument du **tour 2** sur le code du **tour 1** :
+
+```
+URL : http://127.0.0.1:3219/dev/design-system
+Éléments : 975 · SVG Pilou : 22 · SVG icône : 59 · marqués `data-tipi-decor` : 0
+Textes relevés : 127 · formes relevées : 537
+
+| 6  | pilou | Icon  | 3× path   | rgb(216, 204, 184) | 1.58 | none               | —    | 1.58:1 | *** SOUS SEUIL *** |
+| 11 | pilou | Pilou | 20× circle| none               | —    | rgb(255, 139, 123) | 2.15 | 2.15:1 | *** SOUS SEUIL *** |
+| 18 | pilou | Pilou | 4× circle | rgb(111, 184, 232) | 2.05 | none               | —    | 2.05:1 | *** SOUS SEUIL *** |
+| 24 | apple | Icon  | 3× path   | rgb(199, 199, 204) | 1.68 | none               | —    | 1.68:1 | *** SOUS SEUIL *** |
+| 29 | apple | Pilou | 20× circle| none               | —    | rgb(255, 149, 0)   | 2.01 | 2.01:1 | *** SOUS SEUIL *** |
+
+Textes mesurés : 123. Groupes de tracés mesurés : 38 (537 formes).
+Sous leur seuil : 5.
+=== VERDICT DE L INSTRUMENT : ECHEC ===
+EXIT=1
+```
+
+**Reproduit.** Ligne 18 : `4× circle` avec `stroke: rgb(111,184,232)` à
+**2,05:1** — la monture des `lunettes` du tour 1, trouvée par l'instrument
+seul, sur du code qu'il n'a jamais vu, sans que rien ne la lui désigne. C'est
+la règle 1 de « Corriger un instrument de mesure » appliquée dans le bon sens,
+et c'est la meilleure preuve qu'un instrument puisse produire.
+
+Cette manipulation prouve du même coup les **trois** échappatoires que
+l'Orchestrateur me demandait de tester, sans que j'aie à modifier un fichier de
+production :
+
+| Échappatoire | Cas du tour 1 qui le démontre | Attrapé ? |
+| --- | --- | --- |
+| une variante redéfinit `stroke` | `lunettes`, stroke cosmétique, `fill="none"` | **oui**, 2,05:1 |
+| une variante n'a qu'un `fill` faible, `stroke="none"` | les joues, 2,15 / 2,01:1 | **oui** |
+| une opacité réduit le contraste | boutons désactivés, 2,93 / 2,33:1 | **oui**, alpha composé |
+
+### 3.3 Ce que la preuve montre aussi, et qui doit être dit
+
+L'instrument signale **5 groupes** sur le code du tour 1, pas un. Or le tour 2
+en sort à zéro. Le compte mérite d'être décomposé, parce que « 5 → 0 » se lit
+comme cinq réparations :
+
+| Groupe signalé sur le tour 1 | Ratio T1 | Ratio T2 | Traitement réel |
+| --- | --- | --- | --- |
+| monture `lunettes`, pilou | 2,05:1 | **13,49:1** | **réparé** |
+| chevron `ListRow`, pilou | 1,58:1 | 1,58:1 | **exempté** `data-tipi-decor="chevron"` |
+| chevron `ListRow`, apple | 1,68:1 | 1,68:1 | **exempté** |
+| joues de Pilou, pilou | 2,15:1 | 2,15:1 | **exempté** `data-tipi-decor="joue"` |
+| joues de Pilou, apple | 2,01:1 | 2,01:1 | **exempté** |
+
+**Une réparation, quatre exemptions déclarées.** Les quatre exemptions sont
+légitimes et je ne peux pas dire le contraire : j'ai moi-même accepté ces deux
+classements au tour 1, nommément — « les chevrons… : accepté », « les joues… :
+accepté également ». Elles sont explicites, marquées dans le code, et publiées
+avec leur ratio. Mais le rapport présente le passage à zéro sans cette
+décomposition, et un lecteur pressé y verra cinq défauts corrigés. Voir constat
+14.
+
+### 3.4 Son honnêteté sur ce que l'instrument n'attrape pas
+
+Il écrit que l'instrument **ne trouve pas** le [MAJEUR] 2, parce que c'est un
+défaut d'API et non de contraste. C'est exact, et c'est vérifiable : sur le code
+du tour 1, aucune ligne ne signale que les quatre paliers verrouillés sont
+identiques — l'instrument mesurait quatre silhouettes grises parfaitement
+conformes à 3,67:1. Le déclarer plutôt que de laisser croire que l'instrument
+couvre tout est exactement ce que le protocole demande, et c'est ce qui
+distingue un instrument honnête d'une preuve verte. **Je valide.**
+
+Cela dit, l'invariant qui aurait attrapé le [MAJEUR] 2 existe et le protocole le
+nomme : « un ensemble déclaré dont aucun élément ne doit rester inemployé ».
+Voir constat 13.
+
+---
+
+## 4. Les garde-fous de l'incident du serveur resté lié au port
+
+C'est la classe de défaut la plus dangereuse du projet, et l'Orchestrateur a
+raison de me demander de la sonder plutôt que de la lire.
+
+### 4.1 La garde de vraisemblance mord — vérifié
+
+```
+$ TIPI_URL=http://127.0.0.1:3218/page-inexistante node scripts/verifier-contraste-rendu.mjs
+
+URL : http://127.0.0.1:3218/page-inexistante
+Éléments : 13 · SVG Pilou : 0 · SVG icône : 0 · marqués `data-tipi-decor` : 0
+Textes relevés : 2 · formes relevées : 0
+
+=== RELEVÉ INVRAISEMBLABLE — L INSTRUMENT REFUSE DE CONCLURE ===
+  textes 2 < 60
+  formes 0 < 300
+  SVG Pilou 0 < 20
+
+La page mesurée n'est pas celle attendue : serveur d'une version
+antérieure resté lié au port, page non hydratée, ou mauvaise URL.
+EXIT=3
+```
+
+Elle refuse de conclure, sort en **3**, nomme les trois planchers franchis, et
+imprime l'empreinte **avant** de refuser — donc un humain voit ce qui a été
+mesuré. Le scénario « textes 0, VERDICT OK » ne peut plus se produire.
+
+### 4.2 L'empreinte discrimine les deux versions — vérifié
+
+```
+tour 2   {"elements":1185,"marques":66,"parMotif":{"chevron":6,"joue":60},"css":["733c0eba765c5569.css"]}
+tour 1   {"elements":975, "marques":0, "parMotif":{},                      "css":["1abceefbb8828677.css"]}
+```
+
+Quatre des six nombres de l'empreinte diffèrent, et `marqués : 0` contre `66`
+est un discriminant net. Un humain qui lit l'empreinte voit immédiatement qu'il
+a mesuré la mauvaise version.
+
+### 4.3 Mais la garde seule n'aurait pas attrapé l'incident — vérifié
+
+C'est la nuance que je dois publier. Sur la page du **tour 1** :
+127 textes ≥ 60, 537 formes ≥ 300, 22 SVG Pilou ≥ 20. **Les trois planchers
+sont franchis : la garde ne se déclenche pas.** Or c'est exactement le scénario
+de l'incident — un serveur d'une version antérieure resté lié au port.
+
+La garde couvre donc le cas catastrophique (page vide, mauvaise URL), pas le cas
+qui a réellement eu lieu. Ce qui couvre celui-là, c'est l'empreinte — et elle
+est **imprimée, pas assertée** : rien n'échoue, il faut qu'un humain lise.
+
+Le producteur le dit lui-même, et sa justification est juste : confondre « a-t-on
+mesuré une vraie page ? » et « est-ce la bonne version ? » empêcherait de
+rejouer l'instrument sur une version antérieure, ce que la règle 1 du protocole
+exige — et ce que j'ai fait au §3.2. **Il n'a donc rien sur-annoncé.** Le
+durcissement reste possible sans sacrifier le rejeu : voir constat 15, où je
+donne le mécanisme exact, vérifié.
+
+---
+
+## 5. ARB-16 et les orphelins
+
+Appliqué tel que rendu. `pierresRequises: number | null`, cinq `null`, motif
+écrit dans le fichier et citant ARB-16 ; `cosmetiquesDebloques()` retirée avec
+son motif.
+
+**Aucun appelant orphelin**, vérifié :
+
+```
+$ grep -rn "cosmetiquesDebloques" src/ scripts/
+src/config/mascot.config.ts:137:// `cosmetiquesDebloques(solde)` a été RETIRÉE au tour 2. …
+(aucune autre occurrence)
+
+$ grep -rn "pierresRequises" src/
+  → la déclaration du type, le commentaire ARB-16, et les cinq entrées à `null`.
+     Aucun lecteur, aucune comparaison, aucun calcul.
+```
+
+`pnpm typecheck` passe, donc le passage à `number | null` n'a laissé aucun site
+d'appel non gardé. Les cinq `cleLibelle` restent déclarées : elles **nomment ce
+qui manque** plutôt que de le combler, ce qui est la bonne conduite — mais elles
+restent une panne d'écran en attente pour V6, puisque `textes.ts` lève sur une
+clé absente. À produire par `contenu-enfant` avant l'ouverture de V6, comme
+ARB-10 l'a réglé.
+
+---
+
+## 6. Constats du tour 2
+
+Aucun [BLOQUANT], aucun [MAJEUR]. Huit [MINEUR].
+
+### [MINEUR] 13 — Rien n'assure que toute variante déclarée est rendue sur la page mesurée
+
+L'instrument de rendu ne voit que ce que `/dev/design-system` dessine. C'est sa
+force et c'est sa seule dépendance. Or rien ne garantit qu'une variante future
+ajoutée à `mascotConfig.cosmetiques` apparaîtra sur cette page : aujourd'hui
+elle y sera, parce que la galerie fait `mascotConfig.cosmetiques.map(...)` — mais
+ce lien n'est affirmé nulle part, et c'est lui qui porte toute la couverture.
+
+C'est aussi l'invariant qui aurait attrapé le [MAJEUR] 2, et le protocole le
+nomme mot pour mot : « un ensemble déclaré dont aucun élément ne doit rester
+inemployé ».
+
+**Correction attendue.** Ajouter à l'instrument de rendu, ou au contrôle
+structurel, l'assertion : *le nombre de variantes cosmétiques distinctes rendues
+sur la page mesurée égale `mascotConfig.cosmetiques.length`, et il en existe une
+version verrouillée pour chacune sauf `aucun`.* Aujourd'hui : 5 et 4. Cela
+transforme « la galerie est à jour » d'une habitude en une mesure.
+
+### [MINEUR] 14 — « 5 sous seuil → 0 » est une réparation et quatre exemptions
+
+Voir §3.3. Le rapport publie la sortie complète et les exemptions sont
+explicites, donc rien n'est caché ; mais la décomposition n'est écrite nulle
+part, et c'est elle qui dit ce qui a changé de *valeur* et ce qui a changé de
+*classement*. Un détecteur qui ne trouve plus rien après qu'on a élargi ses
+exemptions est précisément ce que la règle 4 du protocole demande de traiter
+comme suspect jusqu'à preuve du contraire.
+
+**Correction attendue.** Inscrire le tableau de §3.3 dans le rapport : pour
+chacun des cinq groupes, ratio avant, ratio après, et *réparé* ou *exempté*.
+
+### [MINEUR] 15 — L'empreinte est imprimée et non assertée, alors que le mécanisme existe
+
+Voir §4.3. La garde ne se déclenche pas sur la page du tour 1 ; seule la lecture
+humaine de l'empreinte distingue les deux versions.
+
+**Correction attendue, vérifiée par moi avant de la proposer.** `buildId` est
+absent de `__NEXT_DATA__` sur l'App Router — je l'ai vérifié, il ne faut pas le
+recommander. En revanche le **nom du fichier de styles servi** est lisible depuis
+le DOM et diffère bien d'une version à l'autre :
+`1abceefbb8828677.css` (tour 1) contre `733c0eba765c5569.css` (tour 2).
+L'ajouter à l'empreinte, et permettre de l'asserter par une variable
+d'environnement facultative (`TIPI_CSS_ATTENDU`), donnerait la vérification de
+version sans jamais empêcher le rejeu sur une version antérieure.
+
+### [MINEUR] 16 — `data-tipi-decor` n'a pas de liste de motifs déclarée, alors qu'I3 a inventé le bon patron
+
+La porte de sortie est unique et publiée, et c'est bien. Mais n'importe quel
+motif nouveau passe : l'instrument imprime une ligne d'exemption de plus et
+conclut `OK`. Rien ne cloisonne l'ensemble des motifs admis.
+
+Le producteur a pourtant écrit exactement le bon patron ailleurs, au tour 2 :
+`PALETTE_SANS_ROLE_ASSUMEE` dans l'invariant I3, une liste explicite qui fait
+échouer l'instrument sur tout élément non déclaré. Ne pas l'appliquer à la seule
+porte de sortie de son meilleur instrument est une incohérence.
+
+Relevé aujourd'hui, par moi : `{"chevron": 6, "joue": 60}` = 66 éléments marqués,
+soit 2 joues × 30 Pilou et 3 chevrons × 2 panneaux. Cohérent, rien d'inattendu.
+
+**Correction attendue.** Déclarer `DECOR_ADMIS = ["joue", "chevron"]` et faire
+échouer l'instrument sur tout autre motif, exactement comme I3.
+
+### [MINEUR] 17 — Le motif donné au point ouvert 9 est factuellement faux
+
+Le rapport écrit, §0.6 et §9 point 9 :
+
+> « Lui donner un corps demanderait une 13ᵉ valeur dans la palette Apple de 3.8
+> — donc un amendement tracé, que seul l'Orchestrateur peut rendre. »
+
+C'est inexact. `--palette-apple-teinte-bleu` (`#EAF3FF`) **existe** dans 3.8 et
+n'est pas une valeur de texte : c'est la teinte du thème. Faire pointer
+`--pilou-corps` vers elle donnerait à Pilou un corps bleu pâle visiblement
+distinct du fond gris neutre, **sans amender 3.8**. Mesuré par moi :
+
+| Corps envisagé | Sur le fond Apple `#F5F5F7` | Trait d'encre dessus | Ventre blanc dessus |
+| --- | --- | --- | --- |
+| `#F5F5F7` (livré) | 1,00:1 | 15,45:1 | 1,08:1 |
+| `#EAF3FF` (existe dans 3.8) | 1,02:1 | 15,03:1 | 1,11:1 |
+| *rappel thème Pilou* : `#FFEFE0` sur `#FFF8EE` | **1,06:1** | 13,49:1 | 1,05:1 |
+
+Deux choses en découlent, et elles vont en sens contraire de ce que le rapport
+suggère. D'abord l'option existe. Ensuite **l'« asymétrie forte entre les deux
+thèmes » n'existe pas en contraste** : le corps de Pilou est à 1,06:1 de son
+fond dans le thème Pilou et à 1,00:1 dans le thème Apple. Dans les deux, c'est
+le trait d'encre qui dessine la mascotte. Ce qui diffère est une **teinte**, pas
+un rapport de luminance. Mon avis est au §7.
+
+**Correction attendue.** Rectifier le motif. La décision, elle, reste à
+l'Orchestrateur.
+
+### [MINEUR] 18 — Le rejet de `var()` ne couvre pas la forme imbriquée
+
+`if (/^var\([^)]*\)$/.test(t)) throw` attrape `var(--x, repli)` et laisse passer
+les piles de polices — vérifié, c'est correct et la précision publiée est juste.
+Mais `var(--a, var(--b))` n'est pas attrapé : `[^)]*` s'arrête à la première
+parenthèse fermante, la chaîne continue, la regex échoue, et la valeur repart
+comme littérale vers le calcul de luminance. Aucune occurrence aujourd'hui.
+
+**Correction attendue.** Tester `t.startsWith("var(")` plutôt que la forme
+complète, après avoir écarté le cas `var(--x)` seul déjà résolu au-dessus.
+
+### [MINEUR] 19 — Le fond d'une forme SVG est celui du conteneur, jamais la forme dessinée dessous
+
+Limite **déclarée par l'instrument lui-même**, dans sa sortie. Je la confirme et
+je chiffre ce qu'elle coûte : la monture des `lunettes` est mesurée contre le
+fond de page (`#FFF8EE`, 13,49:1) alors qu'elle repose sur la tête
+(`--pilou-corps #FFEFE0`, **12,65:1**). Même chose pour les yeux et la truffe.
+L'écart est ici sans conséquence — toutes les formes concernées restent très
+au-dessus des seuils — mais une forme future posée sur un cosmétique saturé
+serait mesurée contre le mauvais fond, et dans le sens indulgent.
+
+**Correction attendue.** Aucune dans l'immédiat. À inscrire dans le rapport
+comme une limite chiffrée et non seulement nommée, et à rouvrir si une variante
+future empile deux formes colorées.
+
+### [MINEUR] 20 — Le jeton `{n}` s'affiche non rendu sur la galerie
+
+`Il en faut {n} pour celui-là.` apparaît tel quel comme titre du bloc des
+paliers verrouillés. Le producteur l'explique dans le code : le rendu des jetons
+est serveur et appartient à V1. L'explication est bonne et la galerie montre
+légitimement la chaîne telle qu'elle est stockée. Je le relève seulement pour
+qu'aucun agent aval ne le recopie en croyant que c'est l'affichage attendu.
+
+---
+
+## 7. Avis sur les trois points ouverts
+
+### Point 7 — Pilou se lit comme un ours et non comme une loutre
+
+**Ce n'est ni un [MAJEUR] ni un [MINEUR] : c'est une décision qui doit remonter
+au produit, et je recommande une escalade à l'humain avant V9.**
+
+Je motive, parce que la tentation de le classer [MAJEUR] est réelle et qu'il
+faut dire pourquoi j'y résiste.
+
+*Ce que le référentiel permet de constater.* §1.3 énonce quatre traits
+opérables — « corps clair aux contours très arrondis, petites oreilles rondes,
+joues colorées, museau doux ». **Les quatre sont respectés**, et le tour 2 les
+a rapprochés encore : oreilles de 31 % à 23 % du rayon de la tête et désormais
+posées sur son cercle, queue allongée et effilée, museau élargi et abaissé.
+DES-09, seule exigence de design portant sur la mascotte, demande un SVG unique
+réutilisable paramétré dans un fichier de config : tenu, vérifié. **Aucune
+exigence n'est violée.** Un contrôleur qui prononcerait un [MAJEUR] ici
+fabriquerait l'exigence qui lui manque pour le prononcer — c'est ce que la
+troisième règle absolue interdit, et elle vaut dans les deux sens.
+
+*Ce que le référentiel ne permet pas de trancher.* Le mot « loutre » figure en
+§1.3, en §1.2 du livrable marketing et dans sa prose. Il n'est traduit nulle
+part en géométrie. Décider s'il engage le dessin ou s'il n'est qu'une image,
+c'est décider ce que §1.3 veut dire — et cela n'appartient ni au producteur ni
+à moi. C'est le même type de question qu'ESC-001, que l'humain a tranchée en
+une ligne.
+
+*Pourquoi cela ne peut pas simplement aller au backlog.* Le coût de la décision
+croît vite et de façon irréversible : la mascotte entre dans neuf verticales,
+elle fournit l'icône d'application et l'écran de lancement (DES-10, V9), et
+767 textes la nomment. Aujourd'hui elle tient dans **un fichier, un composant,
+un fichier de config** — c'est le moment le moins cher de toute la vie du
+projet pour en changer. Repoussée, elle deviendra une reprise transverse.
+
+*Mon avis de fond, puisqu'il m'est demandé franchement.* J'ai regardé les deux
+thèmes au rendu. La silhouette, et surtout la vignette « silhouette » grise qui
+ne garde que le contour, est un **ours en peluche** : tête ronde, deux oreilles
+rondes aux angles supérieurs, corps rond. C'est charmant, c'est chaleureux, un
+enfant de six ans et demi l'aimera. Ce n'est pas une loutre, et aucun adulte à
+qui on demanderait « quel animal est-ce ? » ne répondrait loutre.
+
+*Si l'humain veut une loutre*, voici les critères mesurables qui feraient
+basculer la lecture, pour que la décision soit actionnable et non une
+appréciation : oreilles de rayon ≤ 6 et **entièrement contenues** dans le cercle
+de la tête ; tête plus large que haute ; museau posé bas et large, avec des
+bajoues marquées ; queue **prolongeant la ligne du corps** au lieu de démarrer à
+côté. Une passe de dessin dédiée, sur un seul fichier.
+
+*Si l'humain veut fermer le sujet*, la formulation qui le ferme proprement est :
+« les quatre traits énoncés en §1.3 sont la spécification opposable ; le nom de
+l'espèce ne l'est pas » — inscrite comme arbitrage, elle empêche que la question
+soit rouverte à chaque tour par chaque agent qui regardera le dessin.
+
+**Recommandation : ouvrir une escalade, question fermée, avant l'ouverture de
+V9.** Dans ma liste de constats je ne le compte pas, précisément pour qu'il ne
+soit pas traité comme un défaut de livrable.
+
+### Point 8 — `Button variante="texte"` en thème Apple, à 3,32:1
+
+**Je retire ma proposition du tour 1 et je me range à son refus.** Son argument
+est meilleur que le mien.
+
+J'avais proposé de rattacher cette variante à `--tipi-texte-appui`, ce qui la
+porterait de 3,32:1 à 15,45:1. Il répond qu'en thème Apple ce rôle vaut
+l'encre, donc « Je ne sais pas » et « Passer » s'afficheraient en 20 px / 700
+**dans la même encre que l'action principale**, et que DES-06 veut une action
+principale identifiable au premier regard. Il a raison : ma correction achetait
+12 points de contraste sur un couple **déjà conforme** en les payant avec la
+hiérarchie d'action — et c'est la hiérarchie qui compte pour un enfant fatigué
+qui cherche le bouton à presser. Un ratio conforme n'a pas à être amélioré au
+prix d'une exigence qui, elle, serait affaiblie.
+
+La marge de 0,32 reste mince et mon inquiétude d'origine n'était pas nulle. La
+bonne sortie, s'il en faut une un jour, n'est ni le gris ni l'encre mais une
+**troisième valeur de 3.8 déjà présente** — rien n'oblige une action tertiaire à
+être neutre. **Mon avis : garder le gris à 3,32:1, fermer le point**, et ne le
+rouvrir que si V4 ou V5 observe qu'un enfant hésite. Je suis d'accord avec lui
+pour que ce soit tranché maintenant et non renvoyé aux verticales : deux
+verticales doivent lire la même règle.
+
+### Point 9 — Le corps de Pilou vaut le fond en thème Apple
+
+**Mon avis : fermer le point sans amender 3.8.** Deux raisons, mesurées.
+
+D'abord, le motif invoqué est faux (constat 17) : `#EAF3FF` existe dans la
+palette Apple de 3.8 et pourrait servir de corps. **Aucun amendement n'est
+nécessaire**, et il ne faut pas que l'Orchestrateur tranche en croyant qu'on lui
+demande d'ajouter une valeur.
+
+Ensuite, l'« asymétrie » est bien moindre qu'annoncée. Le corps de Pilou est à
+**1,06:1** de son fond dans le thème Pilou et à **1,00:1** dans le thème Apple.
+Dans les deux thèmes, c'est le trait d'encre qui dessine la mascotte — 13,49:1
+et 15,45:1 — et le ventre blanc qui lui donne son volume. Le thème Pilou n'a
+jamais eu de corps contrasté non plus : il a un corps *teinté*. La différence
+est une affaire de teinte, pas de perceptibilité, et aucune exigence ne porte
+sur la teinte du corps de la mascotte.
+
+Si l'Orchestrateur veut néanmoins un corps visible en thème Apple, l'option
+existe et coûte une ligne — `--pilou-corps: var(--palette-apple-teinte-bleu)` —
+avec une réserve à peser : ce bleu pâle est déjà celui des `Chip`, des `Card`
+teintées et de l'option retenue du `ThemeSwitch`. Une mascotte de la même
+couleur que les pastilles d'information n'est pas forcément un gain.
+
+### Le point 5 du tour 1, resté ouvert : les joues en thème Apple
+
+Il ne l'a pas fait, en disant que la décision touche l'identité et revient à
+l'Orchestrateur. C'est cohérent avec ce que j'avais écrit et je ne le lui
+reproche pas. **Je maintiens mon avis et je le renforce après un second
+regard** : au rendu du tour 2, les deux disques `#FF9500` restent l'élément le
+plus criard des deux panneaux, et l'effet a empiré, parce que le corps de Pilou
+en thème Apple est désormais un simple contour — les joues flottent donc sur du
+blanc. Mesurées 2,01:1, classées décoratives à juste titre, aucune information
+portée. Le geste tient en une ligne, `--pilou-joue` vers une teinte ou vers
+`none` dans le bloc Apple. **À trancher en même temps que le point 7 : c'est la
+même décision d'identité.**
+
+---
+
+## 8. Chiffres annoncés contre chiffres réels — tour 2
+
+| # | Grandeur annoncée | Annoncé | Mesuré par moi | Écart |
+| --- | --- | --- | --- | --- |
+| 1 | `typecheck && lint && build` | code 0 | **0** | — |
+| 2 | ESLint | `✔ No ESLint warnings or errors` | identique | — |
+| 3 | Pages statiques | 4 / 4 | **4 / 4** | — |
+| 4 | Taille de `/dev/design-system` | — | 15,6 kB (15,4 au tour 1 : les vignettes ajoutées) | — |
+| 5 | Couples de l'instrument de calcul | 70 | **70** (35 × 2) | — |
+| 6 | Couples sous seuil | 0 | **0** | — |
+| 7 | I1 / I2 | 27 / 0 et 25 / 0 | **identiques** | — |
+| 8 | I3 — entrées de palette | 27 ; sans rôle 2 ; non déclarées 0 | **identique** | — |
+| 9 | Textes mesurés au rendu | 133 | **133** | — |
+| 10 | Formes mesurées au rendu | 697 | **697** | — |
+| 11 | Groupes de tracés | — | **34** | — |
+| 12 | Sous seuil au rendu | 0 | **0** | — |
+| 13 | Exemptions publiées | 10 | **10** (4 `data-tipi-decor` + 6 WCAG 1.4.3) | — |
+| 14 | Éléments marqués `data-tipi-decor` | 66 | **66** = 60 joues + 6 chevrons, 2 motifs, aucun inattendu | — |
+| 15 | `lunettes` après correction | 13,49 / 15,45:1 | **13,49 / 15,45:1** | — |
+| 16 | `lunettes` avant correction | 2,05:1 | **2,05:1** (rejoué sur `dad1524`) | — |
+| 17 | Rejeu sur le tour 1 : code de sortie | 1 | **1** | — |
+| 18 | Rejeu sur le tour 1 : groupes sous seuil | « trouve le MAJEUR 1 seul » | **5 groupes**, dont 1 réparé et 4 exemptés au tour 2 | **décomposition absente** (constat 14) |
+| 19 | Cosmétique verrouillé | 3,67 / 3,32:1 | **3,67 / 3,32:1** en remplissage ; **13,49 / 15,45:1** en trait | annonce conservatrice |
+| 20 | Touche « Effacer » désactivée | 2,32 → 4,44:1 | **4,44:1** (apple) et **3,97:1** (pilou, non annoncé) | chiffre Pilou manquant |
+| 21 | Couple `ThemeSwitch` ajouté | 5,22 / 15,03:1 | **5,22 / 15,03:1** | — |
+| 22 | `#6E6E73` | 5,07:1 | **5,0713 → 5,07:1** | — |
+| 23 | Jetons de 3.8 | 26, 0 manquant | **26 / 26**, et **aucune ligne de jeton modifiée** depuis le tour 1 | — |
+| 24 | Couleurs en dur, code applicatif | 0 | **0** ; balayage du dépôt : 3 porteurs, 3 déclarés, 0 inattendu | — |
+| 25 | Cibles tactiles | non chiffré | **46 contrôles, 0 sous 56 px**, à 390 px et 1500 px, 0 débordement | — |
+| 26 | `div`/`span` cliquables | 0 | **0** | — |
+| 27 | Contrôles sans nom accessible | — | **0** sur 46 (arbre d'accessibilité réel) | — |
+| 28 | `<svg>` rendus | — | **89** (85 `aria-hidden`, 4 `role="img"`+label, **0** sans l'un ou l'autre) | — |
+| 29 | Emoji / dégradés | 0 / 0 | **0 / 0** | — |
+| 30 | Fichiers dessinant Pilou | 1 | **1** — DES-09 tenue | — |
+| 31 | Appelants de `cosmetiquesDebloques` | 0 | **0** | — |
+| 32 | `pierresRequises` lecteurs restants | 0 | **0** | — |
+| 33 | `prefers-reduced-motion` | — | **toutes animations à 1 ms, 1 itération** | — |
+| 34 | Commutation de thème | — | `pilou → apple`, fond et `aria-checked` suivent | — |
+| 35 | Motif du point ouvert 9 | « demanderait une 13ᵉ valeur » | **faux** : `#EAF3FF` existe dans 3.8 | **écart** (constat 17) |
+| 36 | « asymétrie forte entre les deux thèmes » | qualitatif | **1,00:1 contre 1,06:1** — quasi identique | **écart de qualification** |
+
+Sur 36 grandeurs recontrôlées : **32 exactes, 4 en écart**, dont deux écarts de
+qualification (nº 35, 36), un de décomposition (nº 18) et un chiffre manquant
+(nº 20). **Aucune sortie de commande inventée** : les deux sorties d'instrument
+publiées en §0.8 sont identiques aux miennes, aux délimiteurs Markdown et au
+numéro de port près.
+
+---
+
+## 9. Acquis du tour 1 : rien n'est cassé
+
+Recontrôlé intégralement, parce qu'une correction est le meilleur moment pour
+casser autre chose.
+
+| Acquis | État au tour 2 |
+| --- | --- |
+| 26 jetons de 3.8 exacts et bien affectés | **intact** — `git diff` ne montre aucune ligne de jeton modifiée, seulement des commentaires |
+| 0 couleur en dur dans le code applicatif | **intact**, et le balayage est désormais étendu au dépôt entier |
+| 0 `div`/`span` cliquable | **intact** (source et rendu) |
+| Toute icône seule étiquetée | **intact** — 0 svg sans `aria-hidden` ni `role="img"`+label sur 89 |
+| 46 cibles ≥ 56 px, 0 débordement | **intact** à 390 px et 1500 px |
+| DES-09 : un seul SVG de Pilou | **intact** — 2 fichiers portent un `<path>`, `Icon.tsx` et `Pilou.tsx` |
+| 0 emoji, 0 dégradé | **intact** |
+| DES-08 : `prefers-reduced-motion`, aucun clignotement | **intact** |
+| PRD-17 : commutation à chaud | **intact** |
+| Règles ESLint de TEC-15 | **intactes** — `.eslintrc.json` inchangé |
+| Aucune dépendance ajoutée | **intact** — `package.json` inchangé ; Playwright résolu hors projet par `NODE_PATH`, comme l'architecture §15.1 l'impose |
+
+---
+
+## 10. Sorties réelles de mes commandes — tour 2
+
+### 10.1 `rm -rf .next && pnpm typecheck && pnpm lint && pnpm build`
+
+```
+> tipi@0.1.0 typecheck /home/user/Tipi
+> tsc --noEmit
+
+
+> tipi@0.1.0 lint /home/user/Tipi
+> next lint
+
+✔ No ESLint warnings or errors
+
+> tipi@0.1.0 build /home/user/Tipi
+> next build
+
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/4) ...
+ ✓ Generating static pages (4/4)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /_not-found                          873 B          88.1 kB
+└ ○ /dev/design-system                   15.6 kB         103 kB
++ First Load JS shared by all            87.2 kB
+
+○  (Static)  prerendered as static content
+
+EXIT_CHAIN=0
+```
+
+### 10.2 Les trois instruments, rejoués
+
+```
+$ bash scripts/verifier-design-system.sh
+=== 1. Couleurs en dur (DES-01, DES-02) ===
+-- occurrences DANS themes.css --                     32
+-- occurrences dans le CODE APPLICATIF, ailleurs --   (aucune)   compte : 0
+-- BALAYAGE DU DÉPÔT ENTIER, y compris sans dièse --
+   porteurs légitimes déclarés : scripts/verifier-design-system.sh .cursor/rules/20-themes.mdc src/styles/themes.css
+   porteurs trouvés :
+     .cursor/rules/20-themes.mdc
+     scripts/verifier-design-system.sh
+     src/styles/themes.css
+   aucun porteur inattendu
+…
+=== VERDICT DE L INSTRUMENT : OK ===
+EXIT=0
+
+$ node scripts/verifier-contraste.mjs
+Couples mesurés : 70 (35 par thème, 2 thèmes).
+Couples sous leur seuil : 0.
+I1 — rôles déclarés côté Pilou : 27 ; non résolus côté Apple : 0
+I2 — rôles de couleur : 25 ; jamais mesurés : 0
+I3 — entrées de palette : 27 ; sans rôle : 2 (--palette-apple-accent-rouge, --palette-apple-accent-gris) ; sans rôle ET non déclarées : 0
+=== VERDICT DE L INSTRUMENT : OK ===
+EXIT=0
+
+$ TIPI_URL=…:3218/dev/design-system node scripts/verifier-contraste-rendu.mjs
+URL : http://127.0.0.1:3218/dev/design-system
+Éléments : 1185 · SVG Pilou : 30 · SVG icône : 59 · marqués `data-tipi-decor` : 66
+Textes relevés : 137 · formes relevées : 697
+…
+| pilou | texte « Je commence » | 2.93:1 | composant désactivé — exempté par WCAG 2.1 SC 1.4.3 |
+| pilou | texte « Valider »     | 2.93:1 | composant désactivé — exempté par WCAG 2.1 SC 1.4.3 |
+| apple | texte « Je commence » | 2.33:1 | composant désactivé — exempté par WCAG 2.1 SC 1.4.3 |
+| apple | texte « Valider »     | 2.33:1 | composant désactivé — exempté par WCAG 2.1 SC 1.4.3 |
+| pilou | 3× path de Icon       | 1.58:1 | data-tipi-decor="chevron" |
+| pilou | 2× path de Icon       | 3.97:1 | composant désactivé — exempté par WCAG 2.1 SC 1.4.3 |
+| pilou | 28× circle de Pilou   | 2.15:1 | data-tipi-decor="joue" |
+| apple | 3× path de Icon       | 1.68:1 | data-tipi-decor="chevron" |
+| apple | 2× path de Icon       | 4.44:1 | composant désactivé — exempté par WCAG 2.1 SC 1.4.3 |
+| apple | 28× circle de Pilou   | 2.01:1 | data-tipi-decor="joue" |
+
+Textes mesurés : 133. Groupes de tracés mesurés : 34 (697 formes).
+Sous leur seuil : 0.
+Exemptions : 4 par `data-tipi-decor` (66 éléments marqués dans le DOM), 6 par WCAG 1.4.3 (désactivés).
+=== VERDICT DE L INSTRUMENT : OK ===
+EXIT=0
+```
+
+Comparaison avec les sorties publiées en §0.8 du rapport : **identiques**, aux
+délimiteurs Markdown et au numéro de port près.
+
+### 10.3 Ma propre mesure de contraste, indépendante de la sienne
+
+Même méthode qu'au tour 1 : styles calculés du navigateur, fond effectif obtenu
+en remontant les ancêtres, composition alpha, luminance WCAG 2.1 recodée par
+moi. Aucun de ses scripts n'est lu.
+
+```
+Couples texte distincts mesurés sur le rendu : 42. Sous seuil : 2
+  (les deux boutons désactivés — 2,93:1 pilou et 2,33:1 apple, exemptés par WCAG 1.4.3)
+
+Tracés dont NI le trait NI le remplissage n'atteint 3:1 :
+  pilou | Icon  | 3× chevron     | stroke rgb(216,204,184) | 1.58  -> data-tipi-decor
+  pilou | Pilou | 28× joue       | fill   rgb(255,139,123) | 2.15  -> data-tipi-decor
+  apple | Icon  | 3× chevron     | stroke rgb(199,199,204) | 1.68  -> data-tipi-decor
+  apple | Pilou | 28× joue       | fill   rgb(255,149,0)   | 2.01  -> data-tipi-decor
+  (+ les joues en mode silhouette pleine : fill="none", invisibles, sans objet)
+
+Aucune forme NON exemptée sous 3:1, dans aucun des deux thèmes.
+
+div/span porteurs d'un onclick : 0
+emoji dans un texte rendu : 0 · emoji dans tout le HTML : false
+dégradés dans les styles calculés : 0
+aria : {"ariaLabels":7,"buttons":42,"links":4,"svg":89,"svgRoleImg":4,"svgAriaHidden":85,"svgNi":0}
+panneaux data-theme : ["pilou","pilou","apple"] · html : pilou
+```
+
+**Ma mesure et la sienne concordent sur l'ensemble du rendu.**
+
+### 10.4 Cibles tactiles, accessibilité, animations, thèmes
+
+```
+--- téléphone 390 px ---        --- bureau 1500 px ---
+cibles < 56 px : 0              cibles < 56 px : 0
+débordement horizontal : 0      débordement horizontal : 0
+svg sans étiquette ni aria-hidden : 0
+
+arbre d'accessibilité réel : 46 contrôles nommés, boutons/liens sans nom : 0
+
+prefers-reduced-motion: no-preference -> {"apparait 0.26s ×1":4,"respire 4s ×∞":4,"pense-1 1.8s ×∞":6}
+prefers-reduced-motion: reduce        -> {"apparait 0.001s ×1":4,"respire 0.001s ×1":4,"pense-1 0.001s ×1":6}
+
+html[data-theme] initial : pilou → après clic « Apple » : apple
+fond body : rgb(255,248,238) -> rgb(245,245,247)
+aria-checked des deux options : ["false","true"]
+```
+
+### 10.5 Vérification des orphelins et des jetons
+
+```
+$ grep -rn "cosmetiquesDebloques" src/ scripts/
+src/config/mascot.config.ts:137:// `cosmetiquesDebloques(solde)` a été RETIRÉE au tour 2. …
+(aucun appelant)
+
+$ les 26 jetons de 3.8, cherchés un par un dans themes.css
+(rien — 26/26 présents)
+
+$ git diff dad1524 HEAD -- src/styles/themes.css | grep -E '^[+-] *--'
+(aucune ligne de jeton modifiée)
+```
+
+---
+
+## 11. Ce que je n'ai pas pu contrôler — tour 2
+
+Inchangé depuis le tour 1, et toujours opposable :
+
+1. **Aucun appareil tactile réel, aucun lecteur d'écran.** J'ai lu l'arbre
+   d'accessibilité de Chromium ; je n'ai rien entendu.
+2. **Un seul écran.** `/dev/design-system` reste la seule page. DES-04 et DES-06
+   s'énoncent « dans tous les écrans enfant » ; ces écrans n'existent pas. C'est
+   aussi la portée exacte de l'instrument de rendu — voir constat 13.
+3. **Un seul moteur de rendu**, Chromium 1.56.1, une seule densité.
+4. **La silhouette de Pilou.** Je peux dire ce que je vois et donner des
+   critères ; je ne peux pas décider ce que « loutre » engage. Voir §7.
+
+---
+
+## 12. Conclusion du tour 2
+
+`VERDICT: PASS_AVEC_RESERVES` — **0 [BLOQUANT], 0 [MAJEUR], 8 [MINEUR]** (13 à
+20). La porte G3 peut s'ouvrir.
+
+Les deux [MAJEUR] sont levés, vérifiés au code, à la mesure et à l'œil. Les
+douze constats du tour 1 sont tous traités. Aucun acquis n'est cassé. Aucune
+sortie n'est inventée.
+
+Ce qui distingue ce tour : le producteur n'a pas corrigé deux défauts, il a
+corrigé **la raison pour laquelle il ne les voyait pas**, puis il a prouvé
+l'instrument dans le seul sens qui vaille — en le lançant sur le code qui
+contenait le défaut, et en publiant qu'il le retrouve seul. J'ai refait cette
+manipulation intégralement et elle tient. Il a également déclaré ce que son
+instrument **n'attrape pas**, ce qui vaut mieux qu'un instrument qui prétendrait
+tout couvrir.
+
+Mes huit réserves portent presque toutes sur le même endroit : les garde-fous de
+l'instrument sont imprimés plutôt qu'assertés (14, 15, 16), et sa couverture
+dépend d'un lien entre la config et la galerie que rien n'affirme (13). Aucune
+n'empêche la porte de s'ouvrir ; toutes se ferment en quelques lignes, et le
+producteur a déjà écrit le bon patron ailleurs, dans l'invariant I3.
+
+À verser dans `BACKLOG-V2.md` : 18, 19, 20. À traiter avant l'ouverture de V6 :
+13, 14, 15, 16, 17, et les cinq clés de contenu confiées à `contenu-enfant`.
+À remonter à l'humain avant V9 : la silhouette de la mascotte et les joues du
+thème Apple, qui sont une seule et même décision d'identité.
+
+---
+---
+
+# TOUR 1 — verdict du 2026-09-21, conservé
+
+`VERDICT: FAIL` — 2 [MAJEUR], 10 [MINEUR]. Le sort de chacun des douze constats
+est tracé dans le tableau du §1 ci-dessus. Le texte intégral suit, inchangé.
+
+## Rappel du périmètre contrôlé
+
+Livrable contrôlé :
 `docs/agents/P3/design-system.out.md` + `tailwind.config.ts`,
 `src/styles/themes.css`, `src/components/ui/**`, `src/components/pilou/**`,
 `src/config/mascot.config.ts`, `src/app/dev/design-system/page.tsx`, `scripts/`.
