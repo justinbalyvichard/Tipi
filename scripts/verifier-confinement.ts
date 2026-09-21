@@ -820,7 +820,214 @@ function c7(): void {
 }
 
 // ---------------------------------------------------------------------------
+// C0 — QUI GARDE LE GARDIEN ? LES TABLES DE L'INSTRUMENT, GARDÉES CONTRE ELLES-MÊMES
+// ---------------------------------------------------------------------------
+// AJOUTÉ AU TOUR 4, en réponse à [MAJEUR] M6, et c'est la question que ce projet
+// n'avait pas encore posée.
+//
+// Le tour 3 s'était donné une doctrine — *« toute valeur dont le zéro, le vide
+// ou l'absence rend une garde inopérante doit avoir son cas au catalogue »* —
+// et l'avait étendue nommément à l'instrument. `controle-code` l'a alors
+// appliquée à l'instrument lui-même et a trouvé **quatre tables qui se vident
+// sans que rien ne rougisse**, dont celles de C6 et C7 — les deux contrôles qui
+// n'existent que pour tenir SEC-04. Sept verts, sortie 0.
+//
+// La faute n'était pas d'avoir oublié quatre `if` : c'était d'avoir écrit la
+// garde **trois fois à la main**. Une garde recopiée est une garde qu'on oublie
+// à la quatrième table, et qu'on oubliera à la huitième.
+//
+// C0 la rend donc mécanique, et en deux temps :
+//
+//   (1) **chaque table déclarative est enregistrée avec un prédicat de
+//       neutralité** — vide pour une liste ou un enregistrement, « autorise
+//       n'importe quoi » pour une expression régulière d'autorisation — et
+//       porte la phrase disant ce que sa neutralité éteindrait ;
+//
+//   (2) **la liste des tables à enregistrer est DÉRIVÉE du fichier lui-même**
+//       (ARB-18 mesure 1) : C0 relit `scripts/verifier-confinement.ts`, y
+//       trouve toute constante de premier niveau qui ressemble à une table, et
+//       exige qu'elle soit enregistrée. Ajouter demain une huitième table sans
+//       l'enregistrer fait rougir l'instrument — on ne peut plus oublier.
+//
+// Ce que C0 prouve : aucune table déclarative de cet instrument ne peut être
+// vidée, ni aucune de ses expressions d'autorisation élargie à tout, sans que
+// la porte le voie. Ce qu'il ne prouve pas : qu'une table mal remplie mesure la
+// bonne chose — cela reste le travail d'un contrôleur qui la lit ligne à ligne.
 
+/**
+ * Une constante de ce fichier qui n'est **pas** une table déclarative, avec la
+ * raison. Sans cette liste, la dérivation (2) exigerait d'enregistrer des
+ * constantes qui ne gardent rien.
+ */
+const NON_DECLARATIVES: Readonly<Record<string, string>> = Object.freeze({
+  NON_DECLARATIVES:
+    "Cette liste d'exemptions elle-même. Elle n'autorise rien dans le code contrôlé : la vider rendrait C0 PLUS sévère, jamais plus laxiste, et un contrôleur la lit ligne à ligne.",
+});
+
+/**
+ * Fichier qui ne doit être autorisé par **aucune** expression d'autorisation de
+ * cet instrument. Sert de sonde : une regex qui l'accepte accepte tout.
+ */
+const TEMOIN_HORS_PERIMETRE = "src/app/dev/design-system/page.tsx";
+
+/** Vrai si cette expression d'autorisation est devenue permissive. */
+function regexNeutre(re: RegExp): boolean {
+  return re.test("") || re.test(TEMOIN_HORS_PERIMETRE);
+}
+
+/**
+ * Le registre des tables déclaratives, avec pour chacune son prédicat de
+ * neutralité et **la phrase disant ce que sa neutralité éteindrait**
+ * (ARB-18 mesure 2).
+ */
+const TABLES_GARDEES: readonly {
+  readonly nom: string;
+  readonly controle: string;
+  readonly estNeutre: () => boolean;
+  readonly eteint: string;
+}[] = [
+  {
+    nom: "AUTORISES_A_NOMMER_LE_FOURNISSEUR",
+    controle: "C1",
+    estNeutre: () => regexNeutre(AUTORISES_A_NOMMER_LE_FOURNISSEUR),
+    eteint:
+      "TEC-17 : une expression qui autorise tout laisse n'importe quel fichier de src/ nommer le fournisseur, et C1 reste vert.",
+  },
+  {
+    nom: "FERMETURE_AUTORISEE_AI",
+    controle: "C2",
+    estNeutre: () => Object.keys(FERMETURE_AUTORISEE_AI).length === 0,
+    eteint:
+      "SEC-04 (C) : sans référence, la fermeture d'imports de src/lib/ai/** n'est plus comparée à rien de déclaré.",
+  },
+  {
+    nom: "TYPES_BINAIRES",
+    controle: "C3",
+    estNeutre: () => TYPES_BINAIRES.length === 0,
+    eteint:
+      "TEC-05 : aucun type binaire n'est plus cherché, donc une image pourrait entrer dans la frontière d'IA sans un mot.",
+  },
+  {
+    nom: "DOSSIERS_SANS_SEUIL",
+    controle: "C4",
+    estNeutre: () => DOSSIERS_SANS_SEUIL.length === 0,
+    eteint:
+      "TEC-16 : plus aucun dossier n'est examiné, donc un seuil littéral peut revenir n'importe où sans être vu.",
+  },
+  {
+    nom: "MODELES_INTERDITS_A_V2",
+    controle: "C5",
+    estNeutre: () => Object.keys(MODELES_INTERDITS_A_V2).length === 0,
+    eteint:
+      "TEC-06 : plus aucun modèle interdit, donc la dérivation depuis le schéma ne produit plus d'identifiant et V2 peut créer une session.",
+  },
+  {
+    nom: "CHAMPS_INTERDITS_A_V2",
+    controle: "C5",
+    estNeutre: () => Object.keys(CHAMPS_INTERDITS_A_V2).length === 0,
+    eteint:
+      "SEC-06 : le solde de pierres cesse d'être surveillé dans le périmètre de la capture.",
+  },
+  {
+    nom: "PERIMETRE_V2",
+    controle: "C5",
+    estNeutre: () => PERIMETRE_V2.length === 0,
+    eteint:
+      "TEC-06 : plus aucun fichier n'est lu, donc le contrôle ne peut plus rien trouver — il sortirait vert sur un périmètre vide.",
+  },
+  {
+    nom: "PASSAGES_UNIQUES",
+    controle: "C6",
+    estNeutre: () =>
+      PASSAGES_UNIQUES.length === 0 || PASSAGES_UNIQUES.some((p) => regexNeutre(p.ou)),
+    eteint:
+      "SEC-04 : plus aucun passage vers le réseau n'est surveillé. C'est le contrôle qui rend vraie la garantie du type TexteAnonymise — il ne vaut que si executerPrompt reste le seul chemin.",
+  },
+  {
+    nom: "SCEAUX",
+    controle: "C7",
+    estNeutre: () => SCEAUX.length === 0 || SCEAUX.some((s) => regexNeutre(s.ou)),
+    eteint:
+      "SEC-04 : plus aucun sceau n'est épinglé à son unique lieu de fabrication. C'est le contrôle qui répond à [MAJEUR] M5 — un sceau fabriqué ailleurs atteste une liste que personne n'a tirée du foyer.",
+  },
+];
+
+/**
+ * Les constantes de premier niveau de ce fichier qui **ressemblent à une
+ * table** : nom en capitales, initialisée par un littéral de tableau, un
+ * `Object.freeze` ou une expression régulière. Dérivé du source, jamais recopié.
+ */
+function tablesDuFichier(): readonly string[] {
+  const source = lire("scripts/verifier-confinement.ts");
+  const trouvees: string[] = [];
+  for (const m of source.matchAll(
+    /^const\s+([A-Z][A-Z0-9_]*)\s*(?::[^=]+)?=\s*(Object\.freeze\(|\[|\/)/gmu,
+  )) {
+    const nom = m[1];
+    if (nom !== undefined && !trouvees.includes(nom)) trouvees.push(nom);
+  }
+  return trouvees;
+}
+
+function c0(): void {
+  const defauts: string[] = [];
+
+  // (1) aucune table enregistrée n'est neutre.
+  for (const { nom, controle, estNeutre, eteint } of TABLES_GARDEES) {
+    if (estNeutre()) {
+      defauts.push(`${nom} (${controle}) est NEUTRALISÉE. ${eteint}`);
+    }
+    if (eteint.trim().length < 40) {
+      defauts.push(`${nom} est gardée sans motif écrit (ARB-18 mesure 2).`);
+    }
+  }
+
+  // (2) aucune table du fichier n'échappe au registre.
+  const declarees = tablesDuFichier();
+  if (declarees.length === 0) {
+    enregistrer("C0", "C0 — les tables de l'instrument, gardées contre elles-mêmes", "AUCUNE constante lue dans le source de l'instrument", ["La dérivation n'a produit aucune table : C0 ne mesure rien."], false);
+    return;
+  }
+  const enregistrees = new Set(TABLES_GARDEES.map((t) => t.nom));
+  for (const nom of declarees) {
+    if (enregistrees.has(nom)) continue;
+    if (Object.prototype.hasOwnProperty.call(NON_DECLARATIVES, nom)) {
+      const raison = NON_DECLARATIVES[nom] ?? "";
+      if (raison.trim().length < 40) {
+        defauts.push(`${nom} est exemptée sans raison écrite (ARB-18 mesure 2).`);
+      }
+      continue;
+    }
+    defauts.push(
+      `${nom} est une table déclarative de cet instrument et n'est NI enregistrée dans TABLES_GARDEES, NI exemptée dans NON_DECLARATIVES. Une table qu'on oublie d'enregistrer est une table qu'on pourra vider en silence ([MAJEUR] M6).`,
+    );
+  }
+  // Deux réciproques. Une entrée du registre qui ne correspond à aucune table
+  // du fichier signale un renommage — donc une garde qui ne garde plus rien.
+  // Une exemption sans table correspondante est une exemption périmée, qui
+  // couvrirait un jour un nom réemployé pour autre chose.
+  for (const { nom } of TABLES_GARDEES) {
+    if (!declarees.includes(nom)) {
+      defauts.push(`${nom} est enregistrée dans TABLES_GARDEES mais n'existe plus dans le fichier.`);
+    }
+  }
+  for (const nom of Object.keys(NON_DECLARATIVES)) {
+    if (!declarees.includes(nom)) {
+      defauts.push(`${nom} est exemptée dans NON_DECLARATIVES mais n'existe plus dans le fichier : une exemption périmée finit par couvrir autre chose.`);
+    }
+  }
+
+  enregistrer(
+    "C0",
+    "C0 — les tables de l'instrument, gardées contre elles-mêmes",
+    `${declarees.length} constantes déclaratives dérivées du source · ${TABLES_GARDEES.length} gardées, chacune justifiée · ${Object.keys(NON_DECLARATIVES).length} exemptées, chacune motivée · sonde d'autorisation : « ${TEMOIN_HORS_PERIMETRE} »`,
+    defauts,
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+c0();
 c1();
 c2();
 c3();

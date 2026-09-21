@@ -16,7 +16,11 @@
       },
       {
         "selector": "TSAsExpression > TSTypeReference > Identifier[name=/^(TexteAnonymise|PayloadIa|IdentifiantsInterdits)$/]",
-        "message": "SEC-04 : ces trois types sont des SCEAUX. Les fabriquer par assertion (`x as TexteAnonymise`, y compris `as unknown as`) contourne le caviardage — c'est [MAJEUR] M5 sous une autre forme. Passer par la fabrique."
+        "message": "SEC-04 : ces trois types sont des SCEAUX. Cette règle attrape la forme DIRECTE de l'assertion (`x as TexteAnonymise`), qui est la forme accidentelle. Elle n'attrape ni l'alias de type ni le générique — aucune règle de lint ne le peut, et un `eslint-disable` suffirait de toute façon : c'est une barrière d'hygiène contre le geste distrait, jamais contre le geste délibéré. Passer par la fabrique."
+      },
+      {
+        "selector": "TSAsExpression > TSAsExpression",
+        "message": "TEC-15, SEC-04 : pas de double assertion `x as unknown as T`. C'est le détour le plus court pour fabriquer un sceau sans sa fabrique, y compris à travers un alias de type. Aucune ligne du produit n'en a besoin : valider par Zod, ou passer par la fabrique."
       }
     ]
   },

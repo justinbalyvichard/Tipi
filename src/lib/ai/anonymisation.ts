@@ -122,7 +122,15 @@ export class IdentifiantsInterdits {
    * que le compilateur aurait encouragé à passer `{ valeurs: [] }`.
    */
   public static sceller(valeurs: readonly string[]): IdentifiantsInterdits {
-    const utiles = valeurs.map((v) => v.trim()).filter((v) => v !== "");
+    // `replier` et non `trim` — [MINEUR] N9 du tour 3. `controle-code` a scellé
+    // `["\u0301"]`, un accent combinant seul : ni vide, ni blanc, et pourtant
+    // inopérant, parce que tous les consommateurs (`retenus`, `caviarder`,
+    // `assertAucunIdentifiant`) mesurent la vacuité avec `replier`. Le refus
+    // tombait alors trois couches plus bas, au dernier instant avant
+    // l'émission, avec un message qui parlait d'assertion vide là où le défaut
+    // était une liste mal formée. La fabrique mesure maintenant le vide comme
+    // ses consommateurs le mesurent.
+    const utiles = valeurs.map((v) => v.trim()).filter((v) => replier(v) !== "");
     if (utiles.length === 0) {
       throw new AppError(
         "TIPI_PAYLOAD_NON_ANONYME",

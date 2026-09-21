@@ -127,14 +127,32 @@ const schemaEnv = z.object({
 
   PARENT_SESSION_TTL_MIN: entier(5),
   CODE_MAX_TENTATIVES: entier(5),
-  CODE_BLOCAGE_PALIERS_SEC: texte("60,300,900,3600").pipe(
-    z
-      .string()
-      .regex(
-        /^\d+(,\d+)*$/u,
-        "CODE_BLOCAGE_PALIERS_SEC : liste d'entiers séparés par des virgules.",
-      ),
-  ),
+  /**
+   * DOUZIÈME VALEUR NEUTRALISABLE, trouvée par `controle-code` au tour 3
+   * ([MAJEUR] M6 b) dans le fichier que le tour 3 déclarait avoir balayé.
+   *
+   * La validation du tour 3 contrôlait la **forme** de la liste et jamais ses
+   * valeurs : `"0"` et `"0,0,0,0"` étaient acceptés, et **SEC-02 devenait un
+   * blocage de zéro seconde, c'est-à-dire aucun blocage** — sur le seul verrou
+   * qui sépare l'enfant des Réglages. C'est la forme exacte de l'attaque du
+   * tour 2, portée sur une autre exigence : une liste non vide dont le contenu
+   * est neutre. Et la valeur est plausible : c'est ce qu'on écrit pour
+   * désactiver le blocage pendant une mise au point, et que V7 hériterait sans
+   * le savoir.
+   */
+  CODE_BLOCAGE_PALIERS_SEC: texte("60,300,900,3600")
+    .pipe(
+      z
+        .string()
+        .regex(
+          /^\d+(,\d+)*$/u,
+          "CODE_BLOCAGE_PALIERS_SEC : liste d'entiers séparés par des virgules.",
+        ),
+    )
+    .refine(
+      (v) => v.split(",").every((palier) => Number.parseInt(palier, 10) >= 1),
+      "CODE_BLOCAGE_PALIERS_SEC : chaque palier vaut au moins 1 seconde. Un palier nul éteint le blocage progressif de SEC-02.",
+    ),
 
   OCR_CONFIANCE_MIN: unitaire(0.7),
   LECTURE_TOLERANCE_MOT: unitaire(0.34),
@@ -156,6 +174,72 @@ const schemaEnv = z.object({
 
   // Seule valeur neutre légitime du fichier : 0 = ne rien conserver (SEC-05).
   AUDIO_RETENTION_JOURS_DEFAUT: entier(7, 0),
+});
+
+
+/**
+ * ---------------------------------------------------------------------------
+ * LE DÉNOMINATEUR — CLASSEMENT DE NEUTRALITÉ DES 26 VARIABLES SERVEUR
+ * ---------------------------------------------------------------------------
+ * AJOUTÉ AU TOUR 4 de G4.V2, et ces tables vivent **ici** plutôt que dans le
+ * fichier de tests pour deux raisons, la seconde étant la bonne :
+ *
+ *  1. `src/config/env.ts` est, avec `src/lib/ai/providers/` et
+ *     `src/lib/ai/index.ts`, l'un des trois fichiers que la règle de P2 §5.1
+ *     autorise à nommer le fournisseur — et un classement exhaustif doit
+ *     nommer `DEEPSEEK_API_KEY` comme les autres. Le contrôle C1 a d'ailleurs
+ *     mordu quand ces tables étaient dans le test, et il avait raison ;
+ *  2. surtout : c'est ici que viendra la verticale qui ajoutera une variable.
+ *     Le classement doit être sous ses yeux au moment où elle écrit la ligne,
+ *     pas dans un fichier de tests qu'elle ouvrira peut-être.
+ *
+ * `src/config/neutralisations.test.ts` les compare à `.env.example` — seul
+ * document qui déclare toutes les variables — et aux cas réellement exécutés.
+ * **Une variable ajoutée sans classement fait rougir le test**, et un classement
+ * dont la variable a disparu aussi.
+ *
+ * Pourquoi un dénominateur : `controle-code` a relevé aux tours 1, 2 et 3 trois
+ * écarts de la même famille — « onze valeurs quand il y en a douze », « deux
+ * tables gardées sur sept », « une forme de lint sur trois ». Tous du même
+ * motif : **mesurer ce qu'on a couvert, et non ce qu'il y avait à couvrir.**
+ * Corriger la douzième valeur ne corrige pas la famille ; un dénominateur
+ * dérivé, si.
+ */
+
+export const REFUSENT_LE_NEUTRE: Readonly<Record<string, string>> = Object.freeze({
+  UPLOAD_MAX_PHOTO_OCTETS: "Zéro refuserait toute photo : PRD-03 deviendrait injouable.",
+  UPLOAD_MAX_AUDIO_OCTETS: "Zéro refuserait tout enregistrement : l'étape lecture de V4 perdrait sa trace.",
+  AI_TIMEOUT_MS: "Zéro abandonnerait chaque appel avant qu'il ne parte.",
+  PARENT_SESSION_TTL_MIN: "Zéro ferait expirer la session parent avant qu'elle n'existe (PRD-15).",
+  CODE_MAX_TENTATIVES: "Zéro priverait SEC-02 de tout palier de tentatives.",
+  CODE_BLOCAGE_PALIERS_SEC: "Des paliers nuls font un blocage de zéro seconde : SEC-02 sans blocage.",
+  OCR_CONFIANCE_MIN: "Zéro accepterait toute photo, si illisible soit-elle : l'état « illisible » de PRD-16 deviendrait inatteignable.",
+  LECTURE_TOLERANCE_MOT: "Zéro supprimerait la tolérance de lecture souhaitée par 3.4.",
+  LECTURE_SEUIL_MOTS_OK: "Zéro déclarerait toute lecture réussie : PED-09 n'aurait plus rien à juger.",
+  BLOCAGE_NB_SOLLICITATIONS: "Zéro éteindrait la détection de blocage de PED-08.",
+  CALIBRATION_NB_PHOTOS: "Zéro n'écrirait jamais calibration_log, donc supprimerait la preuve de SEC-04 en base (P2 §6).",
+  DUREE_SECOURS_ETAPE_MIN: "Zéro produirait une étape de zéro minute, refusée bien plus tard par V3.",
+});
+
+export const NEUTRE_LEGITIME: Readonly<Record<string, string>> = Object.freeze({
+  AUDIO_RETENTION_JOURS_DEFAUT:
+    "Zéro signifie « ne rien conserver » (SEC-05), et jamais « purge désactivée » : la lecture est fixée par le test de la section 3, qui la dérive du schéma.",
+});
+
+export const SANS_VALEUR_NEUTRE: Readonly<Record<string, string>> = Object.freeze({
+  DATABASE_URL: "Chaîne de connexion. Son absence refuse le démarrage ; une chaîne vide n'est pas une valeur neutre, c'est une absence.",
+  DIRECT_URL: "Chaîne de connexion directe. Même raisonnement, et c'est le rôle sous lequel policies.sql est joué.",
+  SUPABASE_URL: "Point d'entrée Storage. Son absence refuse le démarrage.",
+  SUPABASE_SERVICE_ROLE_KEY: "Secret d'accès total. Son absence refuse le démarrage ; aucune valeur intermédiaire n'éteint de garde.",
+  PARENT_SESSION_SECRET: "Secret de signature. Son absence refuse le démarrage, précisément pour qu'aucun défaut ne serve de valeur neutre.",
+  CRON_SECRET: "Secret de la route de purge. Son absence refuse le démarrage, sans quoi la route serait ouverte.",
+  DEEPSEEK_API_KEY: "Clé du fournisseur. Son absence est un repli déclaré par P2 §11 — TIPI_IA_INDISPONIBLE et saisie manuelle — et non une garde éteinte en silence.",
+  GOOGLE_SERVICE_ACCOUNT_JSON: "Compte de service. Même repli déclaré : OCR indisponible, saisie manuelle ouverte.",
+  AI_PROVIDER: "Nom d'implémentation. Une valeur inconnue LÈVE, elle ne se replie pas en silence sur un défaut.",
+  OCR_PROVIDER: "Nom d'implémentation. Même comportement : une valeur inconnue lève.",
+  VOICE_PROVIDER: "Nom d'implémentation, consommé par V4. Une valeur inconnue lèvera de même.",
+  DEEPSEEK_BASE_URL: "Adresse du point d'entrée. Une adresse injoignable produit TIPI_IA_INDISPONIBLE, chemin d'erreur déclaré et éprouvé.",
+  DEEPSEEK_MODEL: "Nom du modèle appelé. Sa neutralité n'éteint aucune garde ; sa forme est contrôlée là où elle compte, dans le vocabulaire de (A).",
 });
 
 export type Env = z.infer<typeof schemaEnv>;
