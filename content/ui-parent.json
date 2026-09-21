@@ -18,7 +18,7 @@
     "{version}": "Numero de version de l'application, sous-page A propos."
   },
   "regles": {
-    "perimetre": "Textes FIXES de l'interface : titres, libellés de bouton, étiquettes, états vides, messages d'état. Un texte qui varie d'un soir à l'autre n'a rien à faire ici : il vit dans content/encouragements.json. Les rituels vivent dans content/gwenn-scripts.json.",
+    "perimetre": "Textes FIXES de l'interface : titres, libellés de bouton, étiquettes, états vides, messages d'état. Un texte qui varie d'un soir à l'autre n'a rien à faire ici : il vit dans content/encouragements.json. Les rituels vivent dans content/pilou-scripts.json.",
     "propriete_des_cles": "Une clé d'écran a exactement un fichier propriétaire, celui qui porte son texte. La liste cles_fixes_non_variees de encouragements.json ne porte aucun texte : elle déclare seulement ce que la banque ne fait pas varier.",
     "source": "docs/agents/P1/produit-marketing.out.md. Les textes sont extraits de ses tables, jamais ressaisis.",
     "role": "Règle mécanique, aucun rôle deviné : un dernier segment commençant par « bouton » donne bouton ; un verbe d'action de la liste publiée donne action ; « titre » donne titre ; un segment finissant par « aide » donne aide ; un segment commençant par « corps » donne corps ; un texte réduit à un jeton donne valeur ; une clé coffre.cosmetiques.<id> dont le dernier segment est un identifiant de variante d'apparence de Pilou (aucun, echarpe, bonnet, noeud, lunettes, miroir de CosmetiqueId dans mascot.config.ts) donne libelle ; tout le reste donne indetermine. La valeur de repli s'appelle indetermine et non texte, pour qu'un composant ne la rende pas en corps de texte par défaut.",

@@ -7,7 +7,7 @@ Tu es éducateur spécialisé et auteur jeunesse. Tu écris pour un enfant de 6 
 
 Mission
 - Produire content/encouragements.json : au minimum 20 variantes par situation, pour les situations suivantes — accueil, annonce du programme, avant lecture, encouragement en cours de lecture, hésitation sur un mot, réussite d'étape, transition entre étapes, avant maths, indice demandé, blocage, demande de pause, retour de pause, clôture, pas de devoirs ce soir, photo illisible, reprise d'une session interrompue.
-- Produire content/gwenn-scripts.json : les répliques fixes du rituel (onboarding en 3 écrans, rituel de fermeture identique chaque soir).
+- Produire content/pilou-scripts.json : les répliques fixes du rituel (onboarding en 3 écrans, rituel de fermeture identique chaque soir).
 - Indiquer pour chaque entrée si elle est lue par TTS, affichée, ou les deux.
 
 Contraintes de rédaction
@@ -18,7 +18,7 @@ Contraintes de rédaction
 - Aucun emoji.
 
 Livrable
-- content/encouragements.json, content/gwenn-scripts.json, et docs/agents/P1/contenu-enfant.out.md qui explique la structure des fichiers.
+- content/encouragements.json, content/pilou-scripts.json, et docs/agents/P1/contenu-enfant.out.md qui explique la structure des fichiers.
 
 Definition of Done
 - Compte exact de variantes par situation affiché dans le rapport, toutes ≥ 20.

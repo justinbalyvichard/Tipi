@@ -157,7 +157,7 @@
         "bravo.coffre",
         "bravo.fin"
       ],
-      "motif": "Rituel de fermeture invariant (PED-12). Vivent dans gwenn-scripts.json."
+      "motif": "Rituel de fermeture invariant (PED-12). Vivent dans pilou-scripts.json."
     },
     {
       "cles": [
@@ -184,7 +184,7 @@
       "motif": "Un libelle d'action ne varie pas d'un soir a l'autre (DES-06)."
     }
   ],
-  "proprietaire_des_textes": "Ce fichier porte le texte de ses propres variantes, et rien d'autre. Les cles listees dans cles_fixes_non_variees ne sont PAS portees ici : leur texte vit dans content/ui-enfant.json, content/ui-parent.json ou content/gwenn-scripts.json. Une cle d'ecran a exactement un fichier proprietaire.",
+  "proprietaire_des_textes": "Ce fichier porte le texte de ses propres variantes, et rien d'autre. Les cles listees dans cles_fixes_non_variees ne sont PAS portees ici : leur texte vit dans content/ui-enfant.json, content/ui-parent.json ou content/pilou-scripts.json. Une cle d'ecran a exactement un fichier proprietaire.",
   "statut_cles": {
     "session.fin_travail.corps": "Renommée depuis transition.cloture.corps, sur demande du contrôle du tour 2 : le préfixe transition. désigne partout ailleurs un écran suivi d'une étape, or ici aucune ne suit. Texte canonique du marketing : « Tu as bien travaillé. Viens avec moi. » La clé existe pour que la banque cloture n'alimente aucune clé de /enfant/bravo (PED-12). Le renommage côté marketing est demandé en parallèle par l'Orchestrateur."
   },

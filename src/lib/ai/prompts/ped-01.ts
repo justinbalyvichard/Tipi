@@ -86,25 +86,31 @@ export function enLettres(n: number): string | null {
   if (n < 17) return UNITES[n] ?? null;
   if (n === 100) return "cent";
 
-  // 17-19, 27-29, … suivent la même règle que 70-79 et 90-99 en français
-  // standard : la dizaine inférieure plus un nombre de 7 à 19.
-  const base = n >= 80 ? 80 : n >= 70 ? 60 : Math.floor(n / 10) * 10;
-  const reste = n - base;
+  // 17, 18, 19 — « dix » suivi de l'unité.
+  if (n < 20) return `dix-${UNITES[n - 10] ?? ""}`;
 
-  if (base === 80) {
-    const tete = "quatre-vingt";
-    if (reste === 0) return "quatre-vingts";
-    const queue = enLettres(reste);
-    return queue === null ? null : `${tete}-${queue}`;
+  // 20 à 69 — dizaine pleine, puis l'unité. `-et-un` pour 21, 31, 41, 51, 61.
+  if (n < 70) {
+    const base = Math.floor(n / 10) * 10;
+    const reste = n - base;
+    const tete = DIZAINES[base];
+    if (tete === undefined) return null;
+    if (reste === 0) return tete;
+    if (reste === 1) return `${tete}-et-un`;
+    return `${tete}-${UNITES[reste] ?? ""}`;
   }
 
-  const tete = DIZAINES[base];
-  if (tete === undefined) return null;
-  if (reste === 0) return tete;
-  if (reste === 1 && base < 70) return `${tete}-et-un`;
-  if (base === 60 && reste === 11) return "soixante-et-onze";
-  const queue = enLettres(reste);
-  return queue === null ? null : `${tete}-${queue}`;
+  // 70 à 79 — « soixante » plus un nombre de 10 à 19. 71 fait exception.
+  if (n < 80) {
+    if (n === 71) return "soixante-et-onze";
+    const queue = enLettres(n - 60);
+    return queue === null ? null : `soixante-${queue}`;
+  }
+
+  // 80 à 99 — « quatre-vingt » plus un nombre de 1 à 19. 80 seul prend le `s`.
+  if (n === 80) return "quatre-vingts";
+  const queue = enLettres(n - 80);
+  return queue === null ? null : `quatre-vingt-${queue}`;
 }
 
 /** Minuscules, sans accents, sans ponctuation : la forme comparable. */

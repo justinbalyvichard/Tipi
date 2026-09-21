@@ -17,7 +17,7 @@
 import type { z } from "zod";
 
 import encouragementsBrut from "@content/encouragements.json";
-import rituelsBrut from "@content/gwenn-scripts.json";
+import rituelsBrut from "@content/pilou-scripts.json";
 import uiEnfantBrut from "@content/ui-enfant.json";
 import uiParentBrut from "@content/ui-parent.json";
 
@@ -71,7 +71,7 @@ function charger(): Contenu {
       "encouragements.json",
       encouragementsBrut,
     ),
-    rituels: valider(FichierRituels, "gwenn-scripts.json", rituelsBrut),
+    rituels: valider(FichierRituels, "pilou-scripts.json", rituelsBrut),
   });
   return cache;
 }

@@ -16,8 +16,6 @@
  * Aucune de ces six règles n'est laissée au fournisseur : un second fournisseur
  * les hériterait sans les réécrire, et ne pourrait pas les affaiblir.
  */
-import type { z } from "zod";
-
 import {
   PayloadIa,
   assertCorpsDerivable,
@@ -34,6 +32,30 @@ garderServeur("src/lib/ai/execution.ts");
 
 /** Nombre total de tentatives : la première, plus **une** relance (3.2, étape 4). */
 export const TENTATIVES_MAX = 2;
+
+/**
+ * Ce qu'`executerPrompt` attend d'un schéma : savoir valider un `unknown`.
+ *
+ * Décrit structurellement plutôt qu'en `z.ZodType<T>`, et pour une raison
+ * précise : les trois schémas de `schemas.ts` **transforment** leur entrée
+ * (noms de la section 3.6 en entrée, camelCase en sortie), donc leur type
+ * d'entrée n'est pas leur type de sortie. Les nommer par leur type de sortie
+ * seul les rendrait inassignables. Cette forme-ci dit exactement ce qui est
+ * utilisé — `safeParse` sur une valeur inconnue — et rien de plus.
+ */
+export interface SchemaSortie<T> {
+  safeParse(valeur: unknown):
+    | { readonly success: true; readonly data: T }
+    | {
+        readonly success: false;
+        readonly error: {
+          readonly issues: readonly {
+            readonly path: readonly (string | number)[];
+            readonly message: string;
+          }[];
+        };
+      };
+}
 
 /**
  * Extrait le premier objet JSON d'une réponse de modèle.
@@ -101,7 +123,7 @@ export async function executerPrompt<T>(
   transport: AiTransport,
   prompt: PromptVersionne,
   texte: string,
-  schema: z.ZodType<T>,
+  schema: SchemaSortie<T>,
 ): Promise<ResultatIa<T>> {
   garderServeur("src/lib/ai/execution.ts");
   const debut = Date.now();

@@ -65,6 +65,26 @@ export async function handler<E, S>(
   }
 }
 
+/**
+ * Traduit le résultat d'un `handler` en réponse HTTP.
+ *
+ * AJOUTÉE PAR V2, à l'endroit où V1 avait laissé la place : V1 n'a livré
+ * aucune route, donc aucun besoin de rendre une `Response`. La conversion est
+ * ici et nulle part ailleurs, pour que les 32 chemins de P2 §8 aient
+ * rigoureusement la même forme de corps et le même jeu d'en-têtes.
+ *
+ * `cache-control: no-store` sur toutes les routes : aucune réponse de Tipi
+ * n'est cachable — un programme du soir, un état de session, un solde de
+ * pierres sont des données vivantes, et un intermédiaire qui en garderait une
+ * copie afficherait les devoirs d'hier.
+ */
+export function versReponse<T>(reponse: ReponseRoute<T>): Response {
+  return Response.json(reponse.body, {
+    status: reponse.status,
+    headers: { "cache-control": "no-store" },
+  });
+}
+
 function reponseErreur<S>(brute: unknown): ReponseRoute<S> {
   const erreur = estAppError(brute)
     ? brute

@@ -141,7 +141,7 @@ const VOCABULAIRE_PROTOCOLE: Readonly<Record<string, string>> = Object.freeze({
   user: "Rôle du texte de l'exercice. Désigne un rôle de protocole, jamais une personne.",
   model: "Nom du champ qui désigne le modèle appelé. Sa valeur vient de la configuration.",
   response: "Première moitié de `response_format`, champ qui exige une sortie JSON.",
-  format: "Seconde moitié de `response_format`.",
+  format: "Seconde moitié de `response_format`, le champ qui impose la forme de la réponse.",
   type: "Nom du champ qui précise la forme de sortie exigée.",
   json: "Valeur de sortie exigée : du JSON, ce que TEC-05 demande de valider par Zod.",
   object: "Seconde moitié de `json_object`, la forme de sortie exigée.",
@@ -154,6 +154,11 @@ const VOCABULAIRE_PROTOCOLE: Readonly<Record<string, string>> = Object.freeze({
 
 /** Un jeton purement numérique plus long que cela est refusé : c'est un blob. */
 const LONGUEUR_MAX_JETON_NUMERIQUE = 10;
+
+/** Suites de lettres ou de chiffres examinées dans le résidu. */
+const MOTIF_JETON = /[\p{L}\p{N}]{3,}/gu;
+/** Même découpage, sans borne basse, pour le vocabulaire déclaré. */
+const MOTIF_JETON_LARGE = /[\p{L}\p{N}]+/gu;
 
 // ---------------------------------------------------------------------------
 // Repliement : comparer sans tenir compte de la casse ni des accents, tout en
@@ -445,13 +450,18 @@ export function defautsDeDerivabilite(
 
   const autorises = new Set<string>(Object.keys(VOCABULAIRE_PROTOCOLE));
   for (const mot of vocabulaireSupplementaire) {
-    for (const jeton of replier(mot).matchAll(/[\p{L}\p{N}_]{1,}/gu)) {
+    for (const jeton of replier(mot).matchAll(MOTIF_JETON_LARGE)) {
       autorises.add(jeton[0]);
     }
   }
 
   const defauts: DefautDerivabilite[] = [];
-  for (const trouve of residu.matchAll(/[\p{L}\p{N}_]{3,}/gu)) {
+  // Le tiret bas ne fait pas partie d'un jeton : c'est un séparateur de
+  // protocole (`response_format`, `json_object`), et l'y inclure obligerait à
+  // déclarer chaque combinaison au lieu de chaque mot. Découper dessus rend le
+  // vocabulaire plus petit ET le contrôle plus fin — `child_id` devient
+  // « child », qui n'est déclaré nulle part.
+  for (const trouve of residu.matchAll(MOTIF_JETON)) {
     const jeton = replier(trouve[0]);
     if (autorises.has(jeton)) continue;
     if (/^\d+$/u.test(jeton)) {

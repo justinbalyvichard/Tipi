@@ -141,7 +141,7 @@ export const FichierEncouragements = z
 export type FichierEncouragements = z.infer<typeof FichierEncouragements>;
 
 // ---------------------------------------------------------------------------
-// content/gwenn-scripts.json
+// content/pilou-scripts.json
 // ---------------------------------------------------------------------------
 // Le nom du fichier est celui du prompt maître. ESC-001 a été tranchée le
 // 2026-09-21 : le nom est conservé, le personnage s'appelle Pilou partout.

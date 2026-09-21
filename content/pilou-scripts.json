@@ -1,8 +1,8 @@
 {
-  "schema": "tipi.gwenn-scripts.v2",
+  "schema": "tipi.pilou-scripts.v2",
   "version": "2.0.0",
   "personnage": "Pilou",
-  "note_nom_de_fichier": "Le fichier s'appelle gwenn-scripts.json parce que le prompt maître le nomme ainsi. Le personnage s'appelle Pilou partout dans les textes.",
+  "note_nom_de_fichier": "Le fichier s'appelle pilou-scripts.json et le personnage s'appelle Pilou. Le prompt maitre disait gwenn-scripts.json, nom herite d'une version anterieure : renomme le 2026-09-21 sur decision humaine, ESC-001 rouverte et tranchee dans l'autre sens.",
   "jeton_prenom": "{prenom}",
   "canaux": [
     "tts",

@@ -9,7 +9,7 @@ import { cx } from "../ui/cx";
  * affiché et la réplique entendue arrivent ensemble, sans se couper.
  *
  * Le texte n'est jamais écrit ici : il arrive par `children`, depuis
- * `content/encouragements.json`, `content/gwenn-scripts.json` ou
+ * `content/encouragements.json`, `content/pilou-scripts.json` ou
  * `content/ui-enfant.json`.
  *
  * La pointe de la bulle est un carré pivoté de la même couleur que la surface :
