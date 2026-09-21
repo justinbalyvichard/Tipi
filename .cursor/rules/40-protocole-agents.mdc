@@ -51,6 +51,35 @@ Règles :
    même chose. Publie aussi le **compte des cas pile au seuil**.
 4. Un détecteur qui ne trouve plus rien après avoir été élargi est suspect
    jusqu'à preuve du contraire.
+5. **Un instrument qui affiche le défaut sans le voir est pire qu'un instrument
+   muet** : il produit une preuve verte. Un contrôle qui imprime une ligne
+   absurde et conclut « aucun problème » a échoué deux fois.
+
+## Invariant plutôt que re-dérivation
+
+Leçon tirée de la porte G1 et des fichiers d'interface, applicable à toute
+vérification, y compris aux tests des phases de code.
+
+Pour vérifier un résultat calculé, deux méthodes s'offrent :
+
+- **la re-dérivation** — recalculer avec une seconde implémentation et comparer ;
+- **l'invariant** — affirmer une propriété que le résultat doit satisfaire, quelle
+  que soit la façon dont il a été obtenu.
+
+**Préférer l'invariant chaque fois que les deux sont possibles.** Une
+re-dérivation partage nécessairement la règle et les données avec ce qu'elle
+vérifie : elle attrape une erreur de codage, jamais une **règle fausse**. Deux
+implémentations correctes d'une règle fausse sont d'accord entre elles.
+
+Cas réel : un appariement par sous-chaîne rattachait la mauvaise condition à une
+clé. Deux re-dérivations auraient concordé. C'est l'invariant « aucun segment
+déclaré ne reste inemployé » qui révélait le défaut — le bon segment existait,
+masqué et jamais utilisé.
+
+Bons invariants : une somme qui doit égaler un total ; une relation qui doit être
+réciproque ; un ensemble déclaré dont aucun élément ne doit rester inemployé ;
+un résultat qui ne doit pas dépendre de l'ordre des entrées — testable en
+permutant.
 
 ## Boucle et escalade
 
