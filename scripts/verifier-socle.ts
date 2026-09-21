@@ -839,6 +839,24 @@ function i2(): void {
     }
   }
 
+  // AJOUTÉ AU TOUR 4 — [MINEUR] T4-1. Le SQL brut n'est pas une affectation de
+  // champ : il ne contient aucun `<champ>: <valeur>` à lire, et il échappait
+  // donc à tout ce qui précède. `controle-code` a écrit
+  // `prisma.$executeRawUnsafe("UPDATE child SET niveau_scolaire = 'CE1, 6 ans'")`
+  // et a lu l'âge d'Evan dans sa base, avec les quatre sous-invariants verts.
+  //
+  // Ce n'est pas une couche de plus au sens d'ARB-18 : c'est une INTERDICTION,
+  // au seul endroit où le problème se pose. Le seed n'a aucune raison d'écrire
+  // du SQL brut — il a Prisma —, et la seule chose que le SQL brut lui apporte
+  // est de contourner le typage et la lecture. Le jour où une verticale en
+  // aurait réellement besoin, elle le justifiera dans son rapport.
+  const sqlBrut = [...seed.matchAll(/\$executeRaw\w*|\$queryRaw\w*/gu)].map((m) => m[0]);
+  if (sqlBrut.length > 0) {
+    defauts.push(
+      `I2d — prisma/seed.ts emploie ${[...new Set(sqlBrut)].join(", ")} : le SQL brut n'est pas une affectation de champ, donc aucun contrôle de forme ne peut le lire. Le seed écrit par Prisma, jamais en SQL brut (PRD-02, [MINEUR] T4-1).`,
+    );
+  }
+
   if (affectationsLues === 0) {
     defauts.push(
       "I2d — aucune affectation littérale à un champ de child n'a été lue dans prisma/seed.ts : l'instrument ne mesure rien.",
