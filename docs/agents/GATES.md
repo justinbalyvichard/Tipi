@@ -11,8 +11,8 @@ sa porte amont n'est pas verte.
 | G1 | P1 Produit & marketing + P1bis Contenu enfant | `produit-marketing`, `contenu-enfant` | `controle-produit` | **verte** | 2026-09-20 | [marketing](P1/produit-marketing.review.md) · [contenu](P1/contenu-enfant.review.md) |
 | G2 | P2 Architecture | `architecte` | `controle-architecture` | **verte** | 2026-09-21 | [verdict](P2/architecture.review.md) |
 | G3 | P3 Design system | `design-system` | `controle-design` | **verte** | 2026-09-21 | [verdict](P3/design-system.review.md) |
-| G4.V1 | P4 V1 Socle | `dev-feature` | `controle-code` | en cours | 2026-09-21 | — |
-| G4.V2 | P4 V2 Capture & analyse IA | `dev-feature` | `controle-code` | ouverte | — | — |
+| G4.V1 | P4 V1 Socle | `dev-feature` | `controle-code` | **verte** | 2026-09-21 | [verdict](P4/V1.review.md) |
+| G4.V2 | P4 V2 Capture & analyse IA | `dev-feature` | `controle-code` | en cours | 2026-09-21 | — |
 | G4.V3 | P4 V3 Moteur de session | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V4 | P4 V4 Module Lecture | `dev-feature` | `controle-code` | ouverte | — | — |
 | G4.V5 | P4 V5 Module Maths | `dev-feature` | `controle-code` | ouverte | — | — |
@@ -83,6 +83,7 @@ tous les agents en aval.
 | 2026-09-21 | **G3 verte.** ESC-003 ouverte sur la silhouette de Pilou, sans bloquer. P4 ouverte, verticale V1 lancée. |
 | 2026-09-21 | V1, tours 1 à 3 : trois `FAIL` (2 majeurs, puis 1, puis 1). Les majeurs sont tous des instruments qui ne mordent pas. TEC-13 prouvée sur le bundle réel avec 24 sentinelles. Arbitrages ARB-17 et ARB-18. |
 | 2026-09-21 | **Règle permanente adoptée par l'humain : ARB-19.** Le quatrième tour devient automatique sous trois conditions. Tour 4 de V1 lancé sans escalade. |
+| 2026-09-21 | V1, tour 4 : `PASS_AVEC_RESERVES` (3 mineurs). Le majeur levé et vérifié par le contrôleur à cinq emplacements dont deux qu'il a ajoutés. **G4.V1 verte.** Deux points portés par le contrôleur contre lui-même : trois invariants jamais mis en défaut, donc non éprouvés, et sa propre fiche calibrée sur une constante disparue. |
 | 2026-09-21 | **ESC-001 tranchée : NON.** `gwenn-scripts.json` garde son nom. Le personnage s'appelle Pilou partout, zéro occurrence de « Gwenn » comme nom dans les 767 textes. Sujet clos. |
 | 2026-09-21 | Architecture, tour 4 : `PASS_AVEC_RESERVES` (2 mineurs). Tout rejoué sur un PostgreSQL 16.13 neuf par le contrôleur : dix applications de `policies.sql`, les sept chemins d'ARB-13 en données construites par lui, neuf tests adverses refusés par la base, test de mutation reproduit. **Aucun écart sur 28 grandeurs, quatrième tour consécutif.** |
 | 2026-09-21 | **G2 verte.** Les deux réserves sont versées au dossier de P5 : elles ne changent ni schéma, ni route, ni contrainte, ni un chiffre. P3 ouverte, `design-system` lancé. |

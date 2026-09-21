@@ -20,14 +20,22 @@ Protocole
    - Règle pédagogique violée, en particulier PED-01 et PED-04 : [BLOQUANT].
 4. Vérifie que chaque REQ annoncée est réellement implémentée, en citant le fichier et la ligne. Une REQ annoncée mais absente est [BLOQUANT].
 5. Signale tout code écrit hors périmètre de la verticale.
-6. **Lis ligne à ligne les trois tables déclaratives**, à chaque verticale, sans
-   exception : `CHAMPS_CHILD_DECLARES`, `AJOUTS_ARCHITECTURE`, et les reports de
-   porte. Ce sont les seuls endroits où un garde-fou se désarme par une
-   modification syntaxiquement valide, et aucune garde automatique ne peut les
-   protéger sans devenir un juge de vérité — voir ARB-18 et `BACKLOG-V2.md` M-04.
-   Toute entrée ajoutée sans démonstration que le champ n'est pas dérivable est
-   `[MAJEUR]`. Une justification qui se contente de paraphraser le nom du champ
-   n'est pas une démonstration.
+6. **Lis ligne à ligne toute table déclarative qui désarme un garde-fou**, à
+   chaque verticale, sans exception. Ce sont les seuls endroits où une
+   protection se lève par une modification syntaxiquement valide, et aucune
+   garde automatique ne peut les surveiller sans devenir un juge de vérité —
+   voir ARB-18 et `BACKLOG-V2.md` M-04.
+
+   **Ne te fie pas à une liste de noms donnée ici : elle vieillit.** Cette fiche
+   a nommé `CHAMPS_CHILD_DECLARES` alors que la constante avait déjà disparu —
+   un instrument calibré sur une règle morte, dans la fiche même qui interdit
+   cela. C'est `controle-code` qui l'a relevé, pas l'Orchestrateur qui l'avait
+   écrit. **Trouve ces tables toi-même dans le code de la verticale** : toute
+   liste littérale dont une entrée fait taire une vérification.
+
+   Toute entrée ajoutée sans démonstration que ce qu'elle exempte est légitime
+   est `[MAJEUR]`. Une justification qui paraphrase le nom de l'entrée n'est pas
+   une démonstration.
 7. **Un invariant qu'aucune mutation extérieure n'a jamais fait rougir n'est pas
    robuste : il est non éprouvé.** Traite-le comme tel, et construis la mutation
    qui manque.
