@@ -16,7 +16,8 @@
     "verifier:socle": "tsx scripts/verifier-socle.ts",
     "verifier:confinement": "tsx scripts/verifier-confinement.ts",
     "db:diff": "bash scripts/db-diff.sh",
-    "epreuve:pipeline": "tsx scripts/epreuve-pipeline.ts"
+    "epreuve:pipeline": "tsx scripts/epreuve-pipeline.ts",
+    "epreuve:session": "tsx scripts/epreuve-session.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

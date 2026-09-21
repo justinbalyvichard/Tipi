@@ -50,7 +50,7 @@ export function EcranTransition({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-prose flex-col items-center justify-center gap-8 p-6">
-      <Pilou taille="grande" anime />
+      <Pilou taille="hero" anime />
 
       <SpeechBubble>
         <span className="block">{textes.felicitation}</span>

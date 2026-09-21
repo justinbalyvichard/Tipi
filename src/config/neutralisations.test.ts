@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { z } from "zod";
 
 import {
   IdentifiantsInterdits,
@@ -21,6 +22,7 @@ import {
   reinitialiserEnvPourTest,
 } from "@/config/env";
 import { reinitialiserSeuilsPourTest, seuils } from "@/config/seuils.config";
+import { appelerApi } from "@/lib/api/client";
 import { autorisationSortie } from "@/lib/parent/autorisation-sortie";
 import {
   CONFIG_BAREME_LIVREE,
@@ -402,6 +404,18 @@ describe("V3 — les listes du moteur de session", () => {
       expect(route, etat).toMatch(/^\//u);
     }
     expect(Object.keys(ROUTE_PAR_ETAT)).toHaveLength(ETATS.length);
+  });
+
+  it("appelerApi REFUSE toute adresse qui n'est pas une route de Tipi", async () => {
+    // Le second passage réseau du produit (C6). Son préfixe `/api/` est la
+    // garde qui l'empêche de devenir un passe-droit vers un hôte externe : un
+    // préfixe vide accepterait n'importe quelle adresse, et le contrôle C6
+    // resterait vert puisque le `fetch` serait toujours au bon endroit.
+    await expect(appelerApi("https://ailleurs.invalid/x", z.unknown())).rejects.toThrow(
+      /route de Tipi/u,
+    );
+    await expect(appelerApi("//ailleurs.invalid/x", z.unknown())).rejects.toThrow(/route de Tipi/u);
+    await expect(appelerApi("/enfant/pause", z.unknown())).rejects.toThrow(/route de Tipi/u);
   });
 
   it("l'autorisation de sortie parent REFUSE, et dit pourquoi (ARB-09)", async () => {

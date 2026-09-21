@@ -3,10 +3,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { z } from "zod";
 
 import { SEUIL_ATTENTE_PILOU_MS } from "@/config/ui.config";
+import { appelerApi } from "@/lib/api/client";
 import { routeDe } from "@/lib/session/routes";
-import type { EtatSession, Evenement, Snapshot } from "@/lib/session/types";
+import { EtatSession, type Evenement } from "@/lib/session/types";
 
 /**
  * Le hook qui fait avancer la machine, côté écran (TEC-04, TEC-12, PRD-16).
@@ -39,14 +41,15 @@ export interface DemandeTransitionClient {
   readonly etatAttendu: EtatSession;
 }
 
-interface ReponseTransition {
-  readonly session: Snapshot;
-  readonly pierresCreditees: number;
-}
-
-function estReponse(valeur: unknown): valeur is ReponseTransition {
-  return typeof valeur === "object" && valeur !== null && "session" in valeur;
-}
+/**
+ * La réponse, validée par Zod : elle a traversé le réseau, c'est donc une
+ * entrée externe. Le schéma ne décrit que ce dont l'écran a besoin —
+ * l'état, pour savoir où aller.
+ */
+const ReponseTransition = z.object({
+  session: z.object({ id: z.string(), etat: EtatSession }),
+  pierresCreditees: z.number().int().nonnegative(),
+});
 
 export interface TransitionSession {
   readonly envoyer: (demande: DemandeTransitionClient) => void;
@@ -62,27 +65,19 @@ export function useTransitionSession(): TransitionSession {
   const [attenteAffichee, setAttenteAffichee] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: async (demande: DemandeTransitionClient): Promise<ReponseTransition> => {
+    mutationFn: async (demande: DemandeTransitionClient) => {
       const cle = `${demande.sessionId}:${demande.evenement}:${demande.etatAttendu}`;
       const existant = identifiants.current.get(cle) ?? crypto.randomUUID();
       identifiants.current.set(cle, existant);
 
-      const reponse = await fetch(`/api/session/${demande.sessionId}/transition`, {
+      return appelerApi(`/api/session/${demande.sessionId}/transition`, ReponseTransition, {
         method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
+        corps: {
           evenementId: existant,
           evenement: demande.evenement,
           etatAttendu: demande.etatAttendu,
-        }),
+        },
       });
-      const corps: unknown = await reponse.json().catch(() => undefined);
-      if (!reponse.ok || !estReponse(corps)) {
-        // Le détail reste au journal du navigateur ; l'enfant ne voit rien
-        // d'autre que son bouton, toujours là.
-        throw new Error(String(reponse.status));
-      }
-      return corps;
     },
     onSuccess: (reponse) => {
       routeur.push(routeDe(reponse.session.etat));

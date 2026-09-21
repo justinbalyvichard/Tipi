@@ -672,10 +672,17 @@ const PASSAGES_UNIQUES: readonly {
   },
   {
     quoi: "fetch(",
+    // ÉLARGI PAR V3, et le motif est écrit plutôt que tu. La règle du tour 2
+    // — « fetch( seulement dans src/lib/ai/providers/ » — a rougi sur le
+    // PREMIER écran qui parle au serveur : un appel vers /api/session/… ne
+    // parle à aucun fournisseur. Élargir à src/hooks/** aurait rendu un appel
+    // de fournisseur écrivable dans un hook ; le second destinataire reçoit
+    // donc son passage unique, comme le premier a le sien, avec une garde
+    // EXÉCUTABLE dans le fichier (le chemin doit commencer par /api/).
     motif: /\bfetch\s*\(/gu,
-    ou: /^src\/lib\/ai\/providers\//u,
+    ou: /^src\/lib\/(ai\/providers\/|api\/client\.ts$)/u,
     motifDeclare:
-      "Un appel réseau écrit hors d'un fournisseur contournerait l'interface AiTransport, donc la coupure corps()/emettre() sur laquelle repose l'ordre « contrôler puis émettre ».",
+      "Le produit n'a que DEUX destinations réseau, chacune lisible en un seul endroit : un fournisseur externe derrière AiTransport, et les routes de Tipi derrière appelerApi(). Un fetch ailleurs contournerait l'une ou l'autre — la coupure corps()/emettre() de SEC-04, ou la validation Zod de la réponse.",
   },
   {
     quoi: "executerPrompt(",
@@ -820,6 +827,130 @@ function c7(): void {
 }
 
 // ---------------------------------------------------------------------------
+// C8 — V3 : L'ÉTAT DE SESSION ET LE LEDGER N'ONT QU'UN ÉCRIVAIN CHACUN
+// ---------------------------------------------------------------------------
+// AJOUTÉ PAR V3, dans la forme de C6 et C7 : des **passages uniques**, chacun
+// épinglé à son lieu, chacun portant son motif, et chacun en ÉCHEC si le
+// passage disparaît.
+//
+// Ce que C8 prouve, et ce qu'il ne prouve pas — la même honnêteté que C6 :
+//
+//   Il prouve que les écritures qui décident de l'état d'une soirée et du solde
+//   de pierres restent **lisibles en un seul endroit**. C'est ce qui rend
+//   vérifiable la phrase de P2 §9.3 : « une transition = une transaction ».
+//   Deux écrivains, c'est deux ordres d'exécution possibles, donc l'ordre
+//   « crédits d'étape puis bonus » qui n'est plus garanti — le défaut exact du
+//   constat 26, qui a coûté une pierre à l'enfant.
+//
+//   Il ne prouve pas l'absence d'écriture : une écriture imbriquée par relation
+//   (`child.update({ data: { sessions: { create: … } } })`) ne nomme aucun de
+//   ces passages. C'est C5 qui attrape cette forme-là, par dérivation depuis
+//   `prisma/schema.prisma`, et il la couvre pour le périmètre de V2. Étendre C5
+//   à tout `src/` est impossible en l'état : `sessionId` est un identifiant
+//   légitime dans un hook, un composant et une route, et un contrôle qui rougit
+//   partout ne mesure plus rien.
+
+const ECRITURES_UNIQUES: readonly {
+  readonly quoi: string;
+  readonly motif: RegExp;
+  readonly ou: RegExp;
+  readonly motifDeclare: string;
+}[] = [
+  {
+    quoi: "gemLedger.create(",
+    motif: /\bgemLedger\s*\.\s*create\s*\(/gu,
+    ou: /^src\/lib\/pierres\/service\.ts$/u,
+    motifDeclare:
+      "TEC-11 et SEC-06 — la seule écriture du ledger. Ailleurs, une pierre serait créditée sans passer par le barème ni par l'unique (session_id, raison) qui porte l'idempotence, et l'invariant gem_balance == SUM(delta) cesserait d'être rétabli.",
+  },
+  {
+    quoi: "gemBalance",
+    motif: /\bgemBalance\b/gu,
+    ou: /^src\/lib\/pierres\/service\.ts$/u,
+    motifDeclare:
+      "SEC-06 — le solde est un cache RECALCULÉ depuis le ledger, jamais incrémenté ni écrit par un autre module. Un second écrivain ferait diverger le cache de sa source sans qu'aucune requête ne le dise.",
+  },
+  {
+    quoi: "session.update(",
+    motif: /\bsession\s*\.\s*update\s*\(/gu,
+    ou: /^src\/lib\/session\/service\.ts$/u,
+    motifDeclare:
+      "TEC-10 — l'état persisté ne change qu'au terme d'une transition calculée par la machine, dans la transaction qui porte ses effets. Une seconde écriture ferait avancer l'état sans crédit, ou créditerait sans faire avancer l'état.",
+  },
+  {
+    quoi: "session.create(",
+    motif: /\bsession\s*\.\s*create\s*\(/gu,
+    ou: /^src\/lib\/session\/service\.ts$/u,
+    motifDeclare:
+      "TEC-06 — une session ne naît qu'après la validation du parent, avec ses cinq gardes (PED-06, ARB-08, matières distinctes, session déjà active, drapeau sansDevoir). Créée ailleurs, elle les contournerait toutes.",
+  },
+  {
+    quoi: "appliquer(",
+    motif: /(?<![A-Za-z0-9_$])appliquer\s*\(/gu,
+    ou: /^src\/lib\/session\/(machine|service)\.ts$/u,
+    motifDeclare:
+      "La fonction pure de la machine n'est appelée que par le service, qui l'entoure du verrou, de l'idempotence et de la transaction. Appelée ailleurs, elle rendrait une transition que personne ne persisterait — un état décidé et jamais écrit, contre PRD-18.",
+  },
+  {
+    quoi: "crediterBonusSiSoireeComplete(",
+    motif: /\bcrediterBonusSiSoireeComplete\s*\(/gu,
+    ou: /^src\/lib\/(pierres\/service|session\/service)\.ts$/u,
+    motifDeclare:
+      "ARB-13 — le bonus est défini une fois et exécuté une fois, à l'endroit qui applique les effets de la machine dans l'ordre où elle les a posés. Ses trois créditeurs (T5, T10, T12) sont des lignes de la TABLE, pas trois appels dispersés : c'est ce qui empêche qu'un quatrième chemin terminal oublie le bonus.",
+  },
+  {
+    quoi: "$queryRaw / $executeRaw",
+    motif: /\$(?:queryRaw|executeRaw)\w*/gu,
+    ou: /^src\/lib\/session\/service\.ts$/u,
+    motifDeclare:
+      "Le SQL brut échappe à toute lecture d'identifiants. Le seul du produit est le SELECT … FOR UPDATE du verrou de transition, irréductible : ni Prisma ni une contrainte ne savent l'exprimer. Tout autre serait une écriture que C5 et C8 ne peuvent pas voir.",
+  },
+];
+
+function c8(): void {
+  const fichiers = fichiersSous("src").filter((f) => !f.endsWith(".test.ts"));
+  if (fichiers.length === 0) {
+    enregistrer("C8", "C8 — TEC-10, TEC-11, SEC-06 : un seul écrivain par garantie", "src/ : AUCUN fichier lu", ["src/ introuvable : l'instrument ne mesure rien."], false);
+    return;
+  }
+
+  const defauts: string[] = [];
+  const comptes: string[] = [];
+
+  for (const { quoi, motif, ou, motifDeclare } of ECRITURES_UNIQUES) {
+    let total = 0;
+    for (const fichier of fichiers) {
+      const nu = codeNu(lire(fichier));
+      const occurrences = [...nu.matchAll(motif)].length;
+      if (occurrences === 0) continue;
+      total += occurrences;
+      if (!ou.test(fichier)) {
+        defauts.push(`${fichier} écrit « ${quoi} » hors de ${ou.source}. ${motifDeclare}`);
+      }
+    }
+    if (total === 0) {
+      defauts.push(
+        `aucune occurrence de « ${quoi} » dans src/ : l'instrument ne mesure rien pour cette écriture. Le passage a disparu, ou le motif ne le reconnaît plus.`,
+      );
+    }
+    comptes.push(`${quoi} ${total}`);
+  }
+
+  for (const { quoi, motifDeclare } of ECRITURES_UNIQUES) {
+    if (motifDeclare.trim().length < 40) {
+      defauts.push(`${quoi} est épinglé sans motif écrit (ARB-18 mesure 2).`);
+    }
+  }
+
+  enregistrer(
+    "C8",
+    "C8 — TEC-10, TEC-11, SEC-06 : un seul écrivain par garantie",
+    `${fichiers.length} fichiers de src/ (hors tests) · ${ECRITURES_UNIQUES.length} écritures surveillées, chacune justifiée · occurrences trouvées : ${comptes.join(" · ")}`,
+    defauts,
+  );
+}
+
+// ---------------------------------------------------------------------------
 // C0 — QUI GARDE LE GARDIEN ? LES TABLES DE L'INSTRUMENT, GARDÉES CONTRE ELLES-MÊMES
 // ---------------------------------------------------------------------------
 // AJOUTÉ AU TOUR 4, en réponse à [MAJEUR] M6, et c'est la question que ce projet
@@ -950,6 +1081,14 @@ const TABLES_GARDEES: readonly {
     eteint:
       "SEC-04 : plus aucun sceau n'est épinglé à son unique lieu de fabrication. C'est le contrôle qui répond à [MAJEUR] M5 — un sceau fabriqué ailleurs atteste une liste que personne n'a tirée du foyer.",
   },
+  {
+    nom: "ECRITURES_UNIQUES",
+    controle: "C8",
+    estNeutre: () =>
+      ECRITURES_UNIQUES.length === 0 || ECRITURES_UNIQUES.some((e) => regexNeutre(e.ou)),
+    eteint:
+      "TEC-10, TEC-11, SEC-06 : plus aucune écriture n'est épinglée à son écrivain unique. L'état de session et le ledger pourraient être écrits depuis n'importe où, donc hors de la transaction qui tient l'ordre « crédits d'étape puis bonus » — le défaut du constat 26, qui coûtait une pierre à l'enfant.",
+  },
 ];
 
 /**
@@ -1035,6 +1174,7 @@ c4();
 c5();
 c6();
 c7();
+c8();
 
 let echecs = 0;
 for (const r of resultats) {

@@ -57,12 +57,28 @@ export function PauseGuidee({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-prose flex-col items-center justify-center gap-8 p-6">
-      <Pilou taille="grande" anime />
+      <Pilou taille="hero" anime />
 
       <SpeechBubble>
+        <span className="block">{textes.titre}</span>
+        <span className="block">{textes.corps}</span>
+      </SpeechBubble>
+
+      {/*
+        « Le rond », que plusieurs phrases de la banque nomment : « Regarde le
+        rond qui grandit. » Il respire au rythme de l'animation `respire`, la
+        même que Pilou, et il est décoratif pour les technologies d'assistance —
+        l'information est dans le texte, jamais dans la forme seule (DES-08).
+      */}
+      <span
+        aria-hidden
+        className="block h-24 w-24 animate-respire rounded-pilule bg-teinte-menthe"
+      />
+
+      <p className="font-texte text-corps text-encre">
         <span className="block">{textes.inspire}</span>
         <span className="block">{textes.expire}</span>
-      </SpeechBubble>
+      </p>
 
       <p className="font-texte text-corps text-texte-secondaire">{textes.rassurance}</p>
 
