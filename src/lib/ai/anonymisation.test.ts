@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  IdentifiantsInterdits,
   PayloadIa,
   TexteAnonymise,
   REMPLACEMENT_IDENTIFIANT,
@@ -11,7 +12,6 @@ import {
   defautsDeDerivabilite,
   vocabulaireProtocole,
   type CorpsIa,
-  type IdentifiantsInterdits,
 } from "@/lib/ai/anonymisation";
 import { PROMPT_1_STRUCTURATION } from "@/lib/ai/prompts/prompt-1-structuration";
 import { estAppError } from "@/lib/errors/app-error";
@@ -34,14 +34,12 @@ import { estAppError } from "@/lib/errors/app-error";
  * qui vaut pour TOUT fichier de `src/`, tests compris. */
 const MODELE_TEMOIN = "modele-texte";
 
-const INTERDITS: IdentifiantsInterdits = {
-  valeurs: [
-    "Evan",
-    "3f1a9c22-0000-4000-8000-000000000001",
-    "9b2d4e55-0000-4000-8000-000000000002",
-    "Foyer Le Goff",
-  ],
-};
+const INTERDITS = IdentifiantsInterdits.sceller([
+  "Evan",
+  "3f1a9c22-0000-4000-8000-000000000001",
+  "9b2d4e55-0000-4000-8000-000000000002",
+  "Foyer Le Goff",
+]);
 
 /** Un texte anonymisé, construit par la seule fabrique qui existe. */
 function anonyme(texte: string): TexteAnonymise {
@@ -100,7 +98,7 @@ describe("SEC-04 (B) — caviardage du texte de devoir", () => {
   });
 
   it("cherche un identifiant court EN MOT ENTIER et ne hache pas le texte", () => {
-    const courts: IdentifiantsInterdits = { valeurs: ["Li"] };
+    const courts = IdentifiantsInterdits.sceller(["Li"]);
     // Rouge si la recherche était en sous-chaîne : « lire » et « police »
     // seraient éventrés.
     const propre = caviarder("Li doit lire la police du livre.", courts);

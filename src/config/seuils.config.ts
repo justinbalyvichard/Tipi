@@ -44,6 +44,27 @@ export function seuils(): Seuils {
   garderServeur("src/config/seuils.config.ts");
   if (cache !== undefined) return cache;
   const e = env();
+  // GARDE DE COHÉRENCE — famille de [MAJEUR] M5. `env.ts` borne déjà chaque
+  // variable ; cette seconde lecture existe parce qu'une garde qui repose sur
+  // « un autre module l'a déjà vérifié » est celle qui tombe le jour où ce
+  // module change. Elle ne duplique pas les bornes : elle vérifie la propriété
+  // qui compte — aucun seuil neutralisé n'atteint le pipeline.
+  const neutres = Object.entries({
+    ocrConfianceMin: e.OCR_CONFIANCE_MIN,
+    lectureToleranceMot: e.LECTURE_TOLERANCE_MOT,
+    lectureSeuilMotsOk: e.LECTURE_SEUIL_MOTS_OK,
+    blocageNbSollicitations: e.BLOCAGE_NB_SOLLICITATIONS,
+    calibrationNbPhotos: e.CALIBRATION_NB_PHOTOS,
+    dureeSecoursEtapeMin: e.DUREE_SECOURS_ETAPE_MIN,
+  })
+    .filter(([, valeur]) => valeur <= 0)
+    .map(([nom]) => nom);
+  if (neutres.length > 0) {
+    throw new Error(
+      `TEC-16 : seuil(s) neutralisé(s) : ${neutres.join(", ")}. Une valeur nulle éteint la garde qu'elle règle (voir l'encadré de src/config/env.ts).`,
+    );
+  }
+
   cache = Object.freeze({
     ocrConfianceMin: e.OCR_CONFIANCE_MIN,
     lectureToleranceMot: e.LECTURE_TOLERANCE_MOT,

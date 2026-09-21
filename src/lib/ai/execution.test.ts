@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  IdentifiantsInterdits,
   PayloadIa,
   TexteAnonymise,
   type CorpsIa,
-  type IdentifiantsInterdits,
 } from "@/lib/ai/anonymisation";
 import { ErreurAppelIa, executerPrompt, extraireJson } from "@/lib/ai/execution";
 import { PROMPT_1_STRUCTURATION } from "@/lib/ai/prompts/prompt-1-structuration";
@@ -31,11 +31,14 @@ const ENV_TEST: Readonly<Record<string, string>> = {
   SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
   PARENT_SESSION_SECRET: "test-parent-session-secret",
   CRON_SECRET: "test-cron-secret",
-  AI_TIMEOUT_MS: "50",
+  // 1000 ms, et non 50 : depuis le tour 3, `env.ts` refuse un délai plus court,
+  // parce qu'un délai quasi nul abandonne tout appel avant qu'il ne parte —
+  // une garde éteinte par sa valeur neutre, la famille de [MAJEUR] M5.
+  AI_TIMEOUT_MS: "1000",
 };
 
 /** Le foyer d'épreuve. Aucun de ces mots n'apparaît dans les textes ci-dessous. */
-const INTERDITS: IdentifiantsInterdits = { valeurs: ["Evan", "Foyer Le Goff"] };
+const INTERDITS = IdentifiantsInterdits.sceller(["Evan", "Foyer Le Goff"]);
 
 /** Le seul moyen de fabriquer l'entrée d'`executerPrompt` : la fabrique. */
 function anonyme(texte: string): TexteAnonymise {

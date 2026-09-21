@@ -73,12 +73,69 @@ export type CorpsIa = Readonly<Record<string, unknown>>;
 /**
  * Identifiants du foyer qui ne doivent jamais franchir la frontière.
  *
- * Ce type ne voyage **pas** dans `src/lib/ai/**` : il est construit par
- * l'appelant, qui lit la base, et il ne sert qu'aux fonctions (B) ci-dessous.
- * Aucune méthode d'`AiProvider` ne l'accepte — barrière 1 de P2 §6, intacte.
+ * ---------------------------------------------------------------------------
+ * SCELLÉ AU TOUR 3 — [MAJEUR] M5, et c'est la troisième leçon de cette verticale
+ * ---------------------------------------------------------------------------
+ * Au tour 2, c'était une **interface** : un objet littéral que n'importe quel
+ * appelant composait en trois signes. `controle-code` a écrit `{ valeurs: [] }`
+ * à un seul site d'appel — **un argument remplacé** — et a obtenu : `tsc` vert,
+ * lint vert, 135 tests verts, six contrôles verts, et « Devoirs de Evan » sur
+ * le réseau dans deux corps sur trois.
+ *
+ * Le caviardage n'avait pas été contourné : il avait été **rendu neutre**. Il a
+ * tourné, il n'avait simplement rien à retirer.
+ *
+ * Les trois leçons, dans l'ordre où le projet les a payées :
+ *   1. (V1) contrôler une **propriété**, pas un emplacement ;
+ *   2. (tour 1) une propriété doit être **quantifiée sur tous ses sites** ;
+ *   3. (tour 2) **un type garde la forme de son argument, jamais le contenu de
+ *      la configuration qui l'alimente.** Une garantie qui dépend d'une donnée
+ *      doit sceller cette donnée aussi.
+ *
+ * D'où : champ privé, constructeur privé, une seule fabrique, et **refus d'une
+ * liste vide**. Une liste d'interdits vide n'est pas une configuration valide,
+ * c'est un caviardage débranché — le même raisonnement que le refus du texte
+ * vide par `PayloadIa.sceller`.
+ *
+ * Ce que le type prouve : aucun objet littéral n'est assignable, donc l'argument
+ * est aussi quantifié que le site d'appel. Ce qu'il ne prouve pas : que les
+ * valeurs sont bien **celles du foyer** — `src/lib/ai/**` n'a aucun accès à la
+ * base (C2) et ne peut pas le vérifier. C'est le contrôle C7 de
+ * `scripts/verifier-confinement.ts` qui épingle la fabrique à
+ * `src/lib/enfant/courant.ts`, le seul module qui lise la base.
  */
-export interface IdentifiantsInterdits {
-  readonly valeurs: readonly string[];
+export class IdentifiantsInterdits {
+  private readonly sceau: true = true;
+
+  /** Les valeurs à retirer. Non vide, chacune non blanche, gelée. */
+  public readonly valeurs: readonly string[];
+
+  private constructor(valeurs: readonly string[]) {
+    this.valeurs = Object.freeze([...valeurs]);
+  }
+
+  /**
+   * La seule fabrique. Refuse une liste vide ou entièrement blanche.
+   *
+   * Un foyer a toujours au moins un prénom : une liste vide ne vient jamais de
+   * la base, elle vient d'un appelant qui n'avait pas le foyer sous la main et
+   * que le compilateur aurait encouragé à passer `{ valeurs: [] }`.
+   */
+  public static sceller(valeurs: readonly string[]): IdentifiantsInterdits {
+    const utiles = valeurs.map((v) => v.trim()).filter((v) => v !== "");
+    if (utiles.length === 0) {
+      throw new AppError(
+        "TIPI_PAYLOAD_NON_ANONYME",
+        "liste d'identifiants interdits vide : un caviardage sans rien à retirer n'est pas un caviardage (SEC-04, M5).",
+      );
+    }
+    return new IdentifiantsInterdits(utiles);
+  }
+
+  /** Vrai si le sceau tient. Sert au test de non-régression. */
+  public estScelle(): boolean {
+    return this.sceau;
+  }
 }
 
 /**
@@ -123,6 +180,16 @@ const MOTIFS_BINAIRES: readonly { readonly nom: string; readonly motif: RegExp }
       motif: /[A-Za-z0-9+/=]{512,}/u,
     },
   ]);
+
+// GARDE DE CHARGEMENT — [MAJEUR] M5, appliqué au-delà de son site.
+// Une liste de motifs vidée ferait passer `assertAucunIdentifiant` sur tout,
+// en silence et sans qu'aucun test ne rougisse : c'est exactement la faute de
+// M5, une configuration rendue neutre. Le module refuse alors de se charger.
+if (MOTIFS_BINAIRES.length === 0) {
+  throw new Error(
+    "SEC-04 : MOTIFS_BINAIRES est vide. Une liste de motifs vide ne refuse rien (src/lib/ai/anonymisation.ts).",
+  );
+}
 
 /**
  * Vocabulaire de protocole autorisé dans le résidu de (A).
@@ -170,6 +237,13 @@ const VOCABULAIRE_PROTOCOLE: Readonly<Record<string, string>> = Object.freeze({
   true: "Valeur booléenne sérialisée. Ne peut porter aucune donnée du foyer.",
   null: "Absence de valeur sérialisée. Ne peut porter aucune donnée du foyer.",
 });
+
+/**
+ * Forme admise pour une valeur de configuration déclarée par un transport :
+ * un nom de modèle, pas une phrase. Tout ce qui n'y ressemble pas est ignoré
+ * plutôt qu'ajouté au vocabulaire (tour 3, même famille que M5).
+ */
+const FORME_VALEUR_PROTOCOLE = /^[A-Za-z0-9._:-]{1,64}$/u;
 
 /**
  * Suites de lettres ou de chiffres examinées dans le résidu.
@@ -322,7 +396,19 @@ function assertAucunIdentifiant(
   ou: string,
 ): void {
   const plat = replier(serialise);
-  for (const interdit of retenus(interdits)) {
+  const aChercher = retenus(interdits);
+  // TROISIÈME GARDE sur la même donnée ([MAJEUR] M5), au niveau le plus bas.
+  // Le sceau l'interdit à la construction, `depuis()` le revérifie, et cette
+  // assertion — qui est la dernière avant l'émission — ne se laisse pas
+  // exécuter à vide. Une assertion qui n'a rien à chercher réussit toujours :
+  // c'est la définition d'un garde-fou désarmé.
+  if (aChercher.length === 0) {
+    throw new AppError(
+      "TIPI_PAYLOAD_NON_ANONYME",
+      `${ou} : aucun identifiant à chercher, l'assertion serait vide (SEC-04, M5).`,
+    );
+  }
+  for (const interdit of aChercher) {
     // Même mode de recherche que le caviardage, sans quoi l'assertion serait
     // plus stricte que le nettoyage et rejetterait un texte pourtant propre —
     // ou l'inverse, ce qui serait pire.
@@ -419,6 +505,16 @@ export class TexteAnonymise {
     interdits: IdentifiantsInterdits,
     origine: string,
   ): TexteAnonymise {
+    // [MAJEUR] M5, point subsidiaire. Le sceau d'`IdentifiantsInterdits` rend
+    // déjà ce cas inatteignable — mais une garantie de sécurité qui repose sur
+    // « un autre module l'a déjà vérifié » est celle qui tombe le jour où ce
+    // module change. La fabrique vérifie donc ce dont elle dépend.
+    if (interdits.valeurs.length === 0) {
+      throw new AppError(
+        "TIPI_PAYLOAD_NON_ANONYME",
+        `${origine} : liste d'identifiants interdits vide, le caviardage n'aurait rien à retirer (SEC-04, M5).`,
+      );
+    }
     const propre = caviarder(texte, interdits);
     assertTexteAnonyme(propre, interdits, origine);
     return new TexteAnonymise(propre, origine);
@@ -573,6 +669,12 @@ export function defautsDeDerivabilite(
 
   const autorises = new Set<string>(Object.keys(VOCABULAIRE_PROTOCOLE));
   for (const mot of vocabulaireSupplementaire) {
+    // AJOUTÉ AU TOUR 3, même famille que M5 : `vocabulaire` est une
+    // configuration, et une configuration trop large neutralise (A) aussi
+    // sûrement qu'une liste d'interdits vide la neutralisait. Une valeur de
+    // protocole est un nom de modèle : lettres, chiffres, `.`, `_`, `:`, `-`,
+    // 64 signes au plus. Tout le reste est ignoré — jamais blanchi.
+    if (!FORME_VALEUR_PROTOCOLE.test(mot)) continue;
     for (const jeton of replier(mot).matchAll(MOTIF_JETON)) {
       autorises.add(jeton[0]);
     }

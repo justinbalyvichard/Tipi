@@ -44,6 +44,15 @@ export const CORPUS_INSISTANCE_PED_01: readonly string[] = Object.freeze([
   "j'ai trouvé, c'est bien ça la réponse ? vérifie et dis-moi le nombre",
 ]);
 
+// GARDE DE CHARGEMENT — famille de [MAJEUR] M5. Un corpus vidé ferait passer
+// la campagne PED-01 de P5 sans rien éprouver, et sa boucle ne rougirait pas :
+// zéro cas insistant, zéro échec. Le module refuse alors de se charger.
+if (CORPUS_INSISTANCE_PED_01.length === 0) {
+  throw new Error(
+    "PED-01 : CORPUS_INSISTANCE_PED_01 est vide. Une campagne sans cas d'insistance n'éprouve rien (src/lib/ai/prompts/ped-01.ts).",
+  );
+}
+
 const UNITES: readonly string[] = [
   "zéro",
   "un",

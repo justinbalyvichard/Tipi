@@ -21,7 +21,7 @@
  * `assertPayloadAnonyme(payload, interdits)` sans dire qui l'appelle, et le
  * seul appelant possible est celui qui possède `interdits`.
  */
-import type { IdentifiantsInterdits } from "@/lib/ai/anonymisation";
+import { IdentifiantsInterdits } from "@/lib/ai/anonymisation";
 import { prisma } from "@/lib/db/prisma";
 import { AppError } from "@/lib/errors/app-error";
 import { garderServeur } from "@/lib/runtime/garde-serveur";
@@ -72,7 +72,14 @@ export async function enfantCourant(): Promise<EnfantCourant> {
  * un geste visible.
  */
 export function interditsDe(enfant: EnfantCourant): IdentifiantsInterdits {
-  return {
-    valeurs: [enfant.prenom, enfant.id, enfant.familyId, enfant.familyNom],
-  };
+  // SCELLÉ AU TOUR 3 — [MAJEUR] M5. Ce module est le seul du produit qui lise
+  // la base, donc le seul qui sache quoi retirer : c'est ici, et nulle part
+  // ailleurs, que la fabrique du sceau est appelée. Le contrôle C7 de
+  // `scripts/verifier-confinement.ts` l'épingle.
+  return IdentifiantsInterdits.sceller([
+    enfant.prenom,
+    enfant.id,
+    enfant.familyId,
+    enfant.familyNom,
+  ]);
 }

@@ -246,6 +246,12 @@ function c2(): void {
   const defauts: string[] = [];
   let aretes = 0;
 
+  if (Object.keys(FERMETURE_AUTORISEE_AI).length === 0) {
+    // Vidée, la fermeture autorisée refuserait tout : le contrôle deviendrait
+    // ininterprétable plutôt que muet. On le dit quand même.
+    defauts.push("FERMETURE_AUTORISEE_AI est vide : le contrôle n'a plus de référence.");
+  }
+
   const autorise = (cible: string): boolean =>
     Object.keys(FERMETURE_AUTORISEE_AI).some(
       (prefixe) => cible === prefixe || cible.startsWith(prefixe),
@@ -340,6 +346,11 @@ function c3(): void {
     return;
   }
   const defauts: string[] = [];
+  // Famille de [MAJEUR] M5 : une liste de recherchés vidée ferait passer le
+  // contrôle sur tout, en silence.
+  if (TYPES_BINAIRES.length === 0) {
+    defauts.push("TYPES_BINAIRES est vide : le contrôle ne cherche plus rien.");
+  }
   for (const fichier of fichiers) {
     if (fichier.endsWith(".test.ts")) continue;
     const nu = codeNu(lire(fichier));
@@ -625,8 +636,26 @@ function c5(): void {
 //       fabrique — donc aucun appelant ne peut l'atteindre par un autre
 //       chemin que les trois méthodes d'`AiProvider`.
 //
-// (a) ∧ (b) ∧ (c) ⟹ tout octet émis vers un fournisseur est passé par le
-// scellement, par l'invariant (A) et par un `TexteAnonymise`.
+// ---------------------------------------------------------------------------
+// CE QUE C6 PROUVE, ET CE QU'IL NE PROUVE PAS — [MINEUR] N6 du tour 2
+// ---------------------------------------------------------------------------
+// Le tour 2 écrivait ici : « (a) ∧ (b) ∧ (c) ⟹ tout octet émis vers un
+// fournisseur est passé par le scellement ». **C'est faux, et `controle-code`
+// l'a montré** : en laissant le `fetch(` légitime en place et en AJOUTANT un
+// appel aliasé (`const envoyer = globalThis.fetch`) dans le périmètre de V2,
+// le texte brut est sorti avec six contrôles verts.
+//
+// Ce que C6 prouve : **les passages nommés restent uniques et lisibles en un
+// seul endroit.** C'est une propriété de lisibilité, et elle est utile — elle
+// attrape le contournement ordinaire, celui qu'on écrit sans y penser, et sa
+// garde « zéro occurrence ⇒ ÉCHEC » attrape aussi la disparition d'un passage
+// par alias ou ré-exportation, ce que le contrôleur a vérifié.
+//
+// Ce que C6 ne prouve pas, et qu'aucune lecture statique ne prouvera :
+// l'absence d'exfiltration. `node:https`, `node:net`, un `import()` dynamique
+// ou un `fetch` atteint par une variable y suffisent sans jamais écrire le mot
+// surveillé. C'est la même honnêteté que C1 affiche trois cents lignes plus
+// haut, et elle vaut mieux qu'une implication séduisante et fausse.
 
 const PASSAGES_UNIQUES: readonly {
   readonly quoi: string;
@@ -695,6 +724,102 @@ function c6(): void {
 }
 
 // ---------------------------------------------------------------------------
+// C7 — LES TROIS SCEAUX NE SE FABRIQUENT QU'À UN SEUL ENDROIT
+// ---------------------------------------------------------------------------
+// AJOUTÉ AU TOUR 3, en réponse à [MAJEUR] M5.
+//
+// SEC-04 repose désormais sur trois types nominaux : `IdentifiantsInterdits`,
+// `TexteAnonymise`, `PayloadIa`. Un type nominal garantit **la forme** de son
+// argument. Il ne garantit rien sur **le contenu de la configuration qui
+// l'alimente** — c'est exactement ce que le contrôleur a exploité au tour 2 en
+// passant une liste d'interdits vide, avec tous les instruments au vert.
+//
+// Le sceau de `IdentifiantsInterdits` referme la brèche du côté du type : un
+// objet littéral n'est plus assignable, et la fabrique refuse une liste vide.
+// Reste une question que le type ne peut pas trancher : **les valeurs
+// viennent-elles bien du foyer ?** `src/lib/ai/**` n'a aucun accès à la base
+// (C2) et ne peut pas le vérifier. C'est donc un contrôle de lisibilité qui
+// l'épingle : la fabrique n'est appelée que depuis le module qui lit la base.
+//
+// Ce que C7 prouve : chacun des trois sceaux a **un et un seul** lieu de
+// fabrication dans le code livré, et ce lieu est celui qui détient la donnée
+// nécessaire. Ce qu'il ne prouve pas : qu'un futur module ne ré-exportera pas
+// une fabrique sous un autre nom — même limite que C6, déclarée pour les mêmes
+// raisons. La garde « zéro occurrence ⇒ ÉCHEC » attrape sa disparition.
+
+const SCEAUX: readonly {
+  readonly quoi: string;
+  readonly motif: RegExp;
+  readonly ou: RegExp;
+  readonly motifDeclare: string;
+}[] = [
+  {
+    quoi: "IdentifiantsInterdits.sceller(",
+    motif: /\bIdentifiantsInterdits\s*\.\s*sceller\s*\(/gu,
+    ou: /^src\/lib\/enfant\/courant\.ts$/u,
+    motifDeclare:
+      "Seul module du produit qui lise la base, donc seul à savoir quels identifiants retirer. Fabriqué ailleurs, le sceau attesterait une liste que personne n'a tirée du foyer — la faute exacte de [MAJEUR] M5.",
+  },
+  {
+    quoi: "TexteAnonymise.depuis(",
+    motif: /\bTexteAnonymise\s*\.\s*depuis\s*\(/gu,
+    ou: /^src\/lib\/devoirs\/analyse\.ts$/u,
+    motifDeclare:
+      "Le caviardage s'exerce là où le foyer est connu, et hors de src/lib/ai/** pour que la barrière 1 de P2 §6 reste intacte. Un second lieu de fabrication serait un second endroit où l'oublier.",
+  },
+  {
+    quoi: "PayloadIa.sceller(",
+    motif: /\bPayloadIa\s*\.\s*sceller\s*\(/gu,
+    ou: /^src\/lib\/ai\/execution\.ts$/u,
+    motifDeclare:
+      "Le scellement précède immédiatement l'invariant (A) et l'émission, dans le passage obligé. Sceller ailleurs séparerait le scellement du contrôle qui le suit.",
+  },
+];
+
+function c7(): void {
+  const fichiers = fichiersSous("src").filter((f) => !f.endsWith(".test.ts"));
+  if (fichiers.length === 0) {
+    enregistrer("C7", "C7 — SEC-04 : les trois sceaux ne se fabriquent qu'à un seul endroit", "src/ : AUCUN fichier lu", ["src/ introuvable : l'instrument ne mesure rien."], false);
+    return;
+  }
+
+  const defauts: string[] = [];
+  const comptes: string[] = [];
+
+  for (const { quoi, motif, ou, motifDeclare } of SCEAUX) {
+    let total = 0;
+    for (const fichier of fichiers) {
+      const nu = codeNu(lire(fichier));
+      const occurrences = [...nu.matchAll(motif)].length;
+      if (occurrences === 0) continue;
+      total += occurrences;
+      if (!ou.test(fichier)) {
+        defauts.push(`${fichier} fabrique « ${quoi} » hors de ${ou.source}. ${motifDeclare}`);
+      }
+    }
+    if (total === 0) {
+      defauts.push(
+        `aucune occurrence de « ${quoi} » dans src/ : l'instrument ne mesure rien pour ce sceau. Le sceau a disparu, ou le motif ne reconnaît plus sa fabrique.`,
+      );
+    }
+    comptes.push(`${quoi} ${total}`);
+  }
+
+  for (const { quoi, motifDeclare } of SCEAUX) {
+    if (motifDeclare.trim().length < 40) {
+      defauts.push(`${quoi} est épinglé sans motif écrit (ARB-18 mesure 2).`);
+    }
+  }
+
+  enregistrer(
+    "C7",
+    "C7 — SEC-04 : les trois sceaux ne se fabriquent qu'à un seul endroit",
+    `${fichiers.length} fichiers de src/ (hors tests) · ${SCEAUX.length} sceaux surveillés, chacun justifié · occurrences trouvées : ${comptes.join(" · ")}`,
+    defauts,
+  );
+}
+
+// ---------------------------------------------------------------------------
 
 c1();
 c2();
@@ -702,6 +827,7 @@ c3();
 c4();
 c5();
 c6();
+c7();
 
 let echecs = 0;
 for (const r of resultats) {

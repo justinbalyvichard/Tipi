@@ -1,5 +1,7 @@
 {
-  "extends": ["next/core-web-vitals"],
+  "extends": [
+    "next/core-web-vitals"
+  ],
   "rules": {
     "no-console": "error",
     "no-restricted-syntax": [
@@ -11,14 +13,30 @@
       {
         "selector": "TSTypeAssertion",
         "message": "TEC-15 : pas d'assertion de type `<T>x`. Valider plutôt par Zod."
+      },
+      {
+        "selector": "TSAsExpression > TSTypeReference > Identifier[name=/^(TexteAnonymise|PayloadIa|IdentifiantsInterdits)$/]",
+        "message": "SEC-04 : ces trois types sont des SCEAUX. Les fabriquer par assertion (`x as TexteAnonymise`, y compris `as unknown as`) contourne le caviardage — c'est [MAJEUR] M5 sous une autre forme. Passer par la fabrique."
       }
     ]
   },
   "overrides": [
     {
-      "files": ["src/lib/errors/route.ts", "prisma/seed.ts"],
+      "files": [
+        "src/lib/errors/route.ts",
+        "prisma/seed.ts"
+      ],
       "rules": {
-        "no-console": ["error", { "allow": ["error", "warn", "info"] }]
+        "no-console": [
+          "error",
+          {
+            "allow": [
+              "error",
+              "warn",
+              "info"
+            ]
+          }
+        ]
       }
     }
   ]

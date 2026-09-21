@@ -21,21 +21,64 @@ import { garderServeur } from "@/lib/runtime/garde-serveur";
 
 garderServeur("src/config/env.ts");
 
-/** Entier positif écrit en chaîne dans l'environnement. */
-const entier = (defaut: number) =>
+/**
+ * ---------------------------------------------------------------------------
+ * UNE CONFIGURATION NEUTRE EST UNE PROTECTION DÉBRANCHÉE — leçon du tour 2
+ * ---------------------------------------------------------------------------
+ * `controle-code` a neutralisé le caviardage de SEC-04 en lui passant une liste
+ * d'interdits **vide** : la fonction a tourné, elle n'avait rien à retirer, et
+ * tous les instruments sont restés verts ([MAJEUR] M5). La faute n'est pas
+ * propre à cette liste — **elle est propre à toute valeur dont la neutralité
+ * éteint une garde en silence.**
+ *
+ * L'Orchestrateur a demandé de chercher la même faute ailleurs plutôt que de
+ * corriger seulement celle-ci. Voici ce que j'ai trouvé dans ce fichier, et
+ * chaque borne ci-dessous dit **ce que la valeur neutre éteindrait** :
+ *
+ *   OCR_CONFIANCE_MIN = 0        toute photo, si illisible soit-elle, passe.
+ *                                L'état « illisible » de PRD-16 devient
+ *                                inatteignable.
+ *   LECTURE_TOLERANCE_MOT = 0    plus aucune tolérance : V4 jugerait faux tout
+ *                                ce qui n'est pas identique au signe près.
+ *   LECTURE_SEUIL_MOTS_OK = 0    toute lecture est « réussie », donc PED-09
+ *                                n'a plus rien à juger.
+ *   CALIBRATION_NB_PHOTOS = 0    `calibration_log` n'est jamais écrit, donc la
+ *                                preuve de SEC-04 en base (P2 §6) disparaît
+ *                                sans un mot. Pour couper la calibration, il
+ *                                existe `family.calibration_active`.
+ *   BLOCAGE_NB_SOLLICITATIONS=0  PED-08 ne détecte plus aucun blocage.
+ *   AI_TIMEOUT_MS = 0            tout appel est abandonné avant de partir.
+ *   CODE_MAX_TENTATIVES = 0      SEC-02 n'a plus de palier.
+ *   PARENT_SESSION_TTL_MIN = 0   la session parent expire avant d'exister.
+ *   DUREE_SECOURS_ETAPE_MIN = 0  une étape de zéro minute, refusée plus tard
+ *                                par `EtapePrevue` — donc un défaut qui
+ *                                n'apparaîtrait qu'au lancement de la soirée.
+ *   UPLOAD_MAX_*_OCTETS = 0      plus aucune photo n'est acceptée.
+ *
+ * Une seule valeur neutre reste **légitime** et n'est donc pas bornée :
+ * `AUDIO_RETENTION_JOURS_DEFAUT = 0`, que `prisma/schema.prisma` documente
+ * explicitement comme « ne rien conserver » (SEC-05). Une exception nommée
+ * n'est pas un trou ; une exception tacite en serait un.
+ */
+
+/** Entier écrit en chaîne. `min` refuse la valeur qui éteindrait une garde. */
+const entier = (defaut: number, min = 1) =>
   z
     .string()
     .optional()
     .transform((v) => (v === undefined || v === "" ? String(defaut) : v))
-    .pipe(z.coerce.number().int().nonnegative());
+    .pipe(z.coerce.number().int().min(min));
 
-/** Nombre décimal borné à [0,1], pour les seuils de confiance et de tolérance. */
+/**
+ * Nombre décimal dans `]0,1]`, pour les seuils de confiance et de tolérance.
+ * **Strictement positif** : voir l'encadré ci-dessus.
+ */
 const unitaire = (defaut: number) =>
   z
     .string()
     .optional()
     .transform((v) => (v === undefined || v === "" ? String(defaut) : v))
-    .pipe(z.coerce.number().min(0).max(1));
+    .pipe(z.coerce.number().gt(0).max(1));
 
 /** Chaîne non vide, avec valeur de repli. */
 const texte = (defaut: string) =>
@@ -64,7 +107,7 @@ const schemaEnv = z.object({
   DEEPSEEK_API_KEY: z.string().optional(),
   DEEPSEEK_BASE_URL: texte("https://api.deepseek.com"),
   DEEPSEEK_MODEL: texte("deepseek-chat"),
-  AI_TIMEOUT_MS: entier(20_000),
+  AI_TIMEOUT_MS: entier(20_000, 1_000),
 
   GOOGLE_SERVICE_ACCOUNT_JSON: z.string().optional(),
   /**
@@ -111,7 +154,8 @@ const schemaEnv = z.object({
    */
   DUREE_SECOURS_ETAPE_MIN: entier(10),
 
-  AUDIO_RETENTION_JOURS_DEFAUT: entier(7),
+  // Seule valeur neutre légitime du fichier : 0 = ne rien conserver (SEC-05).
+  AUDIO_RETENTION_JOURS_DEFAUT: entier(7, 0),
 });
 
 export type Env = z.infer<typeof schemaEnv>;
