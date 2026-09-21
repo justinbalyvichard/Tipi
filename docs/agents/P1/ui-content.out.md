@@ -3,7 +3,8 @@
 Livrable de l'agent `contenu-enfant`, mission ARB-10 et ARB-12, après la
 fermeture de G1. **Version 3** : reprise du `VERDICT: FAIL` du tour 1
 (1 [MAJEUR], 4 [MINEUR]), application d'ARB-14, puis reprise du
-`VERDICT: FAIL` du tour 2 (1 [MAJEUR], 3 [MINEUR]). Sources : `docs/agents/P1/produit-marketing.out.md`,
+`VERDICT: FAIL` du tour 2 (1 [MAJEUR], 3 [MINEUR]), puis la réserve du
+`VERDICT: PASS_AVEC_RESERVES` du tour 3. Sources : `docs/agents/P1/produit-marketing.out.md`,
 `docs/agents/GATES.md` (ARB-08, ARB-10, ARB-12, ARB-13), et le bloc
 **AMENDEMENTS** en tête de `TIPI-PROMPT-CURSOR.md`.
 
@@ -23,6 +24,7 @@ Aucun emoji, aucun prénom en dur, aucun commit git.
 
 0. Reprise après verdict du tour 1
 0 bis. Reprise après verdict du tour 2
+0 ter. Réserve du tour 3
 1. Ce que portent les deux fichiers neufs, et ce qu'ils ne portent pas
 2. Schéma des `ui-*.json`
 3. Répartition enfant / parent
@@ -181,6 +183,54 @@ pendant ce tour, et **arrivé ici par régénération**, jetons `{matieres}` et
 demandé. Je retiens la remarque du contrôleur sur « à verser au backlog si » :
 c'est la formule par laquelle un défaut disparaît, et je ne la réemploierai pas
 sans nommer qui reprend le défaut et quand.
+
+---
+
+# 0 ter. Réserve du tour 3
+
+`VERDICT: PASS_AVEC_RESERVES` — 0 [BLOQUANT], 0 [MAJEUR], 1 [MINEUR], aucun écart
+sur 24 grandeurs. La réserve est levée.
+
+**La règle d'appariement est désormais dans les deux fichiers**, sous
+`regles.appariement_des_segments`, juste au-dessus de la table qu'elle consomme.
+Elle est écrite pour quelqu'un qui modifiera la table sans avoir lu ce fil :
+
+> Comment un motif de `conditions_par_segment` s'apparie à une clé, avant d'en
+> modifier la table. La clé est découpée sur les points, le motif aussi ; il y a
+> appariement quand les segments du motif se retrouvent tels quels et consécutifs
+> parmi ceux de la clé. Un segment se compare **en entier, jamais en
+> sous-chaîne** : « bloque » apparie `reglages.code.bloque.titre` et n'apparie
+> **pas** `coffre.cosmetiques.debloque`. L'ordre des segments **dans** un motif
+> compte : « paliers.vide » apparie `reglages.paliers.vide` et n'apparie pas
+> `reglages.vide.paliers`. L'ordre des **entrées** de la table n'a en revanche
+> aucun effet : le générateur collecte tous les motifs qui apparient et, s'ils
+> donnent deux conditions différentes, il échoue au lieu de trancher en silence —
+> ajouter un motif qui en recouvre un autre arrête donc la production au lieu de
+> produire une condition fausse. Enfin, tout motif déclaré ici doit être employé
+> par au moins une clé : un motif inemployé signale qu'il est masqué par un autre
+> ou devenu obsolète, et le contrôle le refuse.
+
+C'est la même leçon qu'au tour 1 sur la `note` de `cloture` : ce qui n'est écrit
+que dans un rapport n'existe pas pour celui qui lit le fichier. La table a
+d'ailleurs changé de taille deux fois — 25 puis 26 segments — sans que sa règle
+de lecture soit écrite nulle part.
+
+## Ce que je retiens du contre-test du contrôleur
+
+Deux choses que je n'avais pas vues et que j'inscris ici pour la suite :
+
+1. **Ma réparation supprimait cinq collisions latentes, pas une.**
+   `camera_refusee` contre `refuse` en cachait trois de plus, qui ne rendaient le
+   bon résultat que par l'ordre de la table. Un défaut visible en cachait quatre
+   invisibles, tous du même mécanisme.
+2. **Une re-dérivation ne peut pas attraper une règle fausse.** Mon contrôle
+   re-dérive les conditions avec une implémentation indépendante, mais il partage
+   la table et la règle : au tour 2, deux implémentations de « première
+   sous-chaîne » auraient été parfaitement d'accord sur la même erreur. Ce qui
+   aurait sauvé ce tour-là, c'est l'invariant « 0 segment déclaré inemployé »,
+   puisque le bon segment était masqué donc inutilisé. **Préférer un invariant à
+   une re-dérivation chaque fois que les deux sont possibles** — la règle est
+   désormais au protocole, et mes contrôles portent les deux.
 
 ---
 
@@ -399,11 +449,9 @@ content/ui-enfant.json : JSON VALIDE, schema=tipi.ui-enfant.v1, entrees=101
 content/ui-parent.json : JSON VALIDE, schema=tipi.ui-parent.v1, entrees=187
 content/encouragements.json : JSON VALIDE, schema=tipi.encouragements.v2, entrees=460
 content/gwenn-scripts.json : JSON VALIDE, schema=tipi.gwenn-scripts.v2, entrees=19
-conditions renseignees : 137 / 288
-origine : {"intertitre":72,"definie_ici":22,"segment_de_cle":43}
-exclusivites : 21 entrees, 33 liens
+regle d_appariement publiee dans les deux fichiers : true
 table de segments publiee : 26 entrees
-false
+conditions renseignees : 137 / 288
 ---exit:0---
 ```
 
