@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   TIPI — les deux thèmes (DES-01, DES-02, DES-03, DES-05, DES-08)
+   -----------------------------------------------------------------------------
+   CE FICHIER EST LE SEUL DU DÉPÔT QUI CONTIENT UNE VALEUR DE COULEUR.
+   Partout ailleurs — composants, page de contrôle, configuration Tailwind,
+   configuration de la mascotte — une couleur se désigne par son jeton.
+   Invariant vérifiable :
+     grep -rEn '#[0-9a-fA-F]{3,8}' src tailwind.config.ts | grep -v styles/themes.css
+   doit ne rien retourner.
+
+   Les deux thèmes sont DEUX JEUX DE VARIABLES sur le même arbre de composants
+   (3.8 du prompt maître). Le thème actif est porté par `data-theme` sur <html>,
+   ce qui le rend commutable à chaud sans remonter un seul composant React.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. PALETTES LITTÉRALES — recopie exacte de la section 3.8, rien de plus,
+   rien de moins. Ces jetons ne sont jamais consommés directement par un
+   composant : ils alimentent les jetons de rôle de la section 2. Les garder
+   nommés permet à un contrôleur de vérifier la conformité à 3.8 sans lire le
+   reste du fichier.
+-------------------------------------------------------------------------- */
+:root {
+  /* Thème « Pilou » — 3.8, quinze valeurs */
+  --palette-pilou-fond: #fff8ee;
+  --palette-pilou-surface: #ffffff;
+  --palette-pilou-encre: #2e2a26;
+  --palette-pilou-texte-secondaire: #6b6459;
+  --palette-pilou-texte-discret: #8a8074;
+  --palette-pilou-ligne: #ede6d8;
+  --palette-pilou-pointille: #d8ccb8;
+  --palette-pilou-accent-bleu: #6fb8e8;
+  --palette-pilou-accent-corail: #ff8b7b;
+  --palette-pilou-accent-menthe: #8fe3c0;
+  --palette-pilou-accent-jaune: #ffd166;
+  --palette-pilou-teinte-bleu: #e8f4fc;
+  --palette-pilou-teinte-corail: #ffefe0;
+  --palette-pilou-teinte-jaune: #fff3d6;
+  --palette-pilou-teinte-menthe: #e9f9f0;
+
+  /* Thème « Apple » — 3.8, douze valeurs */
+  --palette-apple-fond: #f5f5f7;
+  --palette-apple-surface: #ffffff;
+  --palette-apple-encre: #1d1d1f;
+  --palette-apple-texte-secondaire: #86868b;
+  --palette-apple-ligne: #e5e5ea;
+  --palette-apple-chevron: #c7c7cc;
+  --palette-apple-accent-bleu: #007aff;
+  --palette-apple-accent-orange: #ff9500;
+  --palette-apple-accent-vert: #34c759;
+  --palette-apple-accent-rouge: #ff3b30;
+  --palette-apple-accent-gris: #8e8e93;
+  --palette-apple-teinte-bleu: #eaf3ff;
+
+  /* Jetons communs aux deux thèmes : ils ne portent pas de couleur. */
+  --tipi-cible-min: 56px; /* DES-04 */
+  --tipi-cible-large: 72px;
+  --tipi-hairline: 1px;
+  --tipi-rayon-ecran: 32px; /* identique dans les deux thèmes (3.8) */
+  --tipi-rayon-pilule: 999px;
+
+  /* DES-08 : deux durées seulement, courtes, et une seule courbe. */
+  --tipi-duree-douce: 160ms;
+  --tipi-duree-posee: 260ms;
+  --tipi-courbe-douce: cubic-bezier(0.32, 0.72, 0.4, 1);
+
+  /* DES-03 : les piles de polices, repliées sur des familles toujours
+     disponibles si le réseau ne sert pas Baloo 2 / Quicksand. */
+  --pile-pilou-titre: var(--police-baloo), "Baloo 2", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --pile-pilou-texte: var(--police-quicksand), "Quicksand", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --pile-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+}
+
+/* -----------------------------------------------------------------------------
+   2. JETON DE RÔLE — thème « Pilou » (DES-01)
+   C'est le thème par défaut : `:root` le porte, pour qu'une page rendue avant
+   l'hydratation n'ait jamais de fond blanc nu ni de bascule visible (DES-08).
+-------------------------------------------------------------------------- */
+:root,
+[data-theme="pilou"] {
+  --tipi-fond: var(--palette-pilou-fond);
+  --tipi-surface: var(--palette-pilou-surface);
+  --tipi-encre: var(--palette-pilou-encre);
+
+  /* `texte-secondaire` : 5,54:1 sur fond, 5,84:1 sur surface — AA petit texte. */
+  --tipi-texte-secondaire: var(--palette-pilou-texte-secondaire);
+  /* `texte-appui` : le rôle du sous-titre de liste et de la légende. Voir la
+     décision DS-1 du rapport P3 : c'est le seul rôle dont la valeur diffère du
+     jeton homonyme de 3.8 dans le thème Apple, parce que `#86868B` n'atteint
+     pas AA en petit texte. */
+  --tipi-texte-appui: var(--palette-pilou-texte-secondaire);
+  /* `texte-discret` : 3,67:1 — RÉSERVÉ AU GRAND TEXTE (≥ 24 px) et au non
+     textuel. Aucun composant livré ne l'emploie en petit texte. */
+  --tipi-texte-discret: var(--palette-pilou-texte-discret);
+
+  --tipi-ligne: var(--palette-pilou-ligne);
+  --tipi-pointille: var(--palette-pilou-pointille);
+
+  --tipi-accent-primaire: var(--palette-pilou-accent-bleu);
+  --tipi-accent-primaire-encre: var(--palette-pilou-encre); /* 6,57:1 */
+  --tipi-accent-secondaire: var(--palette-pilou-accent-corail);
+  --tipi-accent-tertiaire: var(--palette-pilou-accent-menthe);
+  --tipi-accent-pierre: var(--palette-pilou-accent-jaune); /* encre : 9,87:1 */
+
+  --tipi-teinte-bleu: var(--palette-pilou-teinte-bleu);
+  --tipi-teinte-corail: var(--palette-pilou-teinte-corail);
+  --tipi-teinte-jaune: var(--palette-pilou-teinte-jaune);
+  --tipi-teinte-menthe: var(--palette-pilou-teinte-menthe);
+
+  --tipi-rayon-liste: 18px;
+  --tipi-rayon-carte: 20px; /* 3.8 : carte 18–22 px */
+  --tipi-rayon-badge: 14px;
+
+  /* Ombre portée douce, jamais de dégradé (3.8). */
+  --tipi-ombre-douce: 0 1px 2px rgba(46, 42, 38, 0.05), 0 6px 18px rgba(46, 42, 38, 0.07);
+  --tipi-ombre-posee: 0 2px 4px rgba(46, 42, 38, 0.06), 0 12px 28px rgba(46, 42, 38, 0.09);
+
+  --tipi-police-titre: var(--pile-pilou-titre);
+  --tipi-police-texte: var(--pile-pilou-texte);
+
+  /* Mascotte (DES-09) — la palette de Pilou est elle aussi thématisée : un seul
+     SVG, deux jeux de variables. */
+  --pilou-corps: var(--palette-pilou-teinte-corail);
+  --pilou-ventre: var(--palette-pilou-surface);
+  --pilou-joue: var(--palette-pilou-accent-corail);
+  --pilou-museau: var(--palette-pilou-encre);
+  --pilou-trait-couleur: var(--palette-pilou-encre);
+  --pilou-cosmetique: var(--palette-pilou-accent-bleu);
+  --pilou-cosmetique-2: var(--palette-pilou-accent-menthe);
+  --pilou-silhouette: var(--palette-pilou-texte-discret);
+  --pilou-trait: 2.5; /* trait rond et franc */
+
+  /* DES-07 : les icônes sont des tracés, jamais des aplats ni des emoji. */
+  --tipi-icone-trait: 2;
+}
+
+/* -----------------------------------------------------------------------------
+   3. JETONS DE RÔLE — thème « Apple » (DES-02)
+-------------------------------------------------------------------------- */
+[data-theme="apple"] {
+  --tipi-fond: var(--palette-apple-fond);
+  --tipi-surface: var(--palette-apple-surface);
+  --tipi-encre: var(--palette-apple-encre);
+
+  /* 3,32:1 sur fond, 3,62:1 sur surface : suffisant en GRAND texte (≥ 3:1),
+     insuffisant en petit texte. Réservé au grand texte et au non textuel. */
+  --tipi-texte-secondaire: var(--palette-apple-texte-secondaire);
+  /* DÉCISION DS-1 : le sous-titre de liste du thème Apple est rendu en encre,
+     la hiérarchie étant portée par la taille et la graisse. Aucune couleur
+     hors 3.8 n'est introduite, et aucun couple texte/fond ne descend sous AA. */
+  --tipi-texte-appui: var(--palette-apple-encre);
+  --tipi-texte-discret: var(--palette-apple-texte-secondaire);
+
+  --tipi-ligne: var(--palette-apple-ligne);
+  --tipi-pointille: var(--palette-apple-chevron);
+
+  --tipi-accent-primaire: var(--palette-apple-accent-bleu);
+  --tipi-accent-primaire-encre: var(--palette-apple-surface); /* 4,01:1, grand texte */
+  --tipi-accent-secondaire: var(--palette-apple-accent-orange);
+  --tipi-accent-tertiaire: var(--palette-apple-accent-vert);
+  --tipi-accent-pierre: var(--palette-apple-accent-orange); /* encre : 7,65:1 */
+
+  /* 3.8 ne donne qu'une teinte au thème Apple. Les quatre rôles de teinte y
+     convergent donc vers elle : les quatre tons de Chip restent distingués par
+     leur libellé et leur icône, jamais par la seule couleur. */
+  --tipi-teinte-bleu: var(--palette-apple-teinte-bleu);
+  --tipi-teinte-corail: var(--palette-apple-teinte-bleu);
+  --tipi-teinte-jaune: var(--palette-apple-teinte-bleu);
+  --tipi-teinte-menthe: var(--palette-apple-teinte-bleu);
+
+  --tipi-rayon-liste: 14px;
+  --tipi-rayon-carte: 20px;
+  --tipi-rayon-badge: 8px; /* badges d'icônes en carrés arrondis 8 px (3.8) */
+
+  --tipi-ombre-douce: 0 1px 2px rgba(29, 29, 31, 0.04);
+  --tipi-ombre-posee: 0 1px 3px rgba(29, 29, 31, 0.06);
+
+  --tipi-police-titre: var(--pile-apple);
+  --tipi-police-texte: var(--pile-apple);
+
+  --pilou-corps: var(--palette-apple-fond);
+  --pilou-ventre: var(--palette-apple-surface);
+  --pilou-joue: var(--palette-apple-accent-orange);
+  --pilou-museau: var(--palette-apple-encre);
+  --pilou-trait-couleur: var(--palette-apple-encre);
+  --pilou-cosmetique: var(--palette-apple-accent-bleu);
+  --pilou-cosmetique-2: var(--palette-apple-accent-vert);
+  --pilou-silhouette: var(--palette-apple-texte-secondaire);
+  --pilou-trait: 1.5; /* trait fin, demandé pour le thème Apple */
+
+  --tipi-icone-trait: 1.6;
+}
+
+/* -----------------------------------------------------------------------------
+   4. BASE
+-------------------------------------------------------------------------- */
+@layer base {
+  html {
+    background-color: var(--tipi-fond);
+    color: var(--tipi-encre);
+    font-family: var(--tipi-police-texte);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--tipi-fond);
+    color: var(--tipi-encre);
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--tipi-police-titre);
+  }
+
+  /* Un anneau de focus visible et identique partout : il tient le contraste
+     dans les deux thèmes (13,49:1 et 15,45:1 sur fond). */
+  :focus-visible {
+    outline: 3px solid var(--tipi-encre);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* DES-08 : la commutation de thème ne doit pas produire de flash. On anime
+     uniquement les couleurs de fond et de texte, sur la durée courte. */
+  html,
+  body {
+    transition:
+      background-color var(--tipi-duree-douce) var(--tipi-courbe-douce),
+      color var(--tipi-duree-douce) var(--tipi-courbe-douce);
+  }
+}
+
+/* DES-08 : respect intégral de la préférence système. Rien ne bouge, rien ne
+   se répète, y compris la respiration de Pilou. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

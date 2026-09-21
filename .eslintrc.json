@@ -1,0 +1,13 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "no-console": "error",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "TSAnyKeyword",
+        "message": "TEC-15 : aucun `any` dans le code livré."
+      }
+    ]
+  }
+}
