@@ -13,7 +13,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
-    "verifier:socle": "tsx scripts/verifier-socle.ts"
+    "verifier:socle": "tsx scripts/verifier-socle.ts",
+    "db:diff": "bash scripts/db-diff.sh"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -34,9 +34,13 @@ export const APPUI_LONG_MS = 2000;
  * n'a pas.
  *
  * GARDE-FOU, et il existe réellement depuis le tour 2 de G4.V1 : le contrôle 9
- * de `scripts/verifier-design-system.sh` **compare** ces constantes aux jetons
- * de `themes.css` et fait échouer l'instrument sur tout écart, dans les deux
- * sens. Au tour 1, ce commentaire annonçait une surveillance qui n'existait
+ * de `scripts/verifier-design-system.sh` **compare** ces constantes à **toutes
+ * les déclarations** du jeton dans `themes.css`, et fait échouer l'instrument
+ * sur tout écart, dans les deux sens — y compris quand un thème redéclare le
+ * jeton avec une autre valeur. Ce dernier cas venait de `controle-code` au
+ * tour 2 : `[data-theme="apple"] { --tipi-cible-min: 44px }` violait DES-04
+ * sur un seul thème et passait vert, parce que le contrôle ne lisait que la
+ * première déclaration (`[MINEUR] T2-3`). Au tour 1, ce commentaire annonçait une surveillance qui n'existait
  * pas — le contrôle n'ouvrait jamais ce fichier —, et `controle-code` l'a
  * démontré en faisant diverger 160 ms en 999 ms sans faire rougir quoi que ce
  * soit (V1.review.md, MAJEUR 1). La preuve du garde-fou corrigé, rougi sur

@@ -127,25 +127,53 @@ echo "   Le contrôle de code l'a prouvé en faisant diverger 160ms en 999ms san
 echo "   qu'aucun instrument ne rougisse (V1.review.md, MAJEUR 1)."
 comparer_jeton() {
   # $1 = nom du jeton CSS, $2 = unité, $3 = constante TypeScript
-  local css ts
+  #
+  # CORRIGÉ AU TOUR 3 — [MINEUR] T2-3. La version du tour 2 faisait `head -1`
+  # des deux côtés. Or `themes.css` est bâti en blocs `:root`,
+  # `[data-theme="pilou"]` et `[data-theme="apple"]` : une REDÉCLARATION dans
+  # le bloc Apple l'emporte en CSS et ne se voyait pas. `controle-code` a posé
+  # `[data-theme="apple"] { --tipi-cible-min: 44px }` — une violation de DES-04
+  # sur un seul thème — et l'instrument est resté vert **tout en imprimant la
+  # valeur divergente deux lignes plus haut**. Même motif que le majeur du
+  # tour 1 : l'information était affichée, elle n'était pas lue.
+  #
+  # On compare donc TOUTES les déclarations. Un jeton commun aux deux thèmes
+  # qui apparaît deux fois avec deux valeurs est un écart, même si la première
+  # est juste.
+  local ts nb valeurs distinctes
   # `--` avant le motif : sans lui, un jeton CSS commençant par « -- » est pris
-  # pour une option de grep, et la comparaison échoue au lieu de comparer.
-  # C'est arrivé à la première version de ce bloc ; elle échouait FERMÉE
-  # (verdict ECHEC), jamais verte — c'est le seul mode de panne acceptable
-  # pour un instrument.
-  css=$(grep -oE -- "$1:[[:space:]]*[0-9]+$2" src/styles/themes.css | grep -oE '[0-9]+' | head -1)
+  # pour une option de grep. C'est arrivé à la première version de ce bloc ;
+  # elle échouait FERMÉE (verdict ECHEC), jamais verte.
+  valeurs=$(grep -oE -- "$1:[[:space:]]*[0-9]+$2" src/styles/themes.css | grep -oE '[0-9]+' || true)
   ts=$(grep -oE -- "$3[[:space:]]*=[[:space:]]*[0-9]+" src/config/ui.config.ts | grep -oE '[0-9]+$' | head -1)
-  if [ -z "$css" ] || [ -z "$ts" ]; then
-    printf '   ECART : %s ou %s introuvable (css=%s ts=%s) — la comparaison ne peut pas se faire\n' \
-      "$1" "$3" "${css:-?}" "${ts:-?}"
+  nb=$(printf '%s' "$valeurs" | grep -c . || true)
+  distinctes=$(printf '%s\n' "$valeurs" | sort -u | grep -c . || true)
+
+  if [ "$nb" -eq 0 ] || [ -z "$ts" ]; then
+    printf '   ECART : %s ou %s introuvable (declarations=%s ts=%s) — la comparaison ne peut pas se faire\n' \
+      "$1" "$3" "$nb" "${ts:-?}"
     echec=1
     return
   fi
+
+  if [ "$distinctes" -gt 1 ]; then
+    printf '   ECART : %s est declare %s fois dans themes.css avec %s valeurs DIFFERENTES (%s).\n' \
+      "$1" "$nb" "$distinctes" "$(printf '%s' "$valeurs" | tr '\n' ' ')"
+    printf '           Un jeton commun aux deux themes qui varie par theme casse la garantie : la\n'
+    printf '           redeclaration l emporte en CSS et desaccorde la minuterie JS %s.\n' "$3"
+    echec=1
+    return
+  fi
+
+  local css
+  css=$(printf '%s' "$valeurs" | head -1)
   if [ "$css" != "$ts" ]; then
-    printf '   ECART : themes.css %s = %s%s  MAIS  ui.config.ts %s = %s\n' "$1" "$css" "$2" "$3" "$ts"
+    printf '   ECART : themes.css %s = %s%s (%s declaration(s))  MAIS  ui.config.ts %s = %s\n' \
+      "$1" "$css" "$2" "$nb" "$3" "$ts"
     echec=1
   else
-    printf '   egal : themes.css %s = %s%s  ==  ui.config.ts %s = %s\n' "$1" "$css" "$2" "$3" "$ts"
+    printf '   egal : themes.css %s = %s%s (%s declaration(s), toutes identiques)  ==  ui.config.ts %s = %s\n' \
+      "$1" "$css" "$2" "$nb" "$3" "$ts"
   fi
 }
 comparer_jeton '--tipi-duree-douce' 'ms' 'DUREE_DOUCE_MS'
