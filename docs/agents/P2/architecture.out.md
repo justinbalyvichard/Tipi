@@ -1784,7 +1784,7 @@ contrôleur avait raison de dire que je posais mal le problème :
 | `@google-cloud/text-to-speech` | TEC-08 |
 | `@node-rs/argon2` | SEC-01 (argon2id) |
 | `vitest`, `@testing-library/react`, `msw` | 4.2 P5, DoD du projet |
-| `tsx` | **TEC-03 ∩ TEC-01**. `prisma db seed` exécute la commande du bloc `prisma.seed` de `package.json` ; `prisma/seed.ts` est un livrable nommé de V1 (§14) et il est en TypeScript parce que TEC-01 l'impose. Sans lanceur, il ne reste qu'un seed en JavaScript compilé — hors du typage strict, donc une régression d'exigence. **Développement seulement : n'entre dans aucun bundle**, vérifié par `controle-code` sur les 23 fichiers de `.next/static`. *Ligne ajoutée au tour 2 de G4.V1, sur arbitrage de l'Orchestrateur, après avis favorable de `controle-code` (`docs/agents/P4/V1.review.md`, §10.1). L'Orchestrateur inscrit l'arbitrage dans `GATES.md` ; seul lui met ce fichier-là à jour.* |
+| `tsx` | **TEC-03 ∩ TEC-01**. `prisma db seed` exécute la commande du bloc `prisma.seed` de `package.json` ; `prisma/seed.ts` est un livrable nommé de V1 (§14) et il est en TypeScript parce que TEC-01 l'impose. Sans lanceur, il ne reste qu'un seed en JavaScript compilé — hors du typage strict, donc une régression d'exigence. **Développement seulement : n'entre dans aucun bundle**, vérifié par `controle-code` sur les 23 fichiers de `.next/static`. *Ligne ajoutée au tour 2 de G4.V1 par **ARB-17 (a)**, après avis favorable de `controle-code` (`docs/agents/P4/V1.review.md`, §10.1).* |
 | `@playwright/test` | 4.2 P6 |
 | `eslint`, `eslint-config-next`, `prettier` | TEC-14, TEC-15 |
 
