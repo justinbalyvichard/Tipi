@@ -9,7 +9,9 @@ référentiel** : une `REQ-xxx` repoussée en V2 est `[BLOQUANT]`.
 
 | # | Idée | Origine (agent / phase) | Pourquoi hors périmètre V1 | Date |
 | --- | --- | --- | --- | --- |
-| — | *(vide pour l'instant)* | — | — | — |
+| V2-01 | **Rituel d'anniversaire.** Pilou saluerait l'enfant autrement le jour de son anniversaire. La fonction `estJourAnniversaire()` avait été écrite pendant V1 à côté du calcul d'âge, puis **retirée** : aucune `REQ-xxx` ne la demande. | `dev-feature`, P4 V1 | PRD-02 exige que l'âge soit calculé, pas qu'il soit fêté. PED-12 impose au contraire un rituel de fermeture **identique chaque soir** : une variation non tracée irait contre une exigence existante. | 2026-09-21 |
+| V2-02 | **Fuseau horaire par foyer.** `src/lib/dates/soiree.ts` fige `Europe/Paris` dans `FUSEAU_FOYER`. Le jour où Tipi dépasse un foyer, la valeur devient une colonne de `family`. | `dev-feature`, P4 V1 | V1 = un seul foyer (1.2) et un seul appareil (TEC-18). La signature des fonctions accepte déjà le fuseau en paramètre : le passage sera une lecture de colonne, pas une réécriture. Ajouter la colonne aujourd'hui serait une couche sans exigence (P2, D5). | 2026-09-21 |
+| V2-03 | **Exécuter `verifier:socle` en intégration continue avec de vrais secrets.** Son invariant I1 ne cherche la valeur d'une variable serveur dans `.next/static` que si cette valeur est disponible ; sans `.env.local`, il sort en `PARTIEL` et le dit. | `dev-feature`, P4 V1 | Le dépôt n'a aucun compte externe (ESC-000) et aucune chaîne d'intégration continue n'est demandée par une `REQ-xxx`. À reprendre par `release` en P8, où la couverture entière de TEC-13 devient opposable. | 2026-09-21 |
 
 ## Constats `[MINEUR]` reportés
 

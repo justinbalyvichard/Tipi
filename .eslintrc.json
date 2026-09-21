@@ -7,7 +7,19 @@
       {
         "selector": "TSAnyKeyword",
         "message": "TEC-15 : aucun `any` dans le code livré."
+      },
+      {
+        "selector": "TSTypeAssertion",
+        "message": "TEC-15 : pas d'assertion de type `<T>x`. Valider plutôt par Zod."
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/lib/errors/route.ts", "prisma/seed.ts"],
+      "rules": {
+        "no-console": ["error", { "allow": ["error", "warn", "info"] }]
+      }
+    }
+  ]
 }
