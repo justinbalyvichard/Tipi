@@ -383,15 +383,42 @@ function i1(): void {
  */
 function modeleDe37(): ReadonlyMap<string, readonly string[]> {
   const brut = readFileSync(join(RACINE, "TIPI-PROMPT-CURSOR.md"), "utf8");
+
+  // CORRIGÉ AU TOUR 4 — [MINEUR] T3-2. La version du tour 3 balayait le
+  // fichier ENTIER, et `table.set` écrasait en silence. `controle-code` a posé
+  // une ligne de tableau en fin de document, très loin de 3.7, listant les
+  // colonnes de `child` PLUS `annees_revolues` : l'instrument l'a prise pour la
+  // définition de `child` et a validé un âge stocké, en sortie 0.
+  //
+  // La dérivation est le pilier d'ARB-18 : si sa source est mal délimitée, elle
+  // dérive de n'importe quoi. On borne donc la lecture à la section 3.7, et un
+  // nom de table vu deux fois est un DÉFAUT, jamais un écrasement.
+  const debut = brut.indexOf("### 3.7 Modèle de données");
+  const fin = brut.indexOf("### 3.8", debut === -1 ? 0 : debut);
+  if (debut === -1 || fin === -1 || fin <= debut) {
+    throw new Error(
+      "Section 3.7 introuvable ou mal bornée dans TIPI-PROMPT-CURSOR.md : la dérivation n'a plus de source.",
+    );
+  }
+  const section = brut.slice(debut, fin);
+
   const table = new Map<string, readonly string[]>();
-  for (const ligne of brut.matchAll(/^\|\s*`(\w+)`\s*\|[^|]*\|([^|]*)\|\s*$/gmu)) {
+  const doublons: string[] = [];
+  for (const ligne of section.matchAll(/^\|\s*`(\w+)`\s*\|[^|]*\|([^|]*)\|\s*$/gmu)) {
     const nom = ligne[1] ?? "";
     const champs = (ligne[2] ?? "")
       .split(",")
       .map((c) => c.trim().replace(/\s*\(.*\)$/u, ""))
       .filter((c) => /^[a-z][a-z0-9_]*$/u.test(c));
     // Une ligne de 3.7 décrit une table : elle nomme au moins `id`.
-    if (champs.includes("id")) table.set(nom, champs);
+    if (!champs.includes("id")) continue;
+    if (table.has(nom)) doublons.push(nom);
+    table.set(nom, champs);
+  }
+  if (doublons.length > 0) {
+    throw new Error(
+      `La section 3.7 définit deux fois la ou les tables : ${[...new Set(doublons)].join(", ")}. Une redéfinition écraserait la référence de l'invariant.`,
+    );
   }
   return table;
 }
@@ -453,6 +480,26 @@ const CHAMPS_CHILD_NUMERIQUES_AUTORISES: Readonly<Record<string, string>> = {
   gem_balance:
     "TEC-11, SEC-06 — solde de pierres, toujours recalculable comme somme de gem_ledger. Il dépend de ce que l'enfant a fait, jamais de sa date de naissance : deux enfants nés le même jour ont des soldes différents, et un même enfant en a plusieurs au cours d'une semaine.",
 };
+
+/**
+ * Les NEUF clés d'horodatage technique, nommées une par une. C'est la seule
+ * exemption de la garde anti-copier-coller : deux horodatages partagent
+ * légitimement leur phrase, parce que c'est littéralement le même fait.
+ * L'exemption porte sur ces clés-là, jamais sur un motif de texte — sinon elle
+ * s'étendrait à toute entrée future qui commencerait par le bon mot
+ * ([MINEUR] T3-3).
+ */
+const CLES_HORODATAGE: readonly string[] = [
+  "family.created_at",
+  "child.created_at",
+  "child.updated_at",
+  "exercise.created_at",
+  "session.created_at",
+  "session.updated_at",
+  "attempt.created_at",
+  "attempt.updated_at",
+  "reward_threshold.created_at",
+];
 
 const TYPES_NUMERIQUES = ["Int", "BigInt", "Float", "Decimal"];
 
@@ -547,6 +594,51 @@ const FORME_PROFIL_SEME: Readonly<Record<string, { readonly motif: RegExp; reado
   classeBilingue: { motif: /^(true|false)$/u, attendu: "un booléen" },
 };
 
+/**
+ * Toutes les affectations `<identifiant>: <valeur>` d'un fichier TypeScript,
+ * quel que soit leur emplacement.
+ *
+ * Écrit à la main plutôt qu'en expression régulière, et c'est nécessaire : une
+ * expression qui coupe la valeur à la première virgule tronque
+ * `new Date(Date.UTC(2019, 10, 29))` et ne lit plus que trois des quatre
+ * champs du profil. Le balayage respecte donc les parenthèses, les crochets,
+ * les accolades et les chaînes, et s'arrête sur une virgule de PREMIER niveau.
+ */
+function affectationsDe(source: string): readonly { champ: string; valeur: string }[] {
+  const sansCommentaires = source
+    .replace(/\/\*[\s\S]*?\*\//gu, " ")
+    .replace(/(^|[^:])\/\/[^\n]*/gu, "$1");
+  const trouvees: { champ: string; valeur: string }[] = [];
+  const motifCle = /(^|[{,\s])([A-Za-z_]\w*)\s*:\s*/gmu;
+  let m: RegExpExecArray | null;
+  while ((m = motifCle.exec(sansCommentaires)) !== null) {
+    const champ = m[2];
+    if (champ === undefined) continue;
+    let i = m.index + m[0].length;
+    let profondeur = 0;
+    let guillemet: string | null = null;
+    const debut = i;
+    for (; i < sansCommentaires.length; i += 1) {
+      const c = sansCommentaires[i] ?? "";
+      if (guillemet !== null) {
+        if (c === "\\") i += 1;
+        else if (c === guillemet) guillemet = null;
+        continue;
+      }
+      if (c === '"' || c === "'" || c === "`") { guillemet = c; continue; }
+      if (c === "(" || c === "[" || c === "{") { profondeur += 1; continue; }
+      if (c === ")" || c === "]" || c === "}") {
+        if (profondeur === 0) break;
+        profondeur -= 1;
+        continue;
+      }
+      if (profondeur === 0 && (c === "," || c === "\n" || c === ";")) break;
+    }
+    trouvees.push({ champ, valeur: sansCommentaires.slice(debut, i).trim() });
+  }
+  return trouvees;
+}
+
 function i2(): void {
   const schema = readFileSync(join(RACINE, "prisma", "schema.prisma"), "utf8");
   const defauts: string[] = [];
@@ -627,10 +719,18 @@ function i2(): void {
 
   // Deux justifications identiques signalent un copier-coller : une liste de
   // justifications ne vaut que si chacune a été écrite pour son entrée.
+  //
+  // CORRIGÉ AU TOUR 4 — [MINEUR] T3-3. Au tour 3, l'exemption portait sur le
+  // TEXTE (`!texte.startsWith("Horodatage")`), donc sur ce qu'on écrit
+  // soi-même : neuf entrées sur vingt et une la franchissaient, et toute
+  // entrée future commençant par ce mot aussi. `controle-code` a fait passer
+  // `child.annees_revolues` en lui donnant une justification d'horodatage.
+  // Une exemption qui se déclenche sur ce qu'on écrit est une exemption qu'on
+  // s'accorde soi-même : elle porte désormais sur des CLÉS nommées.
   const vues = new Map<string, string>();
   for (const [cle, texte] of Object.entries(AJOUTS_ARCHITECTURE)) {
     const precedent = vues.get(texte.trim());
-    if (precedent !== undefined && !texte.startsWith("Horodatage")) {
+    if (precedent !== undefined && !(CLES_HORODATAGE.includes(cle) && CLES_HORODATAGE.includes(precedent))) {
       defauts.push(
         `I2b — ${cle} et ${precedent} portent exactement la même justification : au moins l'une des deux n'a pas été écrite pour son entrée (ARB-18 mesure 2).`,
       );
@@ -649,39 +749,100 @@ function i2(): void {
     }
   }
 
-  // --- I2d : la forme exacte du profil semé --------------------------------
+  // --- I2d : AUCUNE valeur écrite sur child n'échappe à sa forme -----------
+  //
+  // RÉÉCRIT AU TOUR 4 — [MAJEUR] T3-1, et c'est le motif du tour 1 à sa
+  // deuxième occurrence : **contrôler un emplacement et non une propriété**.
+  //
+  // La version du tour 3 ne lisait que le littéral `const EVAN`.
+  // `controle-code` a écrit MA PROPRE quatrième mutation —
+  // `niveauScolaire: "CE1, 6 ans"` — trente lignes plus bas, dans la branche
+  // de mise à jour idempotente, celle que le seed emprunte à chaque rejeu.
+  // Les quatre sous-invariants sont restés verts, `typecheck` et `lint` aussi,
+  // et il a lu « CE1, 6 ans » dans `child.niveau_scolaire` de sa base. Aucune
+  // table à éditer, aucun motif à mentir : du code ordinaire.
+  //
+  // La propriété, elle, ne dépend d'aucun emplacement : **aucune valeur
+  // littérale affectée à un champ de `child`, où que ce soit dans le seed, ne
+  // doit porter une information dérivable de `date_naissance`.** On lit donc
+  // TOUTES les affectations `<champ>: <valeur>` du fichier, et la liste des
+  // champs de `child` est celle du schéma — dérivée, pas recopiée.
+  //
+  // Les constantes de module sont résolues avant comparaison : sans cela,
+  // `const NIVEAU = "CE1, 6 ans"` puis `niveauScolaire: NIVEAU` rouvrirait le
+  // même chemin par indirection. C'est la sixième mutation, que j'ai cherchée
+  // moi-même après celle-ci — voir §0.4 du rapport.
   const seed = readFileSync(join(RACINE, "prisma", "seed.ts"), "utf8");
+  const champsDeChild = new Set(champsChild.map((c) => c.nom));
+
+  /** `const X = <littéral>;` au niveau module, pour résoudre les indirections. */
+  const constantes = new Map<string, string>();
+  for (const m of seed.matchAll(/^const\s+(\w+)\s*(?::[^=]+)?=\s*(.+?);\s*$/gmu)) {
+    const nom = m[1];
+    const valeur = m[2];
+    if (nom !== undefined && valeur !== undefined) constantes.set(nom, valeur.trim());
+  }
+
+  const estLitteral = (v: string): boolean =>
+    /^(["'`]).*\1$/su.test(v) || /^-?\d+(\.\d+)?$/u.test(v) || v === "true" || v === "false" ||
+    /^new Date\(/u.test(v);
+
+  let affectationsLues = 0;
+  for (const { champ: nomChamp, valeur: valeurBrute } of affectationsDe(seed)) {
+    const champ = nomChamp;
+    let valeur = valeurBrute;
+    if (!champsDeChild.has(champ)) continue;
+
+    // Indirection : `EVAN.x` pointe vers le littéral du bloc, déjà contrôlé
+    // ci-dessous ; une autre constante de module est résolue ici.
+    if (/^EVAN\.\w+$/u.test(valeur)) continue;
+    const resolue = constantes.get(valeur);
+    if (resolue !== undefined) valeur = resolue;
+    if (!estLitteral(valeur)) continue; // expression : `foyer.id`, `existant.id`…
+
+    affectationsLues += 1;
+    const forme = FORME_PROFIL_SEME[champ];
+    if (forme === undefined) {
+      defauts.push(
+        `I2d — le seed affecte le littéral ${valeur} à child.${champ}, qui n'est pas l'un des quatre champs de PRD-02 (${Object.keys(FORME_PROFIL_SEME).join(", ")}). Un littéral posé sur un autre champ de child est exactement là qu'un âge se fige.`,
+      );
+      continue;
+    }
+    if (!forme.motif.test(valeur)) {
+      defauts.push(
+        `I2d — le seed affecte ${valeur} à child.${champ} ; attendu : ${forme.attendu} (PRD-02). Peu importe où l'affectation se trouve : littéral, branche de création ou branche de mise à jour.`,
+      );
+    }
+  }
+
+  // Réciprocité : le bloc EVAN porte EXACTEMENT les quatre champs de PRD-02.
   const bloc = /const EVAN = \{([\s\S]*?)\} as const;/u.exec(seed);
   if (bloc?.[1] === undefined) {
     defauts.push(
-      "I2d — le bloc `const EVAN = { … } as const;` est introuvable dans prisma/seed.ts : l'instrument ne peut plus lire ce que le seed écrit.",
+      "I2d — le bloc `const EVAN = { … } as const;` est introuvable dans prisma/seed.ts : le profil de PRD-02 n'est plus déclaré en un seul endroit.",
     );
   } else {
-    const ecrits = new Map<string, string>();
-    for (const ligne of bloc[1].split("\n")) {
-      const m = /^\s*(\w+)\s*:\s*(.+?),\s*(\/\/.*)?$/u.exec(ligne);
-      if (m?.[1] === undefined || m[2] === undefined) continue;
-      ecrits.set(m[1], m[2].trim());
-    }
-    for (const [nom, valeur] of ecrits) {
-      const forme = FORME_PROFIL_SEME[nom];
-      if (forme === undefined) {
+    const ecrits = new Set(
+      [...bloc[1].matchAll(/^\s*(\w+)\s*:/gmu)].map((x) => x[1] ?? ""),
+    );
+    for (const nom of ecrits) {
+      if (!(nom in FORME_PROFIL_SEME)) {
         defauts.push(
-          `I2d — le seed écrit child.${nom}, qui n'est pas l'un des quatre champs de PRD-02 (${Object.keys(FORME_PROFIL_SEME).join(", ")}). Un cinquième champ semé est exactement là qu'un âge se fige.`,
-        );
-        continue;
-      }
-      if (!forme.motif.test(valeur)) {
-        defauts.push(
-          `I2d — child.${nom} vaut ${valeur} dans le seed ; attendu : ${forme.attendu} (PRD-02).`,
+          `I2d — le bloc EVAN écrit child.${nom}, qui n'est pas l'un des quatre champs de PRD-02. Un cinquième champ semé est exactement là qu'un âge se fige.`,
         );
       }
     }
     for (const nom of Object.keys(FORME_PROFIL_SEME)) {
       if (!ecrits.has(nom)) {
-        defauts.push(`I2d — le seed n'écrit pas child.${nom}, exigé par PRD-02.`);
+        defauts.push(`I2d — le bloc EVAN n'écrit pas child.${nom}, exigé par PRD-02.`);
       }
     }
+  }
+
+  if (affectationsLues === 0) {
+    defauts.push(
+      "I2d — aucune affectation littérale à un champ de child n'a été lue dans prisma/seed.ts : l'instrument ne mesure rien.",
+    );
   }
 
   if (colonnesExaminees === 0 || champsExamines === 0) {
@@ -695,7 +856,7 @@ function i2(): void {
   enregistrer(
     "I2",
     "I2 — PRD-02 : aucun âge stockable sur child, quel que soit son nom",
-    `I2a ${champsChild.length} champs de child, ${Object.keys(CHAMPS_CHILD_NUMERIQUES_AUTORISES).length} numérique autorisé et justifié · I2b ${colonnesExaminees} colonnes de ${tables.size} tables contre ${attendu37.size} tables de la section 3.7 + ${Object.keys(AJOUTS_ARCHITECTURE).length} ajouts justifiés · I2c ${champsExamines} champs · I2d les ${Object.keys(FORME_PROFIL_SEME).length} champs du profil semé`,
+    `I2a ${champsChild.length} champs de child, ${Object.keys(CHAMPS_CHILD_NUMERIQUES_AUTORISES).length} numérique autorisé et justifié · I2b ${colonnesExaminees} colonnes de ${tables.size} tables contre ${attendu37.size} tables de la section 3.7 + ${Object.keys(AJOUTS_ARCHITECTURE).length} ajouts justifiés · I2c ${champsExamines} champs · I2d ${affectationsLues} affectations littérales à un champ de child, partout dans prisma/seed.ts`,
     defauts,
   );
 }
