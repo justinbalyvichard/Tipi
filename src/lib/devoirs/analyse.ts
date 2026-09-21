@@ -282,9 +282,14 @@ async function pregenererIndices(
         niveaux: valeur.indices,
         source: "pregenere",
       });
+      // Même geste que dans `calibration.ts` : on passe par une valeur JSON
+      // pure plutôt que par une double assertion de type. Le contenu vient
+      // d'être validé par `IndicesExercice`, donc la sérialisation ne peut
+      // rien perdre — et aucune ligne du produit ne contourne le typage.
+      const valeurJson: Prisma.InputJsonValue = JSON.parse(JSON.stringify(indices));
       await prisma.exercise.update({
         where: { id: exercice.id },
-        data: { indices: indices as unknown as Prisma.InputJsonValue },
+        data: { indices: valeurJson },
       });
       pregeneres += 1;
     } catch {
