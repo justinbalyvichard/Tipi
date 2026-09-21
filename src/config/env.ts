@@ -67,6 +67,19 @@ const schemaEnv = z.object({
   AI_TIMEOUT_MS: entier(20_000),
 
   GOOGLE_SERVICE_ACCOUNT_JSON: z.string().optional(),
+  /**
+   * AJOUTÉE PAR V2, hors des 27 variables du tableau P2 §11 — écart déclaré.
+   *
+   * §11 suppose que l'absence de `GOOGLE_SERVICE_ACCOUNT_JSON` suffit à
+   * dégrader l'OCR. C'est vrai d'une dégradation en production, faux d'un
+   * développement : sans compte externe (ESC-000), un pipeline qui ne sait
+   * qu'échouer n'est testable sur aucun de ses cinq étages. §5.4 de la même
+   * architecture pose `OcrProvider` en prévoyant un remplacement après
+   * calibration — une fabrique sans sélecteur n'en est pas une.
+   *
+   * Valeurs : `google-vision` (défaut, TEC-05) ou `bouchon`.
+   */
+  OCR_PROVIDER: texte("google-vision"),
   VOICE_PROVIDER: texte("google-chirp3"),
 
   PARENT_SESSION_TTL_MIN: entier(5),
@@ -85,6 +98,18 @@ const schemaEnv = z.object({
   LECTURE_SEUIL_MOTS_OK: unitaire(0.6),
   BLOCAGE_NB_SOLLICITATIONS: entier(3),
   CALIBRATION_NB_PHOTOS: entier(20),
+  /**
+   * AJOUTÉE PAR V2, hors des 27 variables du tableau P2 §11 — écart déclaré.
+   *
+   * Durée estimée d'une étape lorsque **aucun modèle ne l'a estimée** : c'est
+   * le cas de la saisie manuelle jouée sans fournisseur d'IA, que P2 §11 pose
+   * nommément comme devant rester possible (« une soirée reste possible »).
+   * Le contrat de `POST /api/devoirs/analyse` exige une durée ; il fallait donc
+   * un nombre, et TEC-16 exige qu'un nombre réglable vive en configuration et
+   * non en constante dispersée. Valeur de départ, à régler sur du réel comme
+   * les cinq autres.
+   */
+  DUREE_SECOURS_ETAPE_MIN: entier(10),
 
   AUDIO_RETENTION_JOURS_DEFAUT: entier(7),
 });

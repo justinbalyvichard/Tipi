@@ -1,0 +1,180 @@
+/**
+ * L'exécution d'un appel d'IA — **SERVEUR UNIQUEMENT**.
+ *
+ * Un seul endroit tient, pour les trois prompts et pour tous les fournisseurs
+ * présents et à venir :
+ *
+ *  1. le scellement du payload (P2 §6, barrière 2) ;
+ *  2. **l'invariant de dérivabilité de SEC-04**, avant tout accès réseau ;
+ *  3. l'abandon au-delà de `AI_TIMEOUT_MS` → `TIPI_IA_TIMEOUT` ;
+ *  4. la validation Zod stricte de la sortie (TEC-05) ;
+ *  5. **la relance, une seule fois**, puis `TIPI_IA_SORTIE_INVALIDE` — le texte
+ *     de la section 3.2 étape 4, mot pour mot : « Toute sortie non conforme est
+ *     rejouée une fois, puis bascule en état illisible » ;
+ *  6. la trace exacte de ce qui est parti et de ce qui est revenu (TEC-16).
+ *
+ * Aucune de ces six règles n'est laissée au fournisseur : un second fournisseur
+ * les hériterait sans les réécrire, et ne pourrait pas les affaiblir.
+ */
+import type { z } from "zod";
+
+import {
+  PayloadIa,
+  assertCorpsDerivable,
+  type CorpsIa,
+} from "@/lib/ai/anonymisation";
+import type { PromptVersionne } from "@/lib/ai/prompts/types";
+import type { ResultatIa, TraceAppelIa } from "@/lib/ai/provider";
+import type { AiTransport } from "@/lib/ai/transport";
+import { env } from "@/config/env";
+import { AppError } from "@/lib/errors/app-error";
+import { garderServeur } from "@/lib/runtime/garde-serveur";
+
+garderServeur("src/lib/ai/execution.ts");
+
+/** Nombre total de tentatives : la première, plus **une** relance (3.2, étape 4). */
+export const TENTATIVES_MAX = 2;
+
+/**
+ * Extrait le premier objet JSON d'une réponse de modèle.
+ *
+ * Les modèles encadrent volontiers leur JSON d'un bloc de code ou d'une phrase
+ * d'introduction, malgré la consigne. Refuser ces sorties ferait basculer en
+ * « illisible » des analyses parfaitement exploitables : on découpe donc du
+ * premier `{` au dernier `}`. Ce n'est pas un assouplissement de la validation
+ * — le schéma Zod s'applique ensuite sans concession sur ce qui a été extrait.
+ */
+export function extraireJson(brut: string): unknown {
+  const debut = brut.indexOf("{");
+  const fin = brut.lastIndexOf("}");
+  if (debut === -1 || fin === -1 || fin <= debut) {
+    throw new Error("aucun objet JSON dans la réponse");
+  }
+  return JSON.parse(brut.slice(debut, fin + 1));
+}
+
+/**
+ * Erreur d'appel d'IA qui **transporte sa trace**.
+ *
+ * Sans elle, une analyse qui échoue ne pourrait pas être journalisée : TEC-16
+ * demande de consigner « le code d'erreur éventuel » à côté du payload envoyé,
+ * et c'est précisément sur les échecs que la calibration est instructive.
+ */
+export class ErreurAppelIa extends AppError {
+  public readonly trace: TraceAppelIa;
+
+  public constructor(
+    code: ConstructorParameters<typeof AppError>[0],
+    trace: TraceAppelIa,
+    detail?: string,
+  ) {
+    super(code, detail);
+    this.name = "ErreurAppelIa";
+    this.trace = trace;
+  }
+}
+
+function trace(
+  prompt: PromptVersionne,
+  corps: CorpsIa,
+  brut: string | null,
+  tentatives: number,
+  debut: number,
+): TraceAppelIa {
+  return {
+    promptId: prompt.id,
+    promptVersion: prompt.version,
+    payload: corps,
+    reponseBrute: brut,
+    tentatives,
+    dureeMs: Date.now() - debut,
+  };
+}
+
+/**
+ * Scelle, contrôle, appelle, valide, relance une fois.
+ *
+ * `texte` est **déjà caviardé** par l'appelant : la partie (B) de SEC-04
+ * s'exerce là où le prénom est connu, c'est-à-dire hors de `src/lib/ai/**`.
+ */
+export async function executerPrompt<T>(
+  transport: AiTransport,
+  prompt: PromptVersionne,
+  texte: string,
+  schema: z.ZodType<T>,
+): Promise<ResultatIa<T>> {
+  garderServeur("src/lib/ai/execution.ts");
+  const debut = Date.now();
+  const { AI_TIMEOUT_MS } = env();
+
+  const payload = PayloadIa.sceller(prompt, texte);
+  const corps = transport.corps(payload);
+
+  // (A) — L'INVARIANT DE SEC-04, AVANT TOUT ACCÈS RÉSEAU.
+  // `transport.emettre` est la seule fonction du produit qui atteigne le
+  // fournisseur, et elle ne peut être appelée qu'après cette ligne.
+  assertCorpsDerivable(corps, payload, transport.vocabulaire);
+
+  let dernierBrut: string | null = null;
+  let dernierDetail = "";
+
+  for (let tentative = 1; tentative <= TENTATIVES_MAX; tentative += 1) {
+    const horloge = new AbortController();
+    const minuterie = setTimeout(() => {
+      horloge.abort();
+    }, AI_TIMEOUT_MS);
+
+    let brut: string;
+    try {
+      brut = await transport.emettre(corps, horloge.signal);
+    } catch (brute) {
+      const expire = horloge.signal.aborted;
+      throw new ErreurAppelIa(
+        expire ? "TIPI_IA_TIMEOUT" : "TIPI_IA_INDISPONIBLE",
+        trace(prompt, corps, dernierBrut, tentative, debut),
+        expire
+          ? `abandon après ${AI_TIMEOUT_MS} ms`
+          : brute instanceof Error
+            ? brute.message
+            : String(brute),
+      );
+    } finally {
+      clearTimeout(minuterie);
+    }
+
+    dernierBrut = brut;
+
+    const parse = schema.safeParse(lireSansLever(brut));
+    if (parse.success) {
+      return {
+        valeur: parse.data,
+        trace: trace(prompt, corps, brut, tentative, debut),
+      };
+    }
+    dernierDetail = parse.error.issues
+      .slice(0, 5)
+      .map((i) => `${i.path.join(".")} — ${i.message}`)
+      .join(" ; ");
+  }
+
+  // Deux sorties non conformes : la relance a eu lieu, on bascule.
+  throw new ErreurAppelIa(
+    "TIPI_IA_SORTIE_INVALIDE",
+    trace(prompt, corps, dernierBrut, TENTATIVES_MAX, debut),
+    `sortie non conforme après ${TENTATIVES_MAX} tentatives : ${dernierDetail}`,
+  );
+}
+
+/**
+ * Le JSON extrait, ou `undefined` si la réponse n'en contient pas.
+ * `undefined` échoue ensuite au schéma : un seul chemin d'échec, donc une seule
+ * relance possible, et jamais deux traitements différents pour « pas de JSON »
+ * et « JSON mal formé ».
+ */
+function lireSansLever(brut: string): unknown {
+  try {
+    return extraireJson(brut);
+  } catch {
+    return undefined;
+  }
+}

@@ -30,6 +30,12 @@ export interface Seuils {
   readonly blocageNbSollicitations: number;
   /** TEC-16 — nombre de photos journalisées en mode calibration. */
   readonly calibrationNbPhotos: number;
+  /**
+   * Durée estimée d'une étape quand aucun modèle ne l'a estimée (saisie
+   * manuelle sans fournisseur d'IA). **Sixième entrée, ajoutée par V2** : écart
+   * déclaré par rapport aux cinq de P2 §13, motivé dans `src/config/env.ts`.
+   */
+  readonly dureeSecoursEtapeMin: number;
 }
 
 let cache: Seuils | undefined;
@@ -44,6 +50,7 @@ export function seuils(): Seuils {
     lectureSeuilMotsOk: e.LECTURE_SEUIL_MOTS_OK,
     blocageNbSollicitations: e.BLOCAGE_NB_SOLLICITATIONS,
     calibrationNbPhotos: e.CALIBRATION_NB_PHOTOS,
+    dureeSecoursEtapeMin: e.DUREE_SECOURS_ETAPE_MIN,
   });
   return cache;
 }

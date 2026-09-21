@@ -206,6 +206,20 @@ model Exercise {
   indices Json?
 
   ordre     Int      @default(0)
+
+  /// AJOUTÉE PAR V2 — durée estimée de CET exercice, en minutes.
+  ///
+  /// La section 3.6 fait estimer au modèle une durée **par étape**, et le
+  /// contrat de `GET /api/devoirs/programme` (P2 §8.2) exige de rendre cette
+  /// durée après un simple rafraîchissement. Or aucune colonne ne la portait :
+  /// la relecture aurait dû réinventer un nombre, qui aurait différé de celui
+  /// affiché une seconde plus tôt.
+  ///
+  /// La durée d'une étape est donc DÉFINIE comme la somme des durées de ses
+  /// exercices, à l'analyse comme à la relecture. Une seule définition, donc
+  /// aucune divergence possible entre les deux chemins.
+  dureeEstimeeMin Int @map("duree_estimee_min") @db.SmallInt
+
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   homework Homework  @relation(fields: [homeworkId], references: [id], onDelete: Cascade)

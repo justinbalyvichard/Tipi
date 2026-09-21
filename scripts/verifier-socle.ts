@@ -467,6 +467,8 @@ const AJOUTS_ARCHITECTURE: Readonly<Record<string, string>> = {
     "3.4 — mots sur lesquels l'enfant a hésité, pour « Mots à revoir » côté parent. Liste de chaînes.",
   "exercise.ordre":
     "Rang de l'exercice dans son devoir, pour le reconstruire dans l'ordre. Indice de position, borné par le nombre d'exercices.",
+  "exercise.duree_estimee_min":
+    "3.6 et P2 §8.2 — durée estimée par le modèle, en minutes. La relecture de l'aperçu doit rendre la même durée que l'analyse ; sans colonne, elle aurait réinventé un nombre. Une durée de travail ne se dérive d'aucune date de naissance : deux enfants nés le même jour ont des devoirs différents.",
   // --- table entière hors 3.7, exigée nommément par TEC-16 ---
   "calibration_log.*":
     "TEC-16 — table entière hors de la section 3.7, exigée nommément par l'exigence. Elle ne contient aucune donnée identifiante : ni prénom, ni photo, ni date de naissance (SEC-04).",

@@ -43,6 +43,20 @@ export const CODES_ERREUR = {
   TIPI_FORMAT_REFUSE: { http: 415, public: "parent", cleContenu: "parent.scan.envoi_echec.*", origine: "serveur" },
   TIPI_UPLOAD_ECHEC: { http: 502, public: "parent", cleContenu: "parent.scan.envoi_echec.*", origine: "serveur" },
 
+  /**
+   * AJOUTÉ PAR V2 — comblement d'un trou de l'architecture, déclaré.
+   *
+   * P2 §8.2 donne `409 TIPI_DEJA_ANALYSE` comme erreur de
+   * `DELETE /api/devoirs/photo/{homeworkId}`, mais le tableau §10.1 ne le
+   * déclare pas : le code était nommé par un contrat de route et absent de la
+   * taxonomie fermée, donc inécrivable. Il rejoint ici la famille de
+   * `TIPI_TRANSITION_INVALIDE` — aucun message, parce que c'est une garde et
+   * non un état limite : l'écran parent ne propose plus de retirer une photo
+   * une fois l'analyse faite. Un `cleContenu` inventé aurait créé une clé
+   * fantôme que l'invariant I3 aurait signalée à juste titre.
+   */
+  TIPI_DEJA_ANALYSE: { http: 409, public: "aucun", cleContenu: null, origine: "serveur" },
+
   TIPI_OCR_VIDE: { http: 422, public: "parent", cleContenu: "parent.scan.illisible.*", origine: "serveur" },
   TIPI_OCR_CONFIANCE_BASSE: { http: 422, public: "parent", cleContenu: "parent.scan.illisible.*", origine: "serveur" },
   TIPI_AUCUN_EXERCICE: { http: 422, public: "parent", cleContenu: "parent.apercu.vide.*", origine: "serveur" },
