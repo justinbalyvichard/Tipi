@@ -165,7 +165,7 @@ async function lireDevoir(
 /**
  * Structuration **sans modèle**, pour la seule saisie manuelle.
  *
- * P2 §11 le pose noir sur blanc : `DEEPSEEK_API_KEY` absente ⇒ « l'analyse
+ * P2 §11 le pose noir sur blanc : la clé du fournisseur absente ⇒ « l'analyse
  * renvoie `TIPI_IA_INDISPONIBLE` et le parent bascule sur la saisie manuelle.
  * **Une soirée reste possible.** » Sans ce repli, la phrase serait fausse : la
  * saisie manuelle repasserait par le modèle absent et échouerait pareil.
@@ -344,32 +344,42 @@ export async function analyserDevoirs(
     await tx.exercise.deleteMany({ where: { homeworkId: { in: ids } } });
     const rendues: { matiere: MatiereIa; dureeEstimeeMin: number; exercices: ExerciceRendu[] }[] =
       [];
+    // `ordre` est GLOBAL au programme, pas local à l'étape. C'est lui qui porte
+    // l'ordre des étapes entre elles à la relecture : un rang remis à zéro à
+    // chaque étape rendrait les deux étapes indiscernables une fois relues.
+    let rang = 0;
+    const matiereDuDevoir = new Map<string, MatiereIa>();
     for (const etape of etapes) {
       const exercices: ExerciceRendu[] = [];
-      for (const [rang, candidat] of etape.exercices.entries()) {
+      for (const candidat of etape.exercices) {
         const cree = await tx.exercise.create({
           data: {
             homeworkId: candidat.homeworkId,
             consigne: candidat.consigne,
             type: candidat.type,
             contenu: candidat.contenu,
+            matiere: etape.matiere,
             ordre: rang,
             dureeEstimeeMin: candidat.dureeEstimeeMin,
           },
         });
+        rang += 1;
         exercices.push({ id: cree.id, consigne: cree.consigne, type: cree.type });
+        // `homework.matiere` reste renseignée — la section 3.7 la déclare —
+        // mais elle ne sert plus à ranger : la PREMIÈRE matière rencontrée
+        // sur ce devoir est conservée, et l'exercice porte la sienne.
+        if (!matiereDuDevoir.has(candidat.homeworkId)) {
+          matiereDuDevoir.set(candidat.homeworkId, etape.matiere);
+        }
       }
       rendues.push({
         matiere: etape.matiere,
         dureeEstimeeMin: etape.dureeEstimeeMin,
         exercices,
       });
-      for (const candidat of etape.exercices) {
-        await tx.homework.update({
-          where: { id: candidat.homeworkId },
-          data: { matiere: etape.matiere },
-        });
-      }
+    }
+    for (const [homeworkId, matiere] of matiereDuDevoir) {
+      await tx.homework.update({ where: { id: homeworkId }, data: { matiere } });
     }
     return rendues;
   });

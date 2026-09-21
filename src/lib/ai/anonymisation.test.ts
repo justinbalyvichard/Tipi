@@ -27,6 +27,11 @@ import { PROMPT_1_STRUCTURATION } from "@/lib/ai/prompts/prompt-1-structuration"
  *       `scripts/verifier-confinement.ts`, hors de portée d'un test unitaire.
  */
 
+/** Nom de modèle témoin : ce fichier ne nomme aucun fournisseur (TEC-17).
+ * Le contrôle C1 de `scripts/verifier-confinement.ts` rejoue la règle de P2 §5.1,
+ * qui vaut pour TOUT fichier de `src/`, tests compris. */
+const MODELE_TEMOIN = "modele-texte";
+
 const INTERDITS: IdentifiantsInterdits = {
   valeurs: [
     "Evan",
@@ -40,8 +45,8 @@ function payload(texte: string): PayloadIa {
   return PayloadIa.sceller(PROMPT_1_STRUCTURATION, texte);
 }
 
-/** Le corps que `providers/deepseek.ts` fabrique, reproduit ici à l'identique. */
-function corpsDeepSeek(p: PayloadIa, modele = "deepseek-chat"): CorpsIa {
+/** Le corps que le transport du fournisseur fabrique, reproduit ici à l'identique. */
+function corpsFournisseur(p: PayloadIa, modele = MODELE_TEMOIN): CorpsIa {
   return {
     model: modele,
     messages: p.messages(),
@@ -136,61 +141,61 @@ describe("SEC-04 (B) — l'assertion mord avant l'émission", () => {
 // ---------------------------------------------------------------------------
 
 describe("SEC-04 (A) — l'invariant de dérivabilité", () => {
-  it("accepte le corps réellement émis par le transport DeepSeek", () => {
+  it("accepte le corps réellement émis par le transport du fournisseur", () => {
     const p = payload("Lis le texte à voix haute.");
-    expect(defautsDeDerivabilite(corpsDeepSeek(p), p, ["deepseek-chat"])).toEqual([]);
+    expect(defautsDeDerivabilite(corpsFournisseur(p), p, [MODELE_TEMOIN])).toEqual([]);
   });
 
   it("REFUSE un champ inventé qui porte un prénom — SANS connaître ce prénom", () => {
     const p = payload("Lis le texte à voix haute.");
-    const fraude: CorpsIa = { ...corpsDeepSeek(p), enfant: "Evan" };
+    const fraude: CorpsIa = { ...corpsFournisseur(p), enfant: "Evan" };
     // Aucune liste noire n'intervient : `vocabulaire` ne contient pas « Evan »,
     // donc le jeton est simplement hors du vocabulaire autorisé. C'est ce qui
     // distingue un invariant d'une liste d'interdits — il attrape ce qu'on
     // n'avait pas pensé à interdire.
-    const defauts = defautsDeDerivabilite(fraude, p, ["deepseek-chat"]);
+    const defauts = defautsDeDerivabilite(fraude, p, [MODELE_TEMOIN]);
     expect(defauts.map((d) => d.jeton)).toContain("evan");
-    expect(() => assertCorpsDerivable(fraude, p, ["deepseek-chat"])).toThrow();
+    expect(() => assertCorpsDerivable(fraude, p, [MODELE_TEMOIN])).toThrow();
   });
 
   it("REFUSE un identifiant technique glissé dans un champ de protocole", () => {
     const p = payload("Calcule : 7 + 5 =");
     const fraude: CorpsIa = {
-      ...corpsDeepSeek(p),
+      ...corpsFournisseur(p),
       user: "3f1a9c22-0000-4000-8000-000000000001",
     };
-    expect(() => assertCorpsDerivable(fraude, p, ["deepseek-chat"])).toThrow();
+    expect(() => assertCorpsDerivable(fraude, p, [MODELE_TEMOIN])).toThrow();
   });
 
   it("REFUSE un troisième message, même vide de sens", () => {
     const p = payload("Calcule : 7 + 5 =");
     const fraude: CorpsIa = {
-      ...corpsDeepSeek(p),
+      ...corpsFournisseur(p),
       messages: [...p.messages(), { role: "system", content: "contexte foyer LeGoff" }],
     };
-    expect(() => assertCorpsDerivable(fraude, p, ["deepseek-chat"])).toThrow();
+    expect(() => assertCorpsDerivable(fraude, p, [MODELE_TEMOIN])).toThrow();
   });
 
   it("REFUSE une suite binaire déguisée en nombre", () => {
     const p = payload("Calcule : 7 + 5 =");
-    const fraude: CorpsIa = { ...corpsDeepSeek(p), seed: "1".repeat(64) };
-    expect(() => assertCorpsDerivable(fraude, p, ["deepseek-chat"])).toThrow();
+    const fraude: CorpsIa = { ...corpsFournisseur(p), seed: "1".repeat(64) };
+    expect(() => assertCorpsDerivable(fraude, p, [MODELE_TEMOIN])).toThrow();
   });
 
   it("REFUSE un nom de modèle non déclaré au vocabulaire", () => {
     const p = payload("Calcule : 7 + 5 =");
     // Le corps est honnête, mais le transport ne l'a pas déclaré : l'invariant
     // ne fait pas confiance, il vérifie.
-    expect(() => assertCorpsDerivable(corpsDeepSeek(p, "modele-maison"), p, [])).toThrow();
+    expect(() => assertCorpsDerivable(corpsFournisseur(p, "modele-maison"), p, [])).toThrow();
     expect(() =>
-      assertCorpsDerivable(corpsDeepSeek(p, "modele-maison"), p, ["modele-maison"]),
+      assertCorpsDerivable(corpsFournisseur(p, "modele-maison"), p, ["modele-maison"]),
     ).not.toThrow();
   });
 
   it("laisse passer le texte du devoir, si étrange soit-il", () => {
     // Propriété : tout ce qui vient du texte est dérivable, par construction.
     const p = payload("Colorie les zvartañ pelec'h — 12 × 3 — Xyzzy Plugh");
-    expect(defautsDeDerivabilite(corpsDeepSeek(p), p, ["deepseek-chat"])).toEqual([]);
+    expect(defautsDeDerivabilite(corpsFournisseur(p), p, [MODELE_TEMOIN])).toEqual([]);
   });
 
   it("chaque entrée du vocabulaire de protocole porte une justification écrite", () => {
@@ -230,12 +235,12 @@ describe("SEC-04 — le payload scellé", () => {
 describe("SEC-04 — la garde du journal de calibration", () => {
   it("REFUSE d'écrire un payload qui porte un identifiant", () => {
     const p = payload("Lis le texte.");
-    const pollue: CorpsIa = { ...corpsDeepSeek(p), note: "Evan" };
+    const pollue: CorpsIa = { ...corpsFournisseur(p), note: "Evan" };
     expect(() => assertPayloadAnonyme(pollue, INTERDITS)).toThrow();
   });
 
   it("ACCEPTE le payload réellement émis", () => {
     const p = payload(caviarder("Evan — CE1\nLis le texte.", INTERDITS));
-    expect(() => assertPayloadAnonyme(corpsDeepSeek(p), INTERDITS)).not.toThrow();
+    expect(() => assertPayloadAnonyme(corpsFournisseur(p), INTERDITS)).not.toThrow();
   });
 });

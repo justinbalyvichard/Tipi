@@ -8,7 +8,7 @@ import type { AiTransport } from "@/lib/ai/transport";
 import { reinitialiserEnvPourTest } from "@/config/env";
 
 /**
- * L'étape 4 du pipeline, mot pour mot : « appel DeepSeek en mode texte, sortie
+ * L'étape 4 du pipeline, mot pour mot : « appel du modèle en mode texte, sortie
  * JSON strictement validée par un schéma Zod. **Toute sortie non conforme est
  * rejouée une fois, puis bascule en état illisible.** »
  *

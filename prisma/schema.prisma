@@ -205,7 +205,21 @@ model Exercise {
   /// Null = génération de secours à la demande, ou état `maths.sans_indice`.
   indices Json?
 
-  ordre     Int      @default(0)
+  /// Rang de l'exercice dans le PROGRAMME du soir, toutes étapes confondues.
+  /// Global et non local à l'étape : c'est lui qui rend l'ordre du programme
+  /// reconstituable par `GET /api/devoirs/programme`, y compris l'ordre des
+  /// étapes entre elles.
+  ordre Int @default(0)
+
+  /// AJOUTÉE PAR V2 — la matière de CET exercice.
+  ///
+  /// `homework.matiere` ne suffit pas : la section 3.6 autorise le modèle à
+  /// rendre DEUX étapes pour une seule photo, donc une photo peut porter des
+  /// exercices de lecture ET de maths. Sans cette colonne, la relecture de
+  /// l'aperçu rangeait tous les exercices d'une telle photo dans une seule
+  /// étape — défaut trouvé en jouant `pnpm epreuve:pipeline` contre une vraie
+  /// base, et invisible à la lecture du code.
+  matiere Matiere
 
   /// AJOUTÉE PAR V2 — durée estimée de CET exercice, en minutes.
   ///

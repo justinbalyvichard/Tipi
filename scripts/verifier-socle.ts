@@ -467,6 +467,8 @@ const AJOUTS_ARCHITECTURE: Readonly<Record<string, string>> = {
     "3.4 — mots sur lesquels l'enfant a hésité, pour « Mots à revoir » côté parent. Liste de chaînes.",
   "exercise.ordre":
     "Rang de l'exercice dans son devoir, pour le reconstruire dans l'ordre. Indice de position, borné par le nombre d'exercices.",
+  "exercise.matiere":
+    "3.6 — la matière de cet exercice. Le modèle peut rendre deux étapes pour une seule photo, donc homework.matiere ne suffit pas à ranger un exercice. C'est une propriété du devoir du jour, sans lien avec l'état civil de qui que ce soit.",
   "exercise.duree_estimee_min":
     "3.6 et P2 §8.2 — durée estimée par le modèle, en minutes. La relecture de l'aperçu doit rendre la même durée que l'analyse ; sans colonne, elle aurait réinventé un nombre. Une durée de travail ne se dérive d'aucune date de naissance : deux enfants nés le même jour ont des devoirs différents.",
   // --- table entière hors 3.7, exigée nommément par TEC-16 ---

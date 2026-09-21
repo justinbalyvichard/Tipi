@@ -4,7 +4,7 @@
  * ---------------------------------------------------------------------------
  * CE QUE SEC-04 DEMANDE
  * ---------------------------------------------------------------------------
- * « Le payload envoyé à DeepSeek ne contient jamais le prénom de l'enfant, ni
+ * « Le payload envoyé au modèle ne contient jamais le prénom de l'enfant, ni
  * la photo brute, ni aucune donnée identifiante — uniquement le texte de
  * l'exercice. »
  *

@@ -50,31 +50,38 @@ export async function programmeCourant(maintenant = new Date()): Promise<Program
   const devoirs = await prisma.homework.findMany({
     where: { childId: enfant.id },
     orderBy: { createdAt: "asc" },
-    include: { exercises: { orderBy: { ordre: "asc" } } },
+    include: { exercises: true },
   });
 
   const duSoir = devoirs.filter((d) => dateSoiree(d.createdAt) === soiree);
 
-  const parMatiere = new Map<MatiereIa, EtapeRendue>();
   const langues: LangueIa[] = [];
-
   for (const devoir of duSoir) {
-    if (devoir.exercises.length === 0) continue; // ARB-08, même règle qu'à l'analyse
-    if (devoir.matiere === null) continue;
+    // ARB-08, même règle qu'à l'analyse : un devoir sans exercice n'apporte
+    // aucune étape, et n'apporte donc pas non plus sa langue.
+    if (devoir.exercises.length === 0) continue;
     if (devoir.langueDetectee !== null) langues.push(devoir.langueDetectee);
+  }
 
-    const existante = parMatiere.get(devoir.matiere);
-    const exercices = devoir.exercises.map((e) => ({
-      id: e.id,
-      consigne: e.consigne,
-      type: e.type,
-    }));
-    const duree = devoir.exercises.reduce((total, e) => total + e.dureeEstimeeMin, 0);
+  // Le tri se fait sur `ordre`, qui est GLOBAL au programme : il reconstitue à
+  // la fois l'ordre des exercices dans une étape et l'ordre des étapes entre
+  // elles, par ordre de première apparition. Et le regroupement se fait sur la
+  // matière de l'EXERCICE, jamais sur celle du devoir — une photo peut porter
+  // les deux (3.6).
+  const tous = duSoir
+    .flatMap((devoir) => devoir.exercises)
+    .sort((a, b) => a.ordre - b.ordre);
 
-    parMatiere.set(devoir.matiere, {
-      matiere: devoir.matiere,
-      dureeEstimeeMin: (existante?.dureeEstimeeMin ?? 0) + duree,
-      exercices: [...(existante?.exercices ?? []), ...exercices],
+  const parMatiere = new Map<MatiereIa, EtapeRendue>();
+  for (const exercice of tous) {
+    const existante = parMatiere.get(exercice.matiere);
+    parMatiere.set(exercice.matiere, {
+      matiere: exercice.matiere,
+      dureeEstimeeMin: (existante?.dureeEstimeeMin ?? 0) + exercice.dureeEstimeeMin,
+      exercices: [
+        ...(existante?.exercices ?? []),
+        { id: exercice.id, consigne: exercice.consigne, type: exercice.type },
+      ],
     });
   }
 

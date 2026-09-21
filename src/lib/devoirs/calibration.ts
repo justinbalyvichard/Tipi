@@ -2,7 +2,7 @@
  * TEC-16 — mode calibration OCR, **SERVEUR UNIQUEMENT**.
  *
  * « Pour les 20 premières photos, journaliser en base le texte OCR brut, le
- * score de confiance et le JSON renvoyé par DeepSeek, consultables depuis
+ * score de confiance et le JSON renvoyé par le modèle, consultables depuis
  * Réglages, afin de régler les seuils sur de vrais devoirs et non sur des
  * exemples inventés. »
  *

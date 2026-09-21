@@ -1,7 +1,7 @@
 /**
  * `AiTransport` — la seule chose qu'un fournisseur a le droit d'être.
  *
- * P2 §6, barrière 2 : « `providers/deepseek.ts` n'a pas le droit de construire
+ * P2 §6, barrière 2 : « le fichier de fournisseur n'a pas le droit de construire
  * son corps de requête lui-même ; il reçoit un `PayloadIa` déjà scellé. » Cette
  * interface **rend la phrase exécutable**, et va un pas plus loin, parce que la
  * phrase seule ne suffisait pas : un transport qui reçoit un payload scellé

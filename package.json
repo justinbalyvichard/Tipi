@@ -14,7 +14,9 @@
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "verifier:socle": "tsx scripts/verifier-socle.ts",
-    "db:diff": "bash scripts/db-diff.sh"
+    "verifier:confinement": "tsx scripts/verifier-confinement.ts",
+    "db:diff": "bash scripts/db-diff.sh",
+    "epreuve:pipeline": "tsx scripts/epreuve-pipeline.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
