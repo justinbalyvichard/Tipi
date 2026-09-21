@@ -33,8 +33,9 @@
  */
 import { Prisma } from "@prisma/client";
 
-import { assertPayloadAnonyme, type CorpsIa } from "@/lib/ai/anonymisation";
+import { assertPayloadAnonyme } from "@/lib/ai/anonymisation";
 import type { IdentifiantsInterdits } from "@/lib/ai/anonymisation";
+import type { TraceAppelIa } from "@/lib/ai/provider";
 import { prisma } from "@/lib/db/prisma";
 import { estAppError } from "@/lib/errors/app-error";
 import { garderServeur } from "@/lib/runtime/garde-serveur";
@@ -47,10 +48,17 @@ export interface LigneCalibration {
   readonly familyId: string;
   readonly texteOcrBrut: string;
   readonly confianceOcr: number;
-  readonly payload: CorpsIa;
-  readonly reponseBrute: string | null;
-  readonly erreurCode: string | null;
-  readonly dureeMs: number;
+  /**
+   * **TOUS** les corps émis pour ce devoir, dans l'ordre : prompt 1, puis un
+   * par exercice de maths (TEC-07).
+   *
+   * CORRIGÉ AU TOUR 2 — [MAJEUR] M2. Le tour 1 ne stockait qu'un corps, celui
+   * du prompt 1, et c'était le seul qui passait par le caviardage. La table
+   * était présentée comme « ce qui est réellement parti » alors qu'elle en
+   * voyait le tiers : c'est la raison mécanique pour laquelle l'épreuve de bout
+   * en bout n'a pas pu voir le bloquant B1.
+   */
+  readonly traces: readonly TraceAppelIa[];
 }
 
 /**
@@ -71,16 +79,39 @@ export async function journaliserCalibration(
   garderServeur("src/lib/devoirs/calibration.ts");
   if (!(await calibrationOuverte(ligne.familyId))) return;
 
-  // La seule erreur qui a le droit de remonter d'ici. Elle signale que le
+  // La seule erreur qui a le droit de remonter d'ici. Elle signale qu'un
   // payload émis portait un identifiant : l'écrire en base l'exposerait dans
   // Réglages > Calibration des photos (SEC-04).
-  assertPayloadAnonyme(ligne.payload, interdits, "calibration_log.payload_ia");
+  //
+  // Elle s'applique désormais à **chacun** des corps émis ([MAJEUR] M2) : un
+  // contrôle qui n'examinerait que le premier serait de nouveau une propriété
+  // quantifiée sur un site au lieu de tous.
+  for (const [rang, trace] of ligne.traces.entries()) {
+    assertPayloadAnonyme(
+      trace.payload,
+      interdits,
+      `calibration_log.payload_ia[${rang}] (${trace.promptId})`,
+    );
+  }
 
-  const payload: Prisma.InputJsonValue = JSON.parse(JSON.stringify(ligne.payload));
+  // Le tableau EXACT des corps émis, dans l'ordre d'émission. La forme change
+  // par rapport au tour 1 — un objet devient un tableau —, et c'est assumé :
+  // la colonne doit porter ce qui part, pas le premier de ce qui part.
+  const payload: Prisma.InputJsonValue = JSON.parse(
+    JSON.stringify(ligne.traces.map((t) => ({ prompt: t.promptId, version: t.promptVersion, corps: t.payload }))),
+  );
+  const reponses = ligne.traces.map((t) => t.reponseBrute);
   // `Prisma.DbNull` et non `null` : la colonne est `Json?`, et Prisma distingue
   // « champ absent » de « valeur JSON null ». Passer `null` serait refusé par le
   // typage, et le contourner écrirait un `null` JSON là où l'on veut un vide.
-  const reponse = ligne.reponseBrute === null ? Prisma.DbNull : ligne.reponseBrute;
+  const reponse: Prisma.InputJsonValue | typeof Prisma.DbNull = reponses.every((r) => r === null)
+    ? Prisma.DbNull
+    : JSON.parse(JSON.stringify(reponses));
+
+  // Le premier code d'erreur rencontré : c'est celui qui a fait basculer
+  // l'analyse. Les suivants en découlent.
+  const erreurCode = ligne.traces.map((t) => t.erreurCode).find((c) => c != null) ?? null;
+  const dureeMs = ligne.traces.reduce((total, t) => total + t.dureeMs, 0);
 
   try {
     await prisma.calibrationLog.upsert({
@@ -91,18 +122,18 @@ export async function journaliserCalibration(
         confianceOcr: ligne.confianceOcr,
         payloadIa: payload,
         reponseIaBrute: reponse,
-        erreurCode: ligne.erreurCode,
+        erreurCode,
         seuilConfianceApplique: seuils().ocrConfianceMin,
-        dureeMs: ligne.dureeMs,
+        dureeMs,
       },
       update: {
         texteOcrBrut: ligne.texteOcrBrut,
         confianceOcr: ligne.confianceOcr,
         payloadIa: payload,
         reponseIaBrute: reponse,
-        erreurCode: ligne.erreurCode,
+        erreurCode,
         seuilConfianceApplique: seuils().ocrConfianceMin,
-        dureeMs: ligne.dureeMs,
+        dureeMs,
       },
     });
   } catch (brute) {

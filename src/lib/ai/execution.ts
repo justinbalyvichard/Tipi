@@ -20,6 +20,7 @@ import {
   PayloadIa,
   assertCorpsDerivable,
   type CorpsIa,
+  type TexteAnonymise,
 } from "@/lib/ai/anonymisation";
 import type { PromptVersionne } from "@/lib/ai/prompts/types";
 import type { ResultatIa, TraceAppelIa } from "@/lib/ai/provider";
@@ -102,6 +103,7 @@ function trace(
   brut: string | null,
   tentatives: number,
   debut: number,
+  erreurCode: string | null = null,
 ): TraceAppelIa {
   return {
     promptId: prompt.id,
@@ -110,19 +112,31 @@ function trace(
     reponseBrute: brut,
     tentatives,
     dureeMs: Date.now() - debut,
+    erreurCode,
   };
 }
 
 /**
  * Scelle, contrôle, appelle, valide, relance une fois.
  *
- * `texte` est **déjà caviardé** par l'appelant : la partie (B) de SEC-04
- * s'exerce là où le prénom est connu, c'est-à-dire hors de `src/lib/ai/**`.
+ * ---------------------------------------------------------------------------
+ * LE PASSAGE OBLIGÉ, ET CE QU'IL EXIGE — [BLOQUANT] B1 DU TOUR 1
+ * ---------------------------------------------------------------------------
+ * `texte` n'est pas une `string` : c'est un `TexteAnonymise`, type **nominal**
+ * que seule `TexteAnonymise.depuis()` sait construire, et qui n'existe qu'après
+ * caviardage et assertion. Cette fonction étant **le seul chemin du produit vers
+ * le réseau du fournisseur**, la partie (B) de SEC-04 cesse d'être une
+ * convention respectée à un site d'appel sur trois : elle devient une condition
+ * de compilation, vraie pour les trois prompts d'aujourd'hui et pour ceux qu'on
+ * ajoutera.
+ *
+ * Le caviardage lui-même s'exerce toujours hors de `src/lib/ai/**`, là où le
+ * prénom est connu : c'est l'appelant qui fabrique le `TexteAnonymise`.
  */
 export async function executerPrompt<T>(
   transport: AiTransport,
   prompt: PromptVersionne,
-  texte: string,
+  texte: TexteAnonymise,
   schema: SchemaSortie<T>,
 ): Promise<ResultatIa<T>> {
   garderServeur("src/lib/ai/execution.ts");
@@ -151,9 +165,10 @@ export async function executerPrompt<T>(
       brut = await transport.emettre(corps, horloge.signal);
     } catch (brute) {
       const expire = horloge.signal.aborted;
+      const code = expire ? "TIPI_IA_TIMEOUT" : "TIPI_IA_INDISPONIBLE";
       throw new ErreurAppelIa(
-        expire ? "TIPI_IA_TIMEOUT" : "TIPI_IA_INDISPONIBLE",
-        trace(prompt, corps, dernierBrut, tentative, debut),
+        code,
+        trace(prompt, corps, dernierBrut, tentative, debut, code),
         expire
           ? `abandon après ${AI_TIMEOUT_MS} ms`
           : brute instanceof Error
@@ -182,7 +197,7 @@ export async function executerPrompt<T>(
   // Deux sorties non conformes : la relance a eu lieu, on bascule.
   throw new ErreurAppelIa(
     "TIPI_IA_SORTIE_INVALIDE",
-    trace(prompt, corps, dernierBrut, TENTATIVES_MAX, debut),
+    trace(prompt, corps, dernierBrut, TENTATIVES_MAX, debut, "TIPI_IA_SORTIE_INVALIDE"),
     `sortie non conforme après ${TENTATIVES_MAX} tentatives : ${dernierDetail}`,
   );
 }

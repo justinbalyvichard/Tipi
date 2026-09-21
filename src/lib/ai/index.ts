@@ -12,6 +12,7 @@
  * `execution.ts`. Un transport ne peut donc ni les contourner, ni les
  * affaiblir, ni oublier d'en appliquer un.
  */
+import type { TexteAnonymise } from "@/lib/ai/anonymisation";
 import type { AiProvider, ResultatIa, TexteExercice } from "@/lib/ai/provider";
 import { executerPrompt } from "@/lib/ai/execution";
 import { PROMPT_1_STRUCTURATION } from "@/lib/ai/prompts/prompt-1-structuration";
@@ -52,6 +53,11 @@ const TRANSPORTS: Readonly<Record<string, () => AiTransport>> = {
  * de ce qui entre dans le payload du prompt 2. Un test peut donc vérifier
  * qu'elle ne compose **que** les trois champs de `TexteExercice`, sans jamais
  * ajouter un identifiant d'exercice ni un identifiant de session.
+ *
+ * Elle rend une `string` **brute**, et c'est voulu : la composition a lieu
+ * **avant** le caviardage, chez l'appelant qui connaît le foyer. Composer après
+ * aurait recréé un chemin par lequel du texte non anonymisé rejoint du texte
+ * anonymisé — exactement la faille du tour 1, déplacée d'un cran.
  */
 export function texteDePrompt(exercice: TexteExercice): string {
   const type = exercice.type === undefined ? "" : `\nType : ${exercice.type}`;
@@ -62,20 +68,15 @@ function construire(transport: AiTransport): AiProvider {
   return {
     nom: transport.nom,
 
-    structurerDevoir(texteOcr: string): Promise<ResultatIa<DevoirStructure>> {
+    structurerDevoir(texteOcr: TexteAnonymise): Promise<ResultatIa<DevoirStructure>> {
       return executerPrompt(transport, PROMPT_1_STRUCTURATION, texteOcr, DevoirStructure);
     },
 
-    genererIndices(exercice: TexteExercice): Promise<ResultatIa<QuatreIndices>> {
-      return executerPrompt(
-        transport,
-        PROMPT_2_INDICES,
-        texteDePrompt(exercice),
-        QuatreIndices,
-      );
+    genererIndices(exercice: TexteAnonymise): Promise<ResultatIa<QuatreIndices>> {
+      return executerPrompt(transport, PROMPT_2_INDICES, exercice, QuatreIndices);
     },
 
-    genererQuestions(texte: string): Promise<ResultatIa<QuestionsLecture>> {
+    genererQuestions(texte: TexteAnonymise): Promise<ResultatIa<QuestionsLecture>> {
       return executerPrompt(transport, PROMPT_3_QUESTIONS, texte, QuestionsLecture);
     },
   };

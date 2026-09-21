@@ -99,8 +99,16 @@ export async function ajouterPhoto(photo: PhotoRecue): Promise<{ homeworkId: str
  * Voie de secours toujours ouverte (PRD-16, P2 §8.2).
  *
  * Elle ne passe par aucun OCR : le parent a déjà lu le devoir. Le texte est
- * normalisé comme un texte d'OCR — mêmes règles, même caviardage ensuite — et
- * la langue est détectée localement. `confiance_ocr` reste **null**, qui est la
+ * normalisé comme un texte d'OCR — mêmes règles — et la langue est détectée
+ * localement.
+ *
+ * Le caviardage de SEC-04, lui, n'a PAS lieu ici : il a lieu au moment de
+ * fabriquer le `TexteAnonymise`, dans `src/lib/devoirs/analyse.ts`, et il est
+ * exigé par le type de `executerPrompt()`. Le tour 1 promettait à cet endroit
+ * un « même caviardage ensuite » qui n'était vrai que d'un prompt sur trois
+ * ([MINEUR] N3, conséquence du [BLOQUANT] B1). Ce qui est écrit en base par
+ * cette fonction est le texte **du parent**, non caviardé — c'est notre base,
+ * et c'est la photo, pas le payload. `confiance_ocr` reste **null**, qui est la
  * valeur juste : il n'y a pas eu de lecture automatique, donc pas de confiance
  * à mesurer. Y écrire 1 serait un chiffre inventé dans la table même qui sert à
  * régler les seuils (TEC-16).

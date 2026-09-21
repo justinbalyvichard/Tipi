@@ -31,7 +31,7 @@
  * trace de l'appel. L'entrée, elle, est inchangée — la propriété qui compte,
  * « aucune donnée identifiante n'entre », est intacte.
  */
-import type { CorpsIa } from "@/lib/ai/anonymisation";
+import type { CorpsIa, TexteAnonymise } from "@/lib/ai/anonymisation";
 import type {
   DevoirStructure,
   QuatreIndices,
@@ -59,6 +59,12 @@ export interface TraceAppelIa {
   /** 1 ou 2. Une sortie non conforme est rejouée **une fois** (3.2, étape 4). */
   readonly tentatives: number;
   readonly dureeMs: number;
+  /**
+   * Code applicatif si cet appel a échoué, `null` sinon. AJOUTÉ AU TOUR 2 :
+   * TEC-16 demande de journaliser « le code d'erreur éventuel », et une trace
+   * qui ne le porte pas oblige l'appelant à le reconstituer.
+   */
+  readonly erreurCode: string | null;
 }
 
 export interface ResultatIa<T> {
@@ -66,12 +72,31 @@ export interface ResultatIa<T> {
   readonly trace: TraceAppelIa;
 }
 
+/**
+ * ---------------------------------------------------------------------------
+ * SECOND ÉCART DÉCLARÉ SUR CETTE INTERFACE — CORRECTION DU [BLOQUANT] B1
+ * ---------------------------------------------------------------------------
+ * Les trois méthodes prenaient une `string` (et `TexteExercice` pour la
+ * deuxième), comme P2 §5.1 l'écrit. Elles prennent désormais un
+ * `TexteAnonymise`. Ce n'est pas un affaiblissement de la barrière 1, c'est son
+ * **renforcement** : la frontière n'accepte plus seulement « aucune donnée
+ * identifiante », elle n'accepte plus qu'un texte **dont le passage par le
+ * caviardage est prouvé par son type**.
+ *
+ * `TexteExercice` n'est pas supprimé : il reste la forme structurée que
+ * l'appelant compose (`texteDePrompt`) **avant** d'anonymiser. La structure
+ * existe toujours, une couche plus tôt — du côté qui connaît le foyer.
+ */
 export interface AiProvider {
   readonly nom: string;
-  /** Prompt 1 — texte OCR déjà normalisé et **déjà caviardé** par l'appelant. */
-  structurerDevoir(texteOcr: string): Promise<ResultatIa<DevoirStructure>>;
+  /** Prompt 1 — texte OCR normalisé, anonymisé par construction. */
+  structurerDevoir(texteOcr: TexteAnonymise): Promise<ResultatIa<DevoirStructure>>;
   /** Prompt 2 — PED-01, PED-02, TEC-07. */
-  genererIndices(exercice: TexteExercice): Promise<ResultatIa<QuatreIndices>>;
-  /** Prompt 3 — 3.4. Consommé par V4 ; aucune colonne ne le stocke en V2. */
-  genererQuestions(texte: string): Promise<ResultatIa<QuestionsLecture>>;
+  genererIndices(exercice: TexteAnonymise): Promise<ResultatIa<QuatreIndices>>;
+  /**
+   * Prompt 3 — 3.4. Consommé par V4 ; aucune colonne ne le stocke en V2.
+   * [MINEUR] N5 : il héritait de B1 et l'aurait rouvert en V4 sur un chemin
+   * **nominal**. Il est couvert par le même type, donc par le même correctif.
+   */
+  genererQuestions(texte: TexteAnonymise): Promise<ResultatIa<QuestionsLecture>>;
 }

@@ -34,14 +34,10 @@
  */
 import { Prisma } from "@prisma/client";
 
-import {
-  assertTexteAnonyme,
-  caviarder,
-  type IdentifiantsInterdits,
-} from "@/lib/ai/anonymisation";
+import { TexteAnonymise, type IdentifiantsInterdits } from "@/lib/ai/anonymisation";
 import { ErreurAppelIa } from "@/lib/ai/execution";
-import { getAiProvider } from "@/lib/ai";
-import type { AiProvider } from "@/lib/ai/provider";
+import { getAiProvider, texteDePrompt } from "@/lib/ai";
+import type { AiProvider, TraceAppelIa } from "@/lib/ai/provider";
 import type { LangueIa, MatiereIa } from "@/lib/ai/schemas";
 import { journaliserCalibration } from "@/lib/devoirs/calibration";
 import { regrouper, type AnalysePhoto } from "@/lib/devoirs/regroupement";
@@ -175,10 +171,17 @@ async function lireDevoir(
  * n'y a rien à structurer sans modèle — inventer une étape à partir d'un texte
  * d'OCR non découpé mettrait l'enfant devant un exercice fabriqué.
  */
-function structurationDeSecours(devoir: DevoirLu): AnalysePhoto | null {
+function structurationDeSecours(
+  devoir: DevoirLu,
+  texteAnonyme: TexteAnonymise,
+): AnalysePhoto | null {
   if (!devoir.saisieManuelle || devoir.matiereDeclaree === null) return null;
-  const lignes = devoir.texteNormalise.split("\n");
-  const consigne = lignes[0] ?? devoir.texteNormalise;
+  // CORRIGÉ AU TOUR 2 — [BLOQUANT] B1, point subsidiaire. Le tour 1 découpait
+  // `devoir.texteNormalise`, le texte BRUT, là où `structurer()` avait pris
+  // soin d'anonymiser vingt lignes plus haut. L'exercice fabriqué portait donc
+  // le prénom — en base, à l'écran d'aperçu, et de là dans le prompt 2.
+  const lignes = texteAnonyme.valeur.split("\n");
+  const consigne = lignes[0] ?? texteAnonyme.valeur;
   const contenu = lignes.slice(1).join("\n");
   return {
     homeworkId: devoir.id,
@@ -192,56 +195,56 @@ function structurationDeSecours(devoir: DevoirLu): AnalysePhoto | null {
   };
 }
 
+/**
+ * Journal des corps réellement émis, par devoir.
+ *
+ * AJOUTÉ AU TOUR 2 — [MAJEUR] M2. Le tour 1 journalisait **un corps sur
+ * trois** : celui du prompt 1, et c'était le seul qui passait par (B). La
+ * preuve de SEC-04 nommée par P2 §6 — « le test lit en base ce qui est
+ * réellement parti » — ne couvrait donc qu'un tiers de ce qui partait, et c'est
+ * la raison mécanique pour laquelle l'épreuve de §6 ne pouvait pas voir B1.
+ *
+ * Chaque trace est rattachée au devoir dont elle est issue, y compris celles
+ * des appels de prompt 2, qui naissent d'un exercice et donc d'une photo.
+ */
+type JournalTraces = Map<string, TraceAppelIa[]>;
+
+function noter(journal: JournalTraces, homeworkId: string, trace: TraceAppelIa): void {
+  const existantes = journal.get(homeworkId) ?? [];
+  existantes.push(trace);
+  journal.set(homeworkId, existantes);
+}
+
 async function structurer(
   ia: AiProvider,
   devoir: DevoirLu,
-  enfant: EnfantCourant,
   interdits: IdentifiantsInterdits,
+  journal: JournalTraces,
 ): Promise<{ analyse: AnalysePhoto; langue: LangueIa }> {
   // (B) de SEC-04, à l'endroit qui connaît le prénom : une photo de cahier
   // porte très souvent le prénom écrit en haut de la page, et l'OCR le lit.
-  const texteAnonyme = caviarder(devoir.texteNormalise, interdits);
-  assertTexteAnonyme(texteAnonyme, interdits, `devoir ${devoir.id}`);
+  //
+  // CORRIGÉ AU TOUR 2 — [BLOQUANT] B1 : le résultat n'est plus une `string`
+  // mais un `TexteAnonymise`, type nominal exigé par `executerPrompt`. Ce
+  // n'est donc plus à ce site d'appel de penser à caviarder : c'est au
+  // compilateur de refuser qu'on ne l'ait pas fait.
+  const texteAnonyme = TexteAnonymise.depuis(
+    devoir.texteNormalise,
+    interdits,
+    `devoir ${devoir.id}`,
+  );
 
   try {
     const { valeur, trace } = await ia.structurerDevoir(texteAnonyme);
-    if (!devoir.saisieManuelle) {
-      await journaliserCalibration(
-        {
-          homeworkId: devoir.id,
-          familyId: enfant.familyId,
-          texteOcrBrut: devoir.texteBrut,
-          confianceOcr: devoir.confiance ?? 0,
-          payload: trace.payload,
-          reponseBrute: trace.reponseBrute,
-          erreurCode: null,
-          dureeMs: trace.dureeMs,
-        },
-        interdits,
-      );
-    }
+    noter(journal, devoir.id, trace);
     return {
       analyse: { homeworkId: devoir.id, etapes: valeur.etapes },
       langue: valeur.langueDetectee,
     };
   } catch (brute) {
     if (brute instanceof ErreurAppelIa) {
-      if (!devoir.saisieManuelle) {
-        await journaliserCalibration(
-          {
-            homeworkId: devoir.id,
-            familyId: enfant.familyId,
-            texteOcrBrut: devoir.texteBrut,
-            confianceOcr: devoir.confiance ?? 0,
-            payload: brute.trace.payload,
-            reponseBrute: brute.trace.reponseBrute,
-            erreurCode: brute.code,
-            dureeMs: brute.trace.dureeMs,
-          },
-          interdits,
-        );
-      }
-      const secours = structurationDeSecours(devoir);
+      noter(journal, devoir.id, brute.trace);
+      const secours = structurationDeSecours(devoir, texteAnonyme);
       if (secours !== null) {
         return { analyse: secours, langue: devoir.langueLocale };
       }
@@ -268,16 +271,35 @@ async function structurer(
  */
 async function pregenererIndices(
   ia: AiProvider,
-  exercices: readonly { id: string; consigne: string; type: string; contenu: string }[],
+  exercices: readonly {
+    id: string;
+    homeworkId: string;
+    consigne: string;
+    type: string;
+    contenu: string;
+  }[],
+  interdits: IdentifiantsInterdits,
+  journal: JournalTraces,
 ): Promise<number> {
   let pregeneres = 0;
   for (const exercice of exercices) {
-    try {
-      const { valeur } = await ia.genererIndices({
+    // [BLOQUANT] B1 — LE SITE D'APPEL QUI MANQUAIT AU TOUR 1.
+    //
+    // La composition a lieu AVANT le caviardage, et le caviardage produit un
+    // `TexteAnonymise` : c'est ce type, et non ce commentaire, qui garantit
+    // que rien d'autre ne peut être remis à `genererIndices`.
+    const texteAnonyme = TexteAnonymise.depuis(
+      texteDePrompt({
         consigne: exercice.consigne,
         contenu: exercice.contenu,
         type: exercice.type,
-      });
+      }),
+      interdits,
+      `exercice ${exercice.id}`,
+    );
+    try {
+      const { valeur, trace } = await ia.genererIndices(texteAnonyme);
+      noter(journal, exercice.homeworkId, trace);
       const indices = IndicesExercice.parse({
         niveaux: valeur.indices,
         source: "pregenere",
@@ -292,8 +314,11 @@ async function pregenererIndices(
         data: { indices: valeurJson },
       });
       pregeneres += 1;
-    } catch {
-      // Secours assumé (TEC-07) : `indices` reste nul.
+    } catch (brute) {
+      // Secours assumé (TEC-07) : `indices` reste nul. Mais la trace est
+      // notée, car TEC-16 veut journaliser ce qui est parti **et** ce qui a
+      // échoué : c'est sur les échecs que la calibration est instructive.
+      if (brute instanceof ErreurAppelIa) noter(journal, exercice.homeworkId, brute.trace);
       continue;
     }
   }
@@ -330,10 +355,58 @@ export async function analyserDevoirs(
   // des OCR simultanés, et chaque lecture écrit sa propre ligne.
   const lus = await Promise.all(devoirs.map((d) => lireDevoir(d)));
 
-  // Étape 4.
+  // Étape 4. `journal` recueille **tous** les corps émis, prompt 2 compris
+  // ([MAJEUR] M2), et il est vidé en base quoi qu'il arrive ensuite — succès,
+  // OCR illisible, sortie invalide, aucun exercice.
   const ia = getAiProvider();
+  const journal: JournalTraces = new Map();
+  try {
+    return await executerAnalyse(ia, lus, devoirs, interdits, journal);
+  } finally {
+    await journaliserTout(lus, enfant, interdits, journal);
+  }
+}
+
+/**
+ * Écrit en base **tout** ce qui est parti, un enregistrement par devoir.
+ *
+ * Appelée depuis un `finally` : une analyse qui échoue est justement celle dont
+ * la calibration a le plus à dire. TEC-16 mesure, elle ne gouverne pas — une
+ * écriture de journal ne fait jamais échouer une soirée, sauf si le payload
+ * n'est pas anonyme, seul cas que `journaliserCalibration` laisse remonter.
+ */
+async function journaliserTout(
+  lus: readonly DevoirLu[],
+  enfant: EnfantCourant,
+  interdits: IdentifiantsInterdits,
+  journal: JournalTraces,
+): Promise<void> {
+  for (const devoir of lus) {
+    if (devoir.saisieManuelle) continue; // TEC-16 parle des photos
+    const traces = journal.get(devoir.id) ?? [];
+    if (traces.length === 0) continue;
+    await journaliserCalibration(
+      {
+        homeworkId: devoir.id,
+        familyId: enfant.familyId,
+        texteOcrBrut: devoir.texteBrut,
+        confianceOcr: devoir.confiance ?? 0,
+        traces,
+      },
+      interdits,
+    );
+  }
+}
+
+async function executerAnalyse(
+  ia: AiProvider,
+  lus: readonly DevoirLu[],
+  devoirs: readonly { id: string }[],
+  interdits: IdentifiantsInterdits,
+  journal: JournalTraces,
+): Promise<ProgrammeRendu> {
   const structures = await Promise.all(
-    lus.map((devoir) => structurer(ia, devoir, enfant, interdits)),
+    lus.map((devoir) => structurer(ia, devoir, interdits, journal)),
   );
 
   const { etapes, reportes } = regrouper(structures.map((s) => s.analyse));
@@ -396,6 +469,7 @@ export async function analyserDevoirs(
       etape.matiere === "maths"
         ? etape.exercices.map((candidat, rang) => ({
             id: creees[index]?.exercices[rang]?.id ?? "",
+            homeworkId: candidat.homeworkId,
             consigne: candidat.consigne,
             type: candidat.type,
             contenu: candidat.contenu,
@@ -403,7 +477,7 @@ export async function analyserDevoirs(
         : [],
     )
     .filter((e) => e.id !== "");
-  await pregenererIndices(ia, maths);
+  await pregenererIndices(ia, maths, interdits, journal);
 
   return {
     etapes: creees,

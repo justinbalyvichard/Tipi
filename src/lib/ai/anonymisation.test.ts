@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   PayloadIa,
+  TexteAnonymise,
   REMPLACEMENT_IDENTIFIANT,
   assertCorpsDerivable,
   assertPayloadAnonyme,
@@ -13,6 +14,7 @@ import {
   type IdentifiantsInterdits,
 } from "@/lib/ai/anonymisation";
 import { PROMPT_1_STRUCTURATION } from "@/lib/ai/prompts/prompt-1-structuration";
+import { estAppError } from "@/lib/errors/app-error";
 
 /**
  * SEC-04 — les trois parties, éprouvées **dans le bon sens** : chaque garde est
@@ -41,8 +43,13 @@ const INTERDITS: IdentifiantsInterdits = {
   ],
 };
 
+/** Un texte anonymisé, construit par la seule fabrique qui existe. */
+function anonyme(texte: string): TexteAnonymise {
+  return TexteAnonymise.depuis(texte, INTERDITS, "test");
+}
+
 function payload(texte: string): PayloadIa {
-  return PayloadIa.sceller(PROMPT_1_STRUCTURATION, texte);
+  return PayloadIa.sceller(PROMPT_1_STRUCTURATION, anonyme(texte));
 }
 
 /** Le corps que le transport du fournisseur fabrique, reproduit ici à l'identique. */
@@ -222,7 +229,7 @@ describe("SEC-04 — le payload scellé", () => {
   });
 
   it("refuse un texte vide, qui casserait l'invariant de dérivabilité", () => {
-    expect(() => PayloadIa.sceller(PROMPT_1_STRUCTURATION, "   ")).toThrow();
+    expect(() => PayloadIa.sceller(PROMPT_1_STRUCTURATION, anonyme("   "))).toThrow();
   });
 
   it("garde la trace du prompt et de sa version pour la calibration (TEC-16)", () => {
@@ -242,5 +249,111 @@ describe("SEC-04 — la garde du journal de calibration", () => {
   it("ACCEPTE le payload réellement émis", () => {
     const p = payload(caviarder("Evan — CE1\nLis le texte.", INTERDITS));
     expect(() => assertPayloadAnonyme(corpsFournisseur(p), INTERDITS)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TOUR 2 — [BLOQUANT] B1 : (B) est quantifiée par le TYPE, plus par l'appelant
+// ---------------------------------------------------------------------------
+
+describe("SEC-04 (B) quantifiée — le type TexteAnonymise", () => {
+  it("la seule fabrique caviarde ET assère", () => {
+    const t = TexteAnonymise.depuis("Evan — CE1\nLis.", INTERDITS, "epreuve");
+    expect(t.valeur).not.toMatch(/evan/iu);
+    expect(t.valeur).toContain(REMPLACEMENT_IDENTIFIANT);
+    expect(t.estAnonymise()).toBe(true);
+    expect(t.origine).toBe("epreuve");
+  });
+
+  it("un objet littéral de la même forme n'est PAS un TexteAnonymise", () => {
+    // La garantie est de compilation, donc invisible à l'exécution. Ce test
+    // fixe la propriété observable qui en découle : la classe n'expose aucune
+    // fabrique publique autre que `depuis`, et `valeur` est en lecture seule.
+    const fabriques = Object.getOwnPropertyNames(TexteAnonymise).filter(
+      (n) => !["length", "name", "prototype"].includes(n),
+    );
+    expect(fabriques).toEqual(["depuis"]);
+  });
+
+  it("le payload scellé ne porte que le texte ANONYMISÉ", () => {
+    const p = PayloadIa.sceller(
+      PROMPT_1_STRUCTURATION,
+      TexteAnonymise.depuis("Evan doit lire.", INTERDITS, "epreuve"),
+    );
+    expect(p.utilisateur).not.toMatch(/evan/iu);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TOUR 2 — [MAJEUR] M3 : les quatre sondes exactes du contrôleur
+// ---------------------------------------------------------------------------
+
+describe("SEC-04 (A) — les quatre sondes du contrôleur, toutes refusées", () => {
+  const sondes: readonly { readonly quoi: string; readonly champ: CorpsIa }[] = [
+    { quoi: "identifiant numérique de 10 chiffres", champ: { user_id: 4815162342 } },
+    { quoi: "identifiant court de 2 signes", champ: { id: "E7" } },
+    { quoi: "date de naissance", champ: { dn: "29/11/2019" } },
+    { quoi: "prénom de 2 lettres", champ: { user: "Li" } },
+  ];
+
+  for (const { quoi, champ } of sondes) {
+    it(`REFUSE ${quoi}`, () => {
+      const p = payload("Calcule : 7 + 5 =");
+      const fraude: CorpsIa = { ...corpsFournisseur(p), ...champ };
+      expect(
+        defautsDeDerivabilite(fraude, p, [MODELE_TEMOIN]).length,
+        JSON.stringify(champ),
+      ).toBeGreaterThan(0);
+      expect(() => assertCorpsDerivable(fraude, p, [MODELE_TEMOIN])).toThrow();
+    });
+  }
+
+  it("le corps honnête reste accepté malgré la sévérité accrue", () => {
+    const p = payload("Calcule : 7 + 5 =");
+    expect(defautsDeDerivabilite(corpsFournisseur(p), p, [MODELE_TEMOIN])).toEqual([]);
+  });
+
+  it("aucune exemption silencieuse ne subsiste : tout jeton est examiné", () => {
+    // Un jeton d'UN signe hors vocabulaire doit être vu. `z` n'est déclaré
+    // nulle part.
+    const p = payload("Calcule : 7 + 5 =");
+    expect(
+      defautsDeDerivabilite({ ...corpsFournisseur(p), z: "z" }, p, [MODELE_TEMOIN]).length,
+    ).toBeGreaterThan(0);
+  });
+});
+
+describe("SEC-04 (A) — le contrôle examine aussi le TEXTE UTILISATEUR", () => {
+  it("(B) refuse déjà une image dans le texte, à la construction", () => {
+    expect(() =>
+      TexteAnonymise.depuis("Colle : data:image/png;base64,iVBORw0KGgo=", INTERDITS, "test"),
+    ).toThrow();
+  });
+
+  it("(A) la refuse AUSSI dans le corps émis, si elle a franchi (B)", () => {
+    // Le résidu retire le texte utilisateur avant de l'examiner : c'est
+    // nécessaire, sinon chaque mot d'un devoir serait un défaut. Les motifs
+    // binaires, eux, portent sur le corps ENTIER — texte compris. On simule
+    // ici un transport qui réécrirait le contenu après le scellement.
+    const p = payload("Calcule : 7 + 5 =");
+    const fraude: CorpsIa = {
+      ...corpsFournisseur(p),
+      messages: [
+        { role: "system", content: p.systeme },
+        { role: "user", content: "data:image/png;base64,iVBORw0KGgo=" },
+      ],
+    };
+    try {
+      assertCorpsDerivable(fraude, p, [MODELE_TEMOIN]);
+      throw new Error("l'assertion aurait dû lever");
+    } catch (brute) {
+      expect(estAppError(brute) ? brute.code : "").toBe("TIPI_PAYLOAD_NON_ANONYME");
+      expect(estAppError(brute) ? brute.detail : "").toMatch(/motif binaire/u);
+    }
+  });
+
+  it("laisse passer un énoncé ordinaire, si étrange soit-il", () => {
+    const p = payload("Colorie les zvartañ pelec'h — 12 × 3 — Xyzzy Plugh");
+    expect(() => assertCorpsDerivable(corpsFournisseur(p), p, [MODELE_TEMOIN])).not.toThrow();
   });
 });

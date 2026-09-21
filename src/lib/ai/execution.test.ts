@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { PayloadIa, type CorpsIa } from "@/lib/ai/anonymisation";
+import {
+  PayloadIa,
+  TexteAnonymise,
+  type CorpsIa,
+  type IdentifiantsInterdits,
+} from "@/lib/ai/anonymisation";
 import { ErreurAppelIa, executerPrompt, extraireJson } from "@/lib/ai/execution";
 import { PROMPT_1_STRUCTURATION } from "@/lib/ai/prompts/prompt-1-structuration";
 import { DevoirStructure } from "@/lib/ai/schemas";
@@ -28,6 +33,14 @@ const ENV_TEST: Readonly<Record<string, string>> = {
   CRON_SECRET: "test-cron-secret",
   AI_TIMEOUT_MS: "50",
 };
+
+/** Le foyer d'épreuve. Aucun de ces mots n'apparaît dans les textes ci-dessous. */
+const INTERDITS: IdentifiantsInterdits = { valeurs: ["Evan", "Foyer Le Goff"] };
+
+/** Le seul moyen de fabriquer l'entrée d'`executerPrompt` : la fabrique. */
+function anonyme(texte: string): TexteAnonymise {
+  return TexteAnonymise.depuis(texte, INTERDITS, "test");
+}
 
 const SORTIE_CONFORME = JSON.stringify({
   langue_detectee: "fr",
@@ -88,7 +101,7 @@ describe("étape 4 — validation stricte et relance unique", () => {
     const resultat = await executerPrompt(
       transportQuiRend([SORTIE_CONFORME], journal),
       PROMPT_1_STRUCTURATION,
-      "Lis le texte.",
+      anonyme("Lis le texte."),
       DevoirStructure,
     );
     expect(resultat.valeur.langueDetectee).toBe("fr");
@@ -101,7 +114,7 @@ describe("étape 4 — validation stricte et relance unique", () => {
     const resultat = await executerPrompt(
       transportQuiRend(['{"langue_detectee":"klingon"}', SORTIE_CONFORME], journal),
       PROMPT_1_STRUCTURATION,
-      "Lis le texte.",
+      anonyme("Lis le texte."),
       DevoirStructure,
     );
     expect(resultat.trace.tentatives).toBe(2);
@@ -114,7 +127,7 @@ describe("étape 4 — validation stricte et relance unique", () => {
       executerPrompt(
         transportQuiRend(["ceci n'est pas du JSON"], journal),
         PROMPT_1_STRUCTURATION,
-        "Lis le texte.",
+        anonyme("Lis le texte."),
         DevoirStructure,
       ),
     ).rejects.toMatchObject({ code: "TIPI_IA_SORTIE_INVALIDE" });
@@ -129,7 +142,7 @@ describe("étape 4 — validation stricte et relance unique", () => {
       executerPrompt(
         transportQuiRend(["jamais"], journal),
         PROMPT_1_STRUCTURATION,
-        "Lis le texte.",
+        anonyme("Lis le texte."),
         DevoirStructure,
       ),
     ).rejects.toMatchObject({ code: "TIPI_IA_TIMEOUT" });
@@ -143,7 +156,7 @@ describe("étape 4 — validation stricte et relance unique", () => {
       emettre: () => Promise.reject(new Error("réseau coupé")),
     };
     await expect(
-      executerPrompt(transport, PROMPT_1_STRUCTURATION, "Lis.", DevoirStructure),
+      executerPrompt(transport, PROMPT_1_STRUCTURATION, anonyme("Lis."), DevoirStructure),
     ).rejects.toMatchObject({ code: "TIPI_IA_INDISPONIBLE" });
   });
 
@@ -153,7 +166,7 @@ describe("étape 4 — validation stricte et relance unique", () => {
       await executerPrompt(
         transportQuiRend(["pas du JSON"], journal),
         PROMPT_1_STRUCTURATION,
-        "Lis.",
+        anonyme("Lis."),
         DevoirStructure,
       );
       throw new Error("aurait dû lever");
@@ -187,7 +200,7 @@ describe("SEC-04 — l'émission est INATTEIGNABLE si le corps n'est pas dériva
     };
 
     await expect(
-      executerPrompt(malveillant, PROMPT_1_STRUCTURATION, "Lis.", DevoirStructure),
+      executerPrompt(malveillant, PROMPT_1_STRUCTURATION, anonyme("Lis."), DevoirStructure),
     ).rejects.toMatchObject({ code: "TIPI_PAYLOAD_NON_ANONYME" });
 
     // LE POINT DU TEST : zéro émission. L'appel n'est pas parti.

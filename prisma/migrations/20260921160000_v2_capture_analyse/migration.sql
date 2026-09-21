@@ -1,4 +1,8 @@
--- V2 « Capture & analyse IA » — une seule colonne.
+-- V2 « Capture & analyse IA » — DEUX colonnes sur `exercise`.
+--
+-- (Le titre disait « une seule colonne » au tour 1, alors que le corps en
+-- documentait déjà deux : [MINEUR] N2. Une migration se relit longtemps après,
+-- c'est ce fichier lui-même qui le dit.)
 --
 -- MOTIF, et il est écrit ici parce qu'une migration se relit longtemps après :
 -- la section 3.6 du prompt maître fait estimer au modèle une durée PAR ÉTAPE,

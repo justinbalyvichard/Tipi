@@ -24,7 +24,25 @@
  *
  * Il ne remplace ni P5 ni P6 : c'est une épreuve de producteur, publiée pour
  * que le contrôleur la rejoue plutôt que de me croire.
+ *
+ * ------------------------------------------------------------------------
+ * TROIS SCÉNARIOS
+ * ------------------------------------------------------------------------
+ *   (défaut)     le pipeline nominal, sur les bouchons.
+ *   --secours    la promesse de P2 §11 : une soirée reste possible sans modèle.
+ *   --attaque    **AJOUTÉ AU TOUR 2** — l'attaque exacte de `controle-code` qui
+ *                a sorti le prénom au tour 1 (B1) : un vrai point d'entrée
+ *                HTTP, joignable, qui refuse le prompt 1 par une sortie hors
+ *                contrat — donc déclenche la voie de secours de PRD-16 — puis
+ *                répond correctement au prompt 2. On regarde ce que le
+ *                fournisseur a REÇU, pas ce que le code croit avoir envoyé.
+ *
+ *                  AI_PROVIDER=deepseek DEEPSEEK_API_KEY=x \
+ *                  DEEPSEEK_BASE_URL=http://127.0.0.1:8899 \
+ *                  pnpm epreuve:pipeline -- --attaque
  */
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+
 import { analyserDevoirs, type ProgrammeRendu } from "@/lib/devoirs/analyse";
 import { ajouterSaisieManuelle } from "@/lib/devoirs/upload";
 import { programmeCourant } from "@/lib/devoirs/programme";
@@ -54,7 +72,7 @@ async function nettoyer(childId: string): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const secours = process.argv.includes("--secours");
+  const secours = process.argv.includes("--secours") || process.argv.includes("--attaque");
   const e = env();
   if (!secours && (e.AI_PROVIDER !== "bouchon" || e.OCR_PROVIDER !== "bouchon")) {
     throw new Error(
@@ -75,6 +93,12 @@ async function main(): Promise<void> {
   console.info(
     `identifiants interdits : ${interdits.valeurs.length} valeurs (prénom, id enfant, id foyer, nom du foyer) — aucune n'est imprimée ici`,
   );
+
+  if (process.argv.includes("--attaque")) {
+    await epreuveAttaque(enfant.id, interdits.valeurs);
+    await prisma.$disconnect();
+    return;
+  }
 
   if (secours) {
     await epreuveSecours(enfant.id);
@@ -123,19 +147,24 @@ async function main(): Promise<void> {
   const journal = await prisma.calibrationLog.findMany();
   console.info(`  lignes calibration_log : ${journal.length}`);
   for (const ligne of journal) {
-    const serialise = JSON.stringify(ligne.payloadIa);
-    const platPayload = replier(serialise);
+    // CORRIGÉ AU TOUR 2 — [MAJEUR] M2 : `payload_ia` porte désormais TOUS les
+    // corps émis pour ce devoir, pas seulement celui du prompt 1. Au tour 1,
+    // cette boucle lisait un corps sur trois — et les deux autres étaient
+    // précisément ceux qui n'étaient pas caviardés.
+    const corps = Array.isArray(ligne.payloadIa) ? ligne.payloadIa : [ligne.payloadIa];
     const platBrut = replier(ligne.texteOcrBrut);
-    console.info(`  payload_ia : ${serialise.length} signes · seuil journalisé ${ligne.seuilConfianceApplique} · ${ligne.dureeMs} ms · erreur ${ligne.erreurCode ?? "aucune"}`);
+    console.info(`  corps journalisés : ${corps.length} · seuil journalisé ${ligne.seuilConfianceApplique} · ${ligne.dureeMs} ms · erreur ${ligne.erreurCode ?? "aucune"}`);
     console.info(`  le texte OCR BRUT journalisé contient le prénom : ${platBrut.includes(replier(enfant.prenom))}  (attendu : true — c'est la photo, elle n'est jamais envoyée)`);
-    console.info(`  le PAYLOAD ENVOYÉ contient le prénom            : ${platPayload.includes(replier(enfant.prenom))}  (attendu : FALSE — SEC-04)`);
-    for (const valeur of interdits.valeurs) {
-      if (platPayload.includes(replier(valeur))) {
-        throw new Error("SEC-04 VIOLÉE : un identifiant du foyer est dans le payload journalisé.");
+    for (const [rang, unCorps] of corps.entries()) {
+      const serialise = JSON.stringify(unCorps);
+      const plat = replier(serialise);
+      const porte = interdits.valeurs.filter((v) => plat.includes(replier(v))).length;
+      console.info(`   #${rang + 1} ${serialise.length} signes · identifiants du foyer présents : ${porte}  (attendu : 0)`);
+      if (porte > 0) {
+        throw new Error("SEC-04 VIOLÉE : un identifiant du foyer est dans un payload journalisé.");
       }
     }
-    console.info(`  aucun des ${interdits.valeurs.length} identifiants du foyer n'est dans le payload.`);
-    console.info(`  extrait du payload : ${serialise.slice(0, 180)}…`);
+    console.info(`  aucun des ${interdits.valeurs.length} identifiants du foyer n'est dans aucun des ${corps.length} corps.`);
   }
 
   // ---------------------------------------------------------------------
@@ -160,9 +189,11 @@ async function main(): Promise<void> {
   titre("RELECTURE — GET /api/devoirs/programme rend-il EXACTEMENT la même chose ?");
   const relu = await programmeCourant();
   imprimerProgramme("programme relu", relu);
-  const identiques =
-    JSON.stringify(programme.etapes) === JSON.stringify(relu.etapes) &&
-    programme.langueDetectee === relu.langueDetectee;
+  // [MINEUR] N1 — la comparaison porte désormais sur l'OBJET ENTIER, `reportes`
+  // compris. Au tour 1 elle ne comparait que `etapes` et `langueDetectee` : le
+  // jour où une troisième matière existera, la divergence n'aurait pas été vue
+  // par l'épreuve qui existe pour la voir.
+  const identiques = JSON.stringify(programme) === JSON.stringify(relu);
   console.info(`  identique à l'analyse : ${identiques}  (attendu : true)`);
   if (!identiques) throw new Error("la relecture diverge de l'analyse");
 
@@ -191,6 +222,81 @@ async function main(): Promise<void> {
   await nettoyer(enfant.id);
   await prisma.$disconnect();
   console.info("\nÉpreuve terminée, base nettoyée.");
+}
+
+/**
+ * L'ATTAQUE EXACTE DE `controle-code`, TOUR 1 — [BLOQUANT] B1.
+ *
+ * Un vrai point d'entrée HTTP compatible OpenAI, **joignable**, qui :
+ *   - journalise chaque corps reçu, au signe près ;
+ *   - refuse le prompt 1 par une sortie hors contrat, deux fois — donc après
+ *     la relance de 3.2 étape 4, `TIPI_IA_SORTIE_INVALIDE`, donc la voie de
+ *     secours de PRD-16 sur une saisie manuelle ;
+ *   - répond correctement au prompt 2, celui de TEC-07.
+ *
+ * Au tour 1, le troisième corps portait le prénom de l'enfant. On regarde ce
+ * que le fournisseur a REÇU, jamais ce que le code croit avoir envoyé.
+ */
+async function epreuveAttaque(childId: string, interdits: readonly string[]): Promise<void> {
+  titre("ATTAQUE SEC-04 — le prénom sort-il par la voie de secours ? (B1 du tour 1)");
+  const recus: { prompt: string; corps: string }[] = [];
+
+  const serveur = createServer((requete: IncomingMessage, reponse: ServerResponse) => {
+    const morceaux: Buffer[] = [];
+    requete.on("data", (m: Buffer) => morceaux.push(m));
+    requete.on("end", () => {
+      const corps = Buffer.concat(morceaux).toString("utf8");
+      const estPrompt1 = corps.includes("Tu structures un devoir scolaire");
+      recus.push({ prompt: estPrompt1 ? "prompt 1" : "prompt 2", corps });
+      const contenu = estPrompt1
+        ? JSON.stringify({ langue_detectee: "klingon" })
+        : JSON.stringify({ indices: ["a", "b", "c", "d"] });
+      reponse.writeHead(200, { "content-type": "application/json" });
+      reponse.end(JSON.stringify({ choices: [{ message: { content: contenu } }] }));
+    });
+  });
+  await new Promise<void>((pret) => serveur.listen(8899, "127.0.0.1", pret));
+
+  console.info("  point d'entrée local JOIGNABLE sur 127.0.0.1:8899");
+  console.info("  il répond, mais hors contrat au prompt 1 : deux tentatives, puis secours");
+
+  // La saisie manuelle du parent porte le prénom, comme un cahier d'écolier.
+  const prenom = interdits[0] ?? "";
+  const { homeworkId } = await ajouterSaisieManuelle({
+    matiere: "maths",
+    consigne: `Devoirs de ${prenom} : calcule les additions.`,
+    contenu: "7 + 5 =\n12 - 4 =",
+  });
+
+  try {
+    const programme = await analyserDevoirs([homeworkId]);
+    imprimerProgramme("programme obtenu par la voie de secours", programme);
+  } catch (brute) {
+    console.info(`  analyse interrompue : ${estAppError(brute) ? brute.code : String(brute)}`);
+  }
+
+  const exercices = await prisma.exercise.findMany({ where: { homeworkId } });
+  for (const exercice of exercices) {
+    const porte = interdits.some((v) => replier(exercice.consigne).includes(replier(v)));
+    console.info(`  exercice persisté : « ${exercice.consigne} » — porte un identifiant : ${porte}  (attendu : false)`);
+  }
+
+  console.info(`\n  corps RÉELLEMENT REÇUS par le fournisseur : ${recus.length}`);
+  let fautifs = 0;
+  for (const [rang, recu] of recus.entries()) {
+    const plat = replier(recu.corps);
+    const porte = interdits.filter((v) => plat.includes(replier(v))).length;
+    if (porte > 0) fautifs += 1;
+    console.info(`   #${rang + 1} ${recu.prompt} · ${recu.corps.length} signes · identifiants du foyer présents : ${porte}`);
+  }
+
+  await new Promise<void>((ferme) => serveur.close(() => ferme()));
+  await prisma.homework.deleteMany({ where: { childId } });
+
+  console.info(
+    `  VERDICT : ${fautifs === 0 ? "SEC-04 TENUE — aucun corps émis ne porte d'identifiant du foyer" : `SEC-04 VIOLÉE — ${fautifs} corps émis portent un identifiant`}`,
+  );
+  if (fautifs > 0) throw new Error("SEC-04 VIOLÉE");
 }
 
 async function epreuveSecours(childId: string): Promise<void> {

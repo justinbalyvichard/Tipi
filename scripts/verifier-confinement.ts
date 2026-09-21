@@ -411,48 +411,285 @@ function c4(): void {
 // un écran : c'est de faire en sorte qu'aucun code de la capture ne sache créer
 // une session. `POST /api/session` (V3) reste la seule porte vers `/enfant`.
 // Le même contrôle couvre le ledger : V2 ne crédite rien (TEC-11, SEC-06).
+//
+// ---------------------------------------------------------------------------
+// RÉÉCRIT AU TOUR 2 — [MAJEUR] M1
+// ---------------------------------------------------------------------------
+// La version du tour 1 cherchait `prisma.session` ou `tx.session` : un NOM dans
+// un EMPLACEMENT, exactement la faute que V1 avait mis quatre tours à corriger.
+// `controle-code` a créé une session depuis le pipeline de capture **sans
+// jamais écrire ces mots**, par relation imbriquée :
+//
+//   await prisma.child.update({
+//     where: { id: enfant.id },
+//     data: { sessions: { create: { date: new Date(), etapesPrevues: [] } } },
+//   });
+//
+// L'instrument est resté vert, `typecheck` aussi, et une session `idle` a bien
+// été ouverte en base.
+//
+// La PROPRIÉTÉ, elle, ne dépend d'aucune forme d'écriture : **aucun identifiant
+// du périmètre de V2 ne doit nommer, directement ou par relation, les tables
+// interdites.** Et la liste des noms par lesquels on les atteint n'est pas
+// écrite ici : elle est **DÉRIVÉE de `prisma/schema.prisma`** (ARB-18 mesure 1)
+// — délégués, champs de relation qui y mènent, clés étrangères, noms de tables.
+// Ajouter demain une relation vers `Session` étend le contrôle sans qu'on y
+// pense ; la renommer ne le désarme pas.
+//
+// S'y ajoute une INTERDICTION, au seul endroit où le problème se pose : le SQL
+// brut. Aucune lecture d'identifiants ne peut voir ce qu'une chaîne SQL écrit,
+// et le pipeline de capture n'en a aucun besoin — il a Prisma. C'est le même
+// geste que V1 a posé sur `prisma/seed.ts` ([MINEUR] T4-1).
 
-const TABLES_INTERDITES_A_V2: Readonly<Record<string, string>> = Object.freeze({
-  session:
-    "TEC-06 — une session ne se crée qu'après la validation du parent sur l'aperçu, par POST /api/session (V3). Aucun chemin de la capture ne doit pouvoir en ouvrir une.",
-  gemLedger:
+/**
+ * Les modèles dont V2 ne doit toucher à rien, avec la phrase qui les y met.
+ * Ce sont des **noms de modèles Prisma** : tout le reste — délégué, relations,
+ * clés étrangères, table — en est dérivé.
+ */
+const MODELES_INTERDITS_A_V2: Readonly<Record<string, string>> = Object.freeze({
+  Session:
+    "TEC-06 — une session ne se crée qu'après la validation du parent sur l'aperçu, par POST /api/session (V3). Aucun chemin de la capture ne doit pouvoir en ouvrir une, par quelque forme d'écriture que ce soit.",
+  GemLedger:
     "TEC-11 et SEC-06 — le crédit de pierres est un effet de transition de session, écrit par src/lib/pierres/service.ts (V6), jamais par la capture.",
+});
+
+/**
+ * Champ supplémentaire interdit, qui n'est pas un modèle : le solde mis en
+ * cache sur `child`. SEC-06 veut qu'il soit recalculé depuis le ledger par la
+ * route serveur, et la capture n'a rien à y écrire.
+ */
+const CHAMPS_INTERDITS_A_V2: Readonly<Record<string, string>> = Object.freeze({
   gemBalance:
-    "SEC-06 — le solde est recalculé depuis le ledger par la route serveur, jamais écrit ailleurs. La capture n'a rien à y faire.",
+    "SEC-06 — le solde est un cache recalculé depuis gem_ledger par la route serveur. La capture ne le lit ni ne l'écrit.",
 });
 
 const PERIMETRE_V2: readonly string[] = ["src/lib/devoirs", "src/app/api/devoirs"];
 
+/** Première lettre en minuscule : le nom du délégué Prisma d'un modèle. */
+function delegue(modele: string): string {
+  return modele.charAt(0).toLowerCase() + modele.slice(1);
+}
+
+/**
+ * Tous les identifiants par lesquels le code peut atteindre un modèle interdit,
+ * **dérivés de `prisma/schema.prisma`** : le délégué, le nom de table `@@map`,
+ * et tout champ de relation — de n'importe quel modèle — dont le type est l'un
+ * des modèles interdits, plus la clé étrangère qui l'accompagne.
+ */
+function identifiantsInterdits(): {
+  readonly noms: ReadonlySet<string>;
+  readonly source: string;
+} {
+  const schema = lire("prisma/schema.prisma");
+  const noms = new Set<string>();
+  const interdits = new Set(Object.keys(MODELES_INTERDITS_A_V2));
+
+  for (const modele of interdits) {
+    noms.add(delegue(modele));
+    noms.add(modele);
+  }
+
+  // Parcours ligne à ligne, modèle par modèle : une expression régulière sur le
+  // bloc entier s'arrête à la première accolade fermante, et les commentaires
+  // de documentation du schéma en contiennent.
+  let courant: string | null = null;
+  for (const ligne of schema.split("\n")) {
+    const nu = ligne.trim();
+    const ouverture = /^model\s+(\w+)\s*\{/u.exec(nu);
+    if (ouverture?.[1] !== undefined) {
+      courant = ouverture[1];
+      continue;
+    }
+    if (courant === null) continue;
+    if (nu === "}") {
+      courant = null;
+      continue;
+    }
+    if (nu === "" || nu.startsWith("//") || nu.startsWith("///")) continue;
+
+    // Table physique d'un modèle interdit.
+    const map = /@@map\("([^"]+)"\)/u.exec(nu);
+    if (map?.[1] !== undefined && interdits.has(courant)) {
+      noms.add(map[1]);
+      continue;
+    }
+
+    const champ = /^(\w+)\s+(\w+)(\[\])?/u.exec(nu);
+    if (champ?.[1] === undefined || champ[2] === undefined) continue;
+    if (!interdits.has(champ[2])) continue;
+
+    // Champ de relation vers un modèle interdit : `sessions Session[]`,
+    // `session Session`, quel que soit le modèle porteur.
+    noms.add(champ[1]);
+    // …et la clé étrangère déclarée avec lui : `@relation(fields: [sessionId])`.
+    for (const cle of nu.matchAll(/fields:\s*\[([^\]]+)\]/gu)) {
+      for (const morceau of (cle[1] ?? "").split(",")) {
+        const propre = morceau.trim();
+        if (propre !== "") noms.add(propre);
+      }
+    }
+  }
+
+  return {
+    noms,
+    source: `${noms.size} identifiants dérivés de prisma/schema.prisma (${[...noms].sort().join(", ")})`,
+  };
+}
+
 function c5(): void {
-  const fichiers = PERIMETRE_V2.flatMap((d) => fichiersSous(d));
+  const fichiers = PERIMETRE_V2.flatMap((d) => fichiersSous(d)).filter(
+    (f) => !f.endsWith(".test.ts"),
+  );
   if (fichiers.length === 0) {
     enregistrer("C5", "C5 — TEC-06 : aucun chemin de V2 ne démarre de session", "aucun fichier lu", ["Le périmètre de V2 est vide : l'instrument ne mesure rien."], false);
     return;
   }
+
+  const { noms, source } = identifiantsInterdits();
+  if (noms.size === 0) {
+    enregistrer("C5", "C5 — TEC-06 : aucun chemin de V2 ne démarre de session", "AUCUN identifiant dérivé", ["La dérivation depuis prisma/schema.prisma n'a rien produit : l'instrument ne mesure rien."], false);
+    return;
+  }
+
   const defauts: string[] = [];
+  let identifiantsExamines = 0;
+
   for (const fichier of fichiers) {
-    if (fichier.endsWith(".test.ts")) continue;
     const nu = codeNu(lire(fichier));
-    for (const [table, motif] of Object.entries(TABLES_INTERDITES_A_V2)) {
-      if (new RegExp(`\\b(?:prisma|tx)\\s*\\.\\s*${table}\\b`, "u").test(nu)) {
-        defauts.push(`${fichier} touche « ${table} ». ${motif}`);
-      }
-    }
-    if (/\bsessionId\s*:/u.test(nu)) {
+
+    // Le SQL brut échappe à toute lecture d'identifiants : il est interdit ici.
+    const sqlBrut = [...nu.matchAll(/\$executeRaw\w*|\$queryRaw\w*/gu)].map((m) => m[0]);
+    if (sqlBrut.length > 0) {
       defauts.push(
-        `${fichier} écrit un champ sessionId. ${TABLES_INTERDITES_A_V2["session"] ?? ""}`,
+        `${fichier} emploie ${[...new Set(sqlBrut)].join(", ")} : aucune lecture d'identifiants ne peut voir ce qu'une chaîne SQL écrit, et la capture n'a aucun besoin de SQL brut (TEC-06).`,
       );
     }
-  }
-  for (const [table, motif] of Object.entries(TABLES_INTERDITES_A_V2)) {
-    if (motif.trim().length < 40) {
-      defauts.push(`${table} est interdite sans motif écrit (ARB-18 mesure 2).`);
+
+    // Tout identifiant du fichier, y compris les clés d'objet : c'est par une
+    // clé d'objet que passe l'écriture imbriquée du contrôleur.
+    for (const trouve of nu.matchAll(/[A-Za-z_$][\w$]*/gu)) {
+      const identifiant = trouve[0];
+      identifiantsExamines += 1;
+      if (!noms.has(identifiant)) continue;
+      const modele = Object.keys(MODELES_INTERDITS_A_V2).find(
+        (m) => identifiant === m || identifiant === delegue(m),
+      );
+      const motif =
+        (modele === undefined ? undefined : MODELES_INTERDITS_A_V2[modele]) ??
+        `Identifiant menant à une table interdite à V2, dérivé de prisma/schema.prisma. ${Object.values(MODELES_INTERDITS_A_V2)[0] ?? ""}`;
+      defauts.push(`${fichier} nomme « ${identifiant} ». ${motif}`);
+    }
+
+    for (const [champ, motif] of Object.entries(CHAMPS_INTERDITS_A_V2)) {
+      if (new RegExp(`\\b${champ}\\b`, "u").test(nu)) {
+        defauts.push(`${fichier} nomme « ${champ} ». ${motif}`);
+      }
     }
   }
+
+  for (const [quoi, motif] of [
+    ...Object.entries(MODELES_INTERDITS_A_V2),
+    ...Object.entries(CHAMPS_INTERDITS_A_V2),
+  ]) {
+    if (motif.trim().length < 40) {
+      defauts.push(`${quoi} est interdit sans motif écrit (ARB-18 mesure 2).`);
+    }
+  }
+
   enregistrer(
     "C5",
     "C5 — TEC-06 : aucun chemin de V2 ne démarre de session",
-    `${fichiers.filter((f) => !f.endsWith(".test.ts")).length} fichiers de ${PERIMETRE_V2.join(", ")} · ${Object.keys(TABLES_INTERDITES_A_V2).length} accès interdits, chacun justifié`,
+    `${fichiers.length} fichiers de ${PERIMETRE_V2.join(", ")} · ${identifiantsExamines} identifiants examinés · ${source} · SQL brut interdit`,
+    defauts,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// C6 — SEC-04, LE GOND DE (B) : `executerPrompt` est le SEUL passage vers le réseau
+// ---------------------------------------------------------------------------
+// AJOUTÉ AU TOUR 2, et c'est le contrôle qui tient tous les autres.
+//
+// La correction du [BLOQUANT] B1 fait porter (B) par un type nominal exigé en
+// entrée d'`executerPrompt()`. Cette garantie ne vaut que si `executerPrompt`
+// est **réellement** le seul chemin du produit vers le fournisseur. Sans ce
+// contrôle, ma propre affirmation serait ce que le verdict du tour 1 reproche :
+// une propriété vraie là où je l'ai écrite, et non partout où elle doit tenir.
+//
+// Trois propriétés, toutes vérifiées sur le code et non sur une intention :
+//
+//   (a) `transport.emettre()` — la seule fonction qui touche le réseau — n'est
+//       appelée QUE depuis `src/lib/ai/execution.ts` ;
+//   (b) `fetch` n'apparaît QUE dans `src/lib/ai/providers/`, donc jamais dans
+//       un module qui pourrait court-circuiter le scellement ;
+//   (c) `executerPrompt()` n'est appelée QUE depuis `src/lib/ai/index.ts`, la
+//       fabrique — donc aucun appelant ne peut l'atteindre par un autre
+//       chemin que les trois méthodes d'`AiProvider`.
+//
+// (a) ∧ (b) ∧ (c) ⟹ tout octet émis vers un fournisseur est passé par le
+// scellement, par l'invariant (A) et par un `TexteAnonymise`.
+
+const PASSAGES_UNIQUES: readonly {
+  readonly quoi: string;
+  readonly motif: RegExp;
+  readonly ou: RegExp;
+  readonly motifDeclare: string;
+}[] = [
+  {
+    quoi: "transport.emettre(",
+    motif: /\.emettre\s*\(/gu,
+    ou: /^src\/lib\/ai\/execution\.ts$/u,
+    motifDeclare:
+      "La seule fonction du produit qui atteigne le fournisseur. Appelée ailleurs, elle émettrait un corps qui n'aurait traversé ni le scellement ni l'invariant (A) de SEC-04.",
+  },
+  {
+    quoi: "fetch(",
+    motif: /\bfetch\s*\(/gu,
+    ou: /^src\/lib\/ai\/providers\//u,
+    motifDeclare:
+      "Un appel réseau écrit hors d'un fournisseur contournerait l'interface AiTransport, donc la coupure corps()/emettre() sur laquelle repose l'ordre « contrôler puis émettre ».",
+  },
+  {
+    quoi: "executerPrompt(",
+    motif: /\bexecuterPrompt\s*\(/gu,
+    ou: /^src\/lib\/ai\/(index|execution)\.ts$/u,
+    motifDeclare:
+      "Le passage obligé qui exige un TexteAnonymise. Appelé depuis un autre module, il resterait sûr — le type tient — mais la frontière cesserait d'être lisible en un seul endroit, et c'est cette lisibilité qui a manqué au tour 1.",
+  },
+];
+
+function c6(): void {
+  const fichiers = fichiersSous("src").filter((f) => !f.endsWith(".test.ts"));
+  if (fichiers.length === 0) {
+    enregistrer("C6", "C6 — SEC-04 : un seul passage du produit vers le réseau du fournisseur", "src/ : AUCUN fichier lu", ["src/ introuvable : l'instrument ne mesure rien."], false);
+    return;
+  }
+
+  const defauts: string[] = [];
+  const comptes: string[] = [];
+
+  for (const { quoi, motif, ou, motifDeclare } of PASSAGES_UNIQUES) {
+    let total = 0;
+    for (const fichier of fichiers) {
+      const nu = codeNu(lire(fichier));
+      const occurrences = [...nu.matchAll(motif)].length;
+      if (occurrences === 0) continue;
+      total += occurrences;
+      if (!ou.test(fichier)) {
+        defauts.push(`${fichier} appelle « ${quoi} » hors de ${ou.source}. ${motifDeclare}`);
+      }
+    }
+    if (total === 0) {
+      defauts.push(
+        `aucune occurrence de « ${quoi} » dans src/ : l'instrument ne mesure rien pour ce passage. Le produit ne parle plus à aucun fournisseur, ou le motif ne reconnaît plus l'appel.`,
+      );
+    }
+    comptes.push(`${quoi} ${total}`);
+  }
+
+  enregistrer(
+    "C6",
+    "C6 — SEC-04 : un seul passage du produit vers le réseau du fournisseur",
+    `${fichiers.length} fichiers de src/ (hors tests) · ${PASSAGES_UNIQUES.length} passages surveillés, chacun justifié · occurrences trouvées : ${comptes.join(" · ")}`,
     defauts,
   );
 }
@@ -464,6 +701,7 @@ c2();
 c3();
 c4();
 c5();
+c6();
 
 let echecs = 0;
 for (const r of resultats) {

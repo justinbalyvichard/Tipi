@@ -134,6 +134,25 @@ const MOTIFS_BINAIRES: readonly { readonly nom: string; readonly motif: RegExp }
  * écrite : élargir ce vocabulaire, c'est autoriser un mot de plus à sortir.
  */
 const VOCABULAIRE_PROTOCOLE: Readonly<Record<string, string>> = Object.freeze({
+  // --- CORRIGÉ AU TOUR 2 — [MAJEUR] M3 ---------------------------------------
+  // Le tour 1 exemptait EN SILENCE deux classes entières de jetons : ceux de
+  // moins de trois signes, et toute suite purement numérique jusqu'à dix
+  // chiffres. `controle-code` a fait passer par ces deux trous une date de
+  // naissance (`{"dn":"29/11/2019"}`), un identifiant de dix chiffres
+  // (`{"user_id":4815162342}`) et un prénom de deux lettres (`{"user":"Li"}`).
+  //
+  // Le propos de §3 — « tout octet appartient au prompt, au texte, ou à un
+  // vocabulaire déclaré et clos » — était donc littéralement faux, et les deux
+  // exemptions ne figuraient pas dans cette table, qui existe pour que rien ne
+  // se taise sans justification écrite (ARB-18 mesure 2).
+  //
+  // Les deux exemptions sont SUPPRIMÉES, pas déclarées : déclarer un trou le
+  // rend visible, le supprimer le referme. Tout jeton d'au moins UN signe est
+  // désormais examiné, chiffres compris. Les seuls nombres qui sortent sont
+  // ceux qui figurent ci-dessous ou que le transport déclare dans son
+  // `vocabulaire` — donc des valeurs de configuration du serveur, jamais des
+  // données venues d'une requête.
+  "0": "Valeur du champ `temperature` : zéro, pour que la même photo donne la même structuration (TEC-16 le suppose). Un chiffre seul ne peut porter aucune donnée du foyer, et il est le SEUL numéral non déclaré par un transport.",
   messages: "Nom du champ qui porte la conversation, protocole compatible OpenAI.",
   role: "Nom du champ qui distingue le prompt du texte. Deux valeurs seulement.",
   content: "Nom du champ qui porte le texte d'un message.",
@@ -152,13 +171,13 @@ const VOCABULAIRE_PROTOCOLE: Readonly<Record<string, string>> = Object.freeze({
   null: "Absence de valeur sérialisée. Ne peut porter aucune donnée du foyer.",
 });
 
-/** Un jeton purement numérique plus long que cela est refusé : c'est un blob. */
-const LONGUEUR_MAX_JETON_NUMERIQUE = 10;
-
-/** Suites de lettres ou de chiffres examinées dans le résidu. */
-const MOTIF_JETON = /[\p{L}\p{N}]{3,}/gu;
-/** Même découpage, sans borne basse, pour le vocabulaire déclaré. */
-const MOTIF_JETON_LARGE = /[\p{L}\p{N}]+/gu;
+/**
+ * Suites de lettres ou de chiffres examinées dans le résidu.
+ *
+ * **Plus aucune borne basse** ([MAJEUR] M3) : `{1,}`, et non `{3,}`. « id »,
+ * « dn » et « E7 » sont des jetons comme les autres.
+ */
+const MOTIF_JETON = /[\p{L}\p{N}]+/gu;
 
 // ---------------------------------------------------------------------------
 // Repliement : comparer sans tenir compte de la casse ni des accents, tout en
@@ -327,6 +346,91 @@ function assertAucunIdentifiant(
 }
 
 // ---------------------------------------------------------------------------
+// (B) QUANTIFIÉE — le texte anonymisé est un TYPE, pas une convention d'appel
+// ---------------------------------------------------------------------------
+
+/**
+ * Un texte **qui a traversé (B)**.
+ *
+ * ---------------------------------------------------------------------------
+ * POURQUOI CE TYPE EXISTE — [BLOQUANT] B1 DU TOUR 1
+ * ---------------------------------------------------------------------------
+ * Au tour 1, (B) était **annoncée** comme « une assertion exécutée avant chaque
+ * appel » et **exercée à un site d'appel sur trois** : `structurerDevoir` la
+ * recevait caviardée, `genererIndices` et `genererQuestions` non. `controle-code`
+ * a monté un vrai point d'entrée HTTP, déclenché la voie de secours de PRD-16, et
+ * **le prénom de l'enfant est parti en clair** dans le corps du prompt 2.
+ *
+ * La faute n'était pas un oubli : c'était la même faute que V1 avait payée
+ * quatre tours durant, d'un cran plus haut. V1 avait appris à **contrôler une
+ * propriété plutôt qu'un emplacement** ; la leçon suivante est qu'une propriété
+ * doit être **quantifiée sur tous ses sites**, et que rien d'autre qu'un type ne
+ * quantifie pour de bon. Un `caviarder()` recopié aux deux sites manquants
+ * aurait refermé le trou d'aujourd'hui et laissé le quatrième site de demain
+ * l'ouvrir à nouveau.
+ *
+ * ---------------------------------------------------------------------------
+ * CE QUE LE TYPE GARANTIT, ET COMMENT
+ * ---------------------------------------------------------------------------
+ * Le champ privé `sceau` rend le type **nominal** : aucune `string`, aucun objet
+ * littéral ne lui est assignable. Le constructeur est privé. La seule fabrique
+ * est `TexteAnonymise.depuis()`, qui **caviarde puis assère**. Et
+ * `executerPrompt()` — le passage obligé unique vers le réseau — n'accepte que
+ * ce type.
+ *
+ * Conséquence, et c'est la quantification demandée : **tout corps émis, par
+ * n'importe quel site d'appel présent ou futur, porte un texte qui a traversé
+ * (B).** Ajouter une quatrième méthode à `AiProvider` dans six mois ne rouvre
+ * rien — le compilateur refuse la `string` brute.
+ *
+ * ---------------------------------------------------------------------------
+ * ET LA BARRIÈRE 1 RESTE INTACTE
+ * ---------------------------------------------------------------------------
+ * Les identifiants du foyer n'entrent pas dans `src/lib/ai/**` par une méthode
+ * de fournisseur : ils entrent par cette **fabrique**, appelée par
+ * `src/lib/devoirs/analyse.ts`, qui seul les connaît. Aucune signature
+ * d'`AiProvider` ni d'`AiTransport` n'accepte un prénom — elles n'acceptent plus
+ * même une `string`.
+ */
+export class TexteAnonymise {
+  private readonly sceau: true = true;
+
+  /** Le texte caviardé. C'est lui, et lui seul, qui part. */
+  public readonly valeur: string;
+  /** D'où il vient, pour les messages d'erreur. Jamais une donnée du foyer. */
+  public readonly origine: string;
+
+  private constructor(valeur: string, origine: string) {
+    this.valeur = valeur;
+    this.origine = origine;
+  }
+
+  /**
+   * **La seule porte d'entrée.** Caviarde, puis assère, puis scelle.
+   *
+   * L'assertion après le caviardage n'est pas redondante : elle attrape le cas
+   * où le caviardage n'aurait pas tout retiré — un identifiant coupé par une
+   * normalisation Unicode, par exemple — et fait échouer l'appel plutôt que de
+   * l'émettre. Ceinture et bretelles, sur la seule exigence du référentiel qui
+   * porte sur des données de mineur.
+   */
+  public static depuis(
+    texte: string,
+    interdits: IdentifiantsInterdits,
+    origine: string,
+  ): TexteAnonymise {
+    const propre = caviarder(texte, interdits);
+    assertTexteAnonyme(propre, interdits, origine);
+    return new TexteAnonymise(propre, origine);
+  }
+
+  /** Vrai si le sceau tient. Sert au test de non-régression. */
+  public estAnonymise(): boolean {
+    return this.sceau;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Le payload scellé — construction unique, type nominal
 // ---------------------------------------------------------------------------
 
@@ -362,14 +466,17 @@ export class PayloadIa {
    * l'invariant de dérivabilité — `"".split("")` découpe chaque signe — et un
    * invariant qui se casse sur une valeur limite est un invariant qui ment.
    */
-  public static sceller(prompt: PromptVersionne, texte: string): PayloadIa {
+  public static sceller(prompt: PromptVersionne, texte: TexteAnonymise): PayloadIa {
     if (prompt.texte.trim() === "") {
       throw new AppError("TIPI_PAYLOAD_NON_ANONYME", "prompt vide : rien à sceller.");
     }
-    if (texte.trim() === "") {
-      throw new AppError("TIPI_PAYLOAD_NON_ANONYME", "texte vide : rien à sceller.");
+    if (texte.valeur.trim() === "") {
+      throw new AppError(
+        "TIPI_PAYLOAD_NON_ANONYME",
+        `texte vide : rien à sceller (${texte.origine}).`,
+      );
     }
-    return new PayloadIa(prompt, texte);
+    return new PayloadIa(prompt, texte.valeur);
   }
 
   /** Les deux messages, dans l'ordre. Aucun troisième rôle n'existe. */
@@ -425,6 +532,22 @@ export function assertCorpsDerivable(
   payload: PayloadIa,
   vocabulaireSupplementaire: readonly string[] = [],
 ): void {
+  // AJOUTÉ AU TOUR 2 — le contrôle du résidu ne voit PAS ce qui est dans le
+  // texte utilisateur, puisqu'il l'a retiré pour l'examiner. Les motifs
+  // structurels, eux, doivent porter sur **ce qui part réellement**, texte
+  // compris : une image encodée glissée dans un énoncé sortirait sinon sans que
+  // (A) la voie. C'est le seul contrôle qui peut s'appliquer au texte sans
+  // rejeter chaque mot d'un devoir.
+  const serialise = JSON.stringify(corps);
+  for (const { nom, motif } of MOTIFS_BINAIRES) {
+    if (motif.test(serialise)) {
+      throw new AppError(
+        "TIPI_PAYLOAD_NON_ANONYME",
+        `corps émis : motif binaire « ${nom} » détecté, texte utilisateur compris. TEC-05 interdit d'envoyer l'image au modèle de langage.`,
+      );
+    }
+  }
+
   const defauts = defautsDeDerivabilite(corps, payload, vocabulaireSupplementaire);
   if (defauts.length > 0) {
     const resume = defauts.map((d) => `« ${d.jeton} » (${d.motif})`).join(" ; ");
@@ -450,7 +573,7 @@ export function defautsDeDerivabilite(
 
   const autorises = new Set<string>(Object.keys(VOCABULAIRE_PROTOCOLE));
   for (const mot of vocabulaireSupplementaire) {
-    for (const jeton of replier(mot).matchAll(MOTIF_JETON_LARGE)) {
+    for (const jeton of replier(mot).matchAll(MOTIF_JETON)) {
       autorises.add(jeton[0]);
     }
   }
@@ -461,18 +584,19 @@ export function defautsDeDerivabilite(
   // déclarer chaque combinaison au lieu de chaque mot. Découper dessus rend le
   // vocabulaire plus petit ET le contrôle plus fin — `child_id` devient
   // « child », qui n'est déclaré nulle part.
+  //
+  // CORRIGÉ AU TOUR 2 — [MAJEUR] M3 : plus aucune exemption. Ni longueur
+  // minimale, ni laissez-passer numérique. Un jeton sort s'il est déclaré, et
+  // pour aucune autre raison.
   for (const trouve of residu.matchAll(MOTIF_JETON)) {
     const jeton = replier(trouve[0]);
     if (autorises.has(jeton)) continue;
-    if (/^\d+$/u.test(jeton)) {
-      if (jeton.length <= LONGUEUR_MAX_JETON_NUMERIQUE) continue;
-      defauts.push({
-        jeton,
-        motif: `suite de ${jeton.length} chiffres, au-delà de la borne ${LONGUEUR_MAX_JETON_NUMERIQUE}`,
-      });
-      continue;
-    }
-    defauts.push({ jeton, motif: "hors du vocabulaire de protocole déclaré" });
+    defauts.push({
+      jeton,
+      motif: /^\d+$/u.test(jeton)
+        ? "numéral hors du vocabulaire déclaré — un nombre peut être un identifiant ou une date"
+        : "hors du vocabulaire de protocole déclaré",
+    });
   }
   return defauts;
 }
